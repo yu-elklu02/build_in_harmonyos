@@ -1,0 +1,44 @@
+software: qt5-qtbase
+version: "5.15.2"
+status: published
+build_date: "2026-07-02"
+category: qt-core
+
+source:
+  url: "https://download.qt.io/archive/qt/5.15/5.15.2/submodules/qtbase-everywhere-src-5.15.2.tar.xz"
+  sha256: "cf0f56b7c2665e98bbc8da3250ecf08c565e8a9df8d857d27178b9caf6c1a936"
+  tar_format: tar.xz
+
+build:
+  system: configure+make
+  configure_options:
+    - "-opensource -confirm-license"
+    - "-no-gui -no-widgets -no-dbus -no-opengl -no-accessibility"
+    - "-no-feature-sql -no-feature-xml"
+    - "-nomake tests -nomake examples"
+    - "-no-iconv -no-glib -no-icu -no-openssl -no-libproxy"
+    - "-platform linux-clang"
+  dependencies:
+    - zlib/1.2.13 (built from source)
+  cc: clang
+  cxx: clang++
+
+products:
+  libraries:
+    - libQt5Core.so.5.15.2
+    - libQt5Network.so.5.15.2 (with abstract socket patch)
+    - libQt5Test.so.5.15.2
+    - libQt5Concurrent.so.5.15.2
+    - libz.so
+  headers:
+    - QtCore, QtNetwork, QtTest, QtConcurrent
+
+patches_applied:
+  - "0001-abstract-socket.patch: QLocalServer abstract socket"
+  - "0002-abstract-socket-client.patch: QLocalSocket abstract socket"
+
+knowledge_gained:
+  - "OHOS stripped ELF dlopen 限制 (E215): musl 拒绝加载 stripped 共享库"
+  - "OHOS Unix 域套接字 bind() 被拒绝: 需使用抽象套接字命名空间"
+  - "LD_LIBRARY_PATH 在 OHOS 上被忽略: 用 \$ORIGIN RPATH 替代"
+  - "qt5-qtbase configure -no-feature-testlib 导致 Qt5Test 缺失"

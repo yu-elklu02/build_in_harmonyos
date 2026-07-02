@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.15)
+project(test_qt5_qtbase CXX)
+find_package(Qt5Core REQUIRED)
+add_executable(test_qt5_qtbase test.cpp)
+target_link_libraries(test_qt5_qtbase Qt5::Core)
+enable_testing()
+add_test(NAME test_qt5_qtbase COMMAND test_qt5_qtbase)

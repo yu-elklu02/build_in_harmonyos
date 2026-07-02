@@ -1,0 +1,28 @@
+--- a/src/network/socket/qlocalserver_unix.cpp
++++ b/src/network/socket/qlocalserver_unix.cpp
+@@ -115,6 +115,7 @@ bool QLocalServerPrivate::listen(const QString &requestedServerName)
+ 
+     // Construct the unix address
+     struct ::sockaddr_un addr;
++    memset(&addr, 0, sizeof(addr));  // OHOS: zero-init for abstract socket
+     addr.sun_family = PF_UNIX;
+     if (sizeof(addr.sun_path) < (uint)encodedFullServerName.size() + 1) {
+         setError(QLatin1String("QLocalServer::listen"));
+@@ -125,11 +126,10 @@ bool QLocalServerPrivate::listen(const QString &requestedServerName)
+         return false;
+     }
+ 
+-    if (socketOptions & QLocalServer::WorldAccessOption) {
+-        ::memcpy(addr.sun_path, encodedTempPath.constData(),
+-                 encodedTempPath.size() + 1);
+-    } else {
+-        ::memcpy(addr.sun_path, encodedFullServerName.constData(),
+-                 encodedFullServerName.size() + 1);
+-    }
++    // OHOS: use abstract socket namespace (sun_path[0] = '\0')
++    // because file-based Unix domain sockets are not allowed on OHOS
++    addr.sun_path[0] = '\0';
++    ::memcpy(addr.sun_path + 1, encodedFullServerName.constData(),
++             qMin(encodedFullServerName.size(), (int)sizeof(addr.sun_path) - 2));
+ 
+     // bind

@@ -1,0 +1,19 @@
+--- a/src/network/socket/qlocalsocket_unix.cpp
++++ b/src/network/socket/qlocalsocket_unix.cpp
+@@ -278,9 +278,11 @@ void QLocalSocketPrivate::_q_connectToSocket()
+ 
+     const QByteArray encodedConnectingPathName = QFile::encodeName(connectingPathName);
+     struct sockaddr_un name;
++    memset(&name, 0, sizeof(name));  // OHOS: zero-init for abstract socket
+     name.sun_family = PF_UNIX;
+     if (sizeof(name.sun_path) < (uint)encodedConnectingPathName.size() + 1) {
+         QString function = QLatin1String("QLocalSocket::connectToServer");
+         setErrorAndEmit(QLocalSocket::ServerNotFoundError, function);
+         return;
+     }
+-    ::memcpy(name.sun_path, encodedConnectingPathName.constData(),
+-             encodedConnectingPathName.size() + 1);
++    // OHOS: use abstract socket namespace (sun_path[0] = '\0')
++    name.sun_path[0] = '\0';
++    ::memcpy(name.sun_path + 1, encodedConnectingPathName.constData(),
++             qMin(encodedConnectingPathName.size(), (int)sizeof(name.sun_path) - 2));
