@@ -3,11 +3,9 @@ sources:
   sha256: "cf0f56b7c2665e98bbc8da3250ecf08c565e8a9df8d857d27178b9caf6c1a936"
 
 patches:
-  "0001-abstract-socket.patch":
-    patch_file: "patches/0001-abstract-socket.patch"
+  - patch_file: "patches/0001-abstract-socket.patch"
     patch_type: "portability"
     patch_description: "OHOS: use abstract Unix domain socket namespace in QLocalServer"
-  "0002-abstract-socket-client.patch":
-    patch_file: "patches/0002-abstract-socket-client.patch"
+  - patch_file: "patches/0002-abstract-socket-client.patch"
     patch_type: "portability"
     patch_description: "OHOS: use abstract Unix domain socket namespace in QLocalSocket"

@@ -15,3 +15,4 @@ class Qt5QtbaseTestConan(ConanFile):
     def test(self):
         cmake = CMake(self)
         cmake.test()
+        self.run("echo 'qt5-qtbase test package passed'")
