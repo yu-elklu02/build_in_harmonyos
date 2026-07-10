@@ -36,6 +36,7 @@ products:
 patches_applied:
   - "0001-abstract-socket.patch: QLocalServer abstract socket"
   - "0002-abstract-socket-client.patch: QLocalSocket abstract socket"
+  - "0003-pthread-cancel-stub.patch: disable pthread_cancel on OHOS (__OHOS__ guard)"
 
 knowledge_gained:
   - "OHOS stripped ELF dlopen 限制 (E215): musl 拒绝加载 stripped 共享库"

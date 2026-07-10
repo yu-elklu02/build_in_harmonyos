@@ -1,17 +1,32 @@
 --- a/src/corelib/thread/qthread_unix.cpp
 +++ b/src/corelib/thread/qthread_unix.cpp
-@@ -99,6 +99,14 @@
- #if defined(Q_OS_QNX)
- #include <sys/neutrino.h>
+@@ -282,7 +282,7 @@
+ void *QThreadPrivate::start(void *arg)
+ {
+-#if !defined(Q_OS_ANDROID)
++#if !defined(Q_OS_ANDROID) && !defined(__OHOS__)
+     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, nullptr);
  #endif
+     pthread_cleanup_push(QThreadPrivate::finish, arg);
+@@ -324,7 +324,7 @@
+         emit thr->started(QThread::QPrivateSignal());
+-#if !defined(Q_OS_ANDROID)
++#if !defined(Q_OS_ANDROID) && !defined(__OHOS__)
+         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+         pthread_testcancel();
+ #endif
+@@ -725,7 +725,7 @@
+ void QThread::terminate()
+ {
+-#if !defined(Q_OS_ANDROID)
++#if !defined(Q_OS_ANDROID) && !defined(__OHOS__)
+     Q_D(QThread);
+     QMutexLocker locker(&d->mutex);
  
-+#if !defined(__GLIBC__)
-+// OHOS/musl: pthread cancellation functions not available
-+#define pthread_setcancelstate(state, oldstate) ((void)(state))
-+#define pthread_testcancel() ((void)0)
-+#define pthread_cancel(thread) ((void)(thread), 0)
-+#endif
-+
- QT_BEGIN_NAMESPACE
- 
- #if QT_CONFIG(thread)
+@@ -765,7 +765,7 @@
+     Q_UNUSED(thr)
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_ANDROID) || defined(__OHOS__)
+     Q_UNUSED(enabled);
+ #else
+     pthread_setcancelstate(enabled ? PTHREAD_CANCEL_ENABLE : PTHREAD_CANCEL_DISABLE, nullptr);

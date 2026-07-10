@@ -24,7 +24,7 @@ class Qt5QtbaseConan(ConanFile):
 
     def requirements(self):
         # R27/R18: zlib as Conan dependency, not inline build
-        self.requires("zlib/1.3.1")
+        self.requires("zlib/1.3.1@ohpcd/stable")
 
     def validate(self):
         # R32: settings.os check must use in ("Linux", "OHOS")
