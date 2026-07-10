@@ -56,10 +56,9 @@ class Qt5QtbaseConan(ConanFile):
         zlib_lib = os.path.join(zlib.package_folder, "lib")
 
         # Configure Qt5 (with -system-zlib to use Conan-managed zlib)
-        env = os.environ.copy()
-        env["CFLAGS"] = f"-I{zlib_inc} " + env.get("CFLAGS", "")
-        env["CXXFLAGS"] = f"-I{zlib_inc} " + env.get("CXXFLAGS", "")
-        env["LDFLAGS"] = f"-L{zlib_lib} " + env.get("LDFLAGS", "")
+        os.environ["CFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CFLAGS", "")
+        os.environ["CXXFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CXXFLAGS", "")
+        os.environ["LDFLAGS"] = f"-L{zlib_lib} " + os.environ.get("LDFLAGS", "")
 
         self.run(
             f'cd "{src_dir}" && ./configure '
@@ -73,11 +72,10 @@ class Qt5QtbaseConan(ConanFile):
             f'-system-zlib '
             f'-platform linux-clang '
             f'-recheck-all',
-            env=env,
         )
 
         # Build with QMAKE_STRIP="" to prevent stripping (OHOS E215)
-        self.run(f'cd "{src_dir}" && make -j1 QMAKE_STRIP=""', env=env)
+        self.run(f'cd "{src_dir}" && make -j1 QMAKE_STRIP=""')
 
     def package(self):
         src_dir = self.source_folder
