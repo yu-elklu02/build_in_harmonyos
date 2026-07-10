@@ -19,7 +19,7 @@ build:
     - "-no-iconv -no-glib -no-icu -no-openssl -no-libproxy"
     - "-platform linux-clang"
   dependencies:
-    - zlib/1.2.13 (built from source)
+    - zlib/1.3.1
   cc: clang
   cxx: clang++
 

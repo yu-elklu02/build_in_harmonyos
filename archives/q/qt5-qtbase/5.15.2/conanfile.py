@@ -1,5 +1,6 @@
 import os
 from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import get, copy, apply_conandata_patches, export_conandata_patches
 from conan.tools.layout import basic_layout
 
@@ -21,7 +22,12 @@ class Qt5QtbaseConan(ConanFile):
     def layout(self):
         basic_layout(self)
 
+    def requirements(self):
+        # R27/R18: zlib as Conan dependency, not inline build
+        self.requires("zlib/1.3.1")
+
     def validate(self):
+        # R32: settings.os check must use in ("Linux", "OHOS")
         if self.settings.os not in ("Linux", "OHOS"):
             raise ConanInvalidConfiguration(
                 f"qt5-qtbase only supports Linux and OHOS, got {self.settings.os}"
@@ -30,35 +36,48 @@ class Qt5QtbaseConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
+    def generate(self):
+        # Expose zlib paths to Qt5 configure via env vars
+        zlib = self.dependencies["zlib"]
+        zlib_inc = os.path.join(zlib.package_folder, "include")
+        zlib_lib = os.path.join(zlib.package_folder, "lib")
+        self.runenv_info.append("CFLAGS", f"-I{zlib_inc}")
+        self.runenv_info.append("CXXFLAGS", f"-I{zlib_inc}")
+        self.runenv_info.append("LDFLAGS", f"-L{zlib_lib}")
+
     def build(self):
         apply_conandata_patches(self)
         src_dir = self.source_folder
+        pkg = self.package_folder
 
-        # Configure Qt5 (without -no-feature-testlib to enable Qt5Test)
-        self.run(f'cd "{src_dir}" && ./configure '
-                 f'-prefix $PREFIX '
-                 f'-opensource -confirm-license '
-                 f'-no-gui -no-widgets -no-dbus -no-opengl -no-accessibility '
-                 f'-no-feature-sql -no-feature-xml '
-                 f'-nomake tests -nomake examples '
-                 f'-no-iconv -no-glib -no-icu -no-opengl -no-vulkan '
-                 f'-no-openssl -no-libproxy -no-system-proxies '
-                 f'-platform linux-clang '
-                 f'-recheck-all')
+        # Get zlib paths from Conan dependency
+        zlib = self.dependencies["zlib"]
+        zlib_inc = os.path.join(zlib.package_folder, "include")
+        zlib_lib = os.path.join(zlib.package_folder, "lib")
+
+        # Configure Qt5 (with -system-zlib to use Conan-managed zlib)
+        env = os.environ.copy()
+        env["CFLAGS"] = f"-I{zlib_inc} " + env.get("CFLAGS", "")
+        env["CXXFLAGS"] = f"-I{zlib_inc} " + env.get("CXXFLAGS", "")
+        env["LDFLAGS"] = f"-L{zlib_lib} " + env.get("LDFLAGS", "")
+
+        self.run(
+            f'cd "{src_dir}" && ./configure '
+            f'-prefix "{pkg}" '
+            f'-opensource -confirm-license '
+            f'-no-gui -no-widgets -no-dbus -no-opengl -no-accessibility '
+            f'-no-feature-sql -no-feature-xml '
+            f'-nomake tests -nomake examples '
+            f'-no-iconv -no-glib -no-icu -no-opengl -no-vulkan '
+            f'-no-openssl -no-libproxy -no-system-proxies '
+            f'-system-zlib '
+            f'-platform linux-clang '
+            f'-recheck-all',
+            env=env,
+        )
 
         # Build with QMAKE_STRIP="" to prevent stripping (OHOS E215)
-        self.run(f'cd "{src_dir}" && make -j1 QMAKE_STRIP=""')
-
-        # Build libz.so (libQt5Core dependency, not available on OHOS)
-        zlib_url = "https://zlib.net/zlib-1.2.13.tar.gz"
-        get(self, zlib_url, destination=os.path.join(src_dir, "zlib-src"), strip_root=True)
-        self.run(f'cd "{src_dir}/zlib-src" && '
-                 f'clang -shared -fPIC -Wl,-soname,libz.so '
-                 f'-o "{src_dir}/lib/libz.so" '
-                 f'adler32.c compress.c crc32.c deflate.c '
-                 f'gzclose.c gzlib.c gzread.c gzwrite.c '
-                 f'infback.c inffast.c inflate.c inftrees.c '
-                 f'trees.c uncompr.c zutil.c')
+        self.run(f'cd "{src_dir}" && make -j1 QMAKE_STRIP=""', env=env)
 
     def package(self):
         src_dir = self.source_folder
@@ -99,7 +118,8 @@ class Qt5QtbaseConan(ConanFile):
                  dst=os.path.join(self.package_folder, "lib", "cmake"), keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ["Qt5Core", "Qt5Network", "Qt5Test", "z"]
+        # zlib is a separate Conan dependency, not bundled
+        self.cpp_info.libs = ["Qt5Core", "Qt5Network", "Qt5Test"]
         self.cpp_info.includedirs = ["include"]
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.bindirs = ["bin"]
