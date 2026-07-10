@@ -8,7 +8,7 @@
      addr.sun_family = PF_UNIX;
      if (sizeof(addr.sun_path) < (uint)encodedFullServerName.size() + 1) {
          setError(QLatin1String("QLocalServer::listen"));
-@@ -125,11 +126,10 @@ bool QLocalServerPrivate::listen(const QString &requestedServerName)
+@@ -125,12 +126,10 @@ bool QLocalServerPrivate::listen(const QString &requestedServerName)
          return false;
      }
  

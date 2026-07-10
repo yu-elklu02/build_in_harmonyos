@@ -1,6 +1,6 @@
 --- a/src/network/socket/qlocalsocket_unix.cpp
 +++ b/src/network/socket/qlocalsocket_unix.cpp
-@@ -278,9 +278,11 @@ void QLocalSocketPrivate::_q_connectToSocket()
+@@ -278,11 +278,14 @@ void QLocalSocketPrivate::_q_connectToSocket()
  
      const QByteArray encodedConnectingPathName = QFile::encodeName(connectingPathName);
      struct sockaddr_un name;
