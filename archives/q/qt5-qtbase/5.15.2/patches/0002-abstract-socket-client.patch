@@ -1,6 +1,6 @@
---- a/src/network/socket/qlocalsocket_unix.cpp
+--- a/src/network/socket/qlocalsocket_unix.cpp	2026-07-10 11:10:12.844133907 +0800
 +++ b/src/network/socket/qlocalsocket_unix.cpp
-@@ -278,11 +278,14 @@ void QLocalSocketPrivate::_q_connectToSocket()
+@@ -278,14 +278,17 @@
  
      const QByteArray encodedConnectingPathName = QFile::encodeName(connectingPathName);
      struct sockaddr_un name;
@@ -17,3 +17,6 @@
 +    name.sun_path[0] = '\0';
 +    ::memcpy(name.sun_path + 1, encodedConnectingPathName.constData(),
 +             qMin(encodedConnectingPathName.size(), (int)sizeof(name.sun_path) - 2));
+     if (-1 == qt_safe_connect(connectingSocket, (struct sockaddr *)&name, sizeof(name))) {
+         QString function = QLatin1String("QLocalSocket::connectToServer");
+         switch (errno)
