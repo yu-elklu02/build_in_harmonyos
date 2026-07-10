@@ -1,0 +1,17 @@
+--- a/src/corelib/thread/qthread_unix.cpp
++++ b/src/corelib/thread/qthread_unix.cpp
+@@ -99,6 +99,14 @@
+ #if defined(Q_OS_QNX)
+ #include <sys/neutrino.h>
+ #endif
+ 
++#if !defined(__GLIBC__)
++// OHOS/musl: pthread cancellation functions not available
++#define pthread_setcancelstate(state, oldstate) ((void)(state))
++#define pthread_testcancel() ((void)0)
++#define pthread_cancel(thread) ((void)(thread), 0)
++#endif
++
+ QT_BEGIN_NAMESPACE
+ 
+ #if QT_CONFIG(thread)
