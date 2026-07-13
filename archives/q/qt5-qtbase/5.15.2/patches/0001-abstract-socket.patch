@@ -28,7 +28,7 @@
 +    // because file-based Unix domain sockets are not allowed on OHOS
 +    addr.sun_path[0] = '\0';
 +    ::memcpy(addr.sun_path + 1, encodedFullServerName.constData(),
-+             qMin(encodedFullServerName.size(), (int)sizeof(addr.sun_path) - 2));
++             qMin(encodedFullServerName.size(), (int)sizeof(addr.sun_path) - 1));
  
      // bind
      if(-1 == QT_SOCKET_BIND(listenSocket, (sockaddr *)&addr, sizeof(sockaddr_un))) {

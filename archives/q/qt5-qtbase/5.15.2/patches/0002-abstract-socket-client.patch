@@ -16,7 +16,7 @@
 +    // OHOS: use abstract socket namespace (sun_path[0] = '\0')
 +    name.sun_path[0] = '\0';
 +    ::memcpy(name.sun_path + 1, encodedConnectingPathName.constData(),
-+             qMin(encodedConnectingPathName.size(), (int)sizeof(name.sun_path) - 2));
++             qMin(encodedConnectingPathName.size(), (int)sizeof(name.sun_path) - 1));
      if (-1 == qt_safe_connect(connectingSocket, (struct sockaddr *)&name, sizeof(name))) {
          QString function = QLatin1String("QLocalSocket::connectToServer");
          switch (errno)

@@ -2,7 +2,6 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QtTest/QtTest>
-#include <cstdio>
 
 class Qt5QtbaseTest : public QObject {
     Q_OBJECT

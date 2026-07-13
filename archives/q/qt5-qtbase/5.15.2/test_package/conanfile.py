@@ -24,6 +24,6 @@ class Qt5QtbaseTestConan(ConanFile):
         # package's lib dir (OHOS conanrun env doesn't set it)
         dep = self.dependencies["qt5-qtbase"]
         libdir = os.path.join(dep.package_folder, dep.cpp_info.libdirs[0])
-        test_bin = os.path.join(self.cpp.build.bindirs[0], "test_qt5_qtbase")
+        test_bin = os.path.join(self.cpp.build.bindirs[0] if self.cpp.build.bindirs else ".", "test_qt5_qtbase")
         os.environ["LD_LIBRARY_PATH"] = libdir + ":" + os.environ.get("LD_LIBRARY_PATH", "")
         self.run(test_bin)

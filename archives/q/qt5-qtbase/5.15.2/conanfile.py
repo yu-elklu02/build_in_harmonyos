@@ -37,13 +37,14 @@ class Qt5QtbaseConan(ConanFile):
         get(self, **self.conan_data["sources"], strip_root=True)
 
     def generate(self):
-        # Expose zlib paths to Qt5 configure via env vars
+        # Expose zlib paths to Qt5 configure via build env
+        # (build() also sets os.environ as fallback)
         zlib = self.dependencies["zlib"]
         zlib_inc = os.path.join(zlib.package_folder, "include")
         zlib_lib = os.path.join(zlib.package_folder, "lib")
-        self.runenv_info.append("CFLAGS", f"-I{zlib_inc}")
-        self.runenv_info.append("CXXFLAGS", f"-I{zlib_inc}")
-        self.runenv_info.append("LDFLAGS", f"-L{zlib_lib}")
+        self.buildenv_info.append("CFLAGS", f"-I{zlib_inc}")
+        self.buildenv_info.append("CXXFLAGS", f"-I{zlib_inc}")
+        self.buildenv_info.append("LDFLAGS", f"-L{zlib_lib}")
 
     def build(self):
         apply_conandata_patches(self)
@@ -54,6 +55,21 @@ class Qt5QtbaseConan(ConanFile):
         zlib = self.dependencies["zlib"]
         zlib_inc = os.path.join(zlib.package_folder, "include")
         zlib_lib = os.path.join(zlib.package_folder, "lib")
+
+        # Detect pthread_cancel availability (musl doesn't provide it)
+        # R8: Use feature detection instead of __OHOS__ platform macro
+        import subprocess
+        try:
+            subprocess.run(
+                f'echo \'#include <pthread.h>\nint main(){{pthread_cancel(0);return 0;}}\' | {os.environ.get("CXX","clang++")} -x c++ - -o /dev/null -lpthread',
+                shell=True, check=True, capture_output=True, timeout=10
+            )
+            has_pthread_cancel = True
+        except Exception:
+            has_pthread_cancel = False
+
+        if has_pthread_cancel:
+            os.environ["CXXFLAGS"] = os.environ.get("CXXFLAGS", "") + " -DHAVE_PTHREAD_CANCEL"
 
         # Configure Qt5 (with -system-zlib to use Conan-managed zlib)
         os.environ["CFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CFLAGS", "")
@@ -117,7 +133,7 @@ class Qt5QtbaseConan(ConanFile):
 
     def package_info(self):
         # zlib is a separate Conan dependency, not bundled
-        self.cpp_info.libs = ["Qt5Core", "Qt5Network", "Qt5Test"]
+        self.cpp_info.libs = ["Qt5Core", "Qt5Network", "Qt5Test", "Qt5Concurrent"]
         self.cpp_info.includedirs = ["include"]
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.bindirs = ["bin"]

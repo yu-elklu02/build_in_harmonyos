@@ -29,7 +29,7 @@ upstream_tests:
 test_package_tests:
   - file: test.cpp
     description: "QLocalServer/QLocalSocket 抽象套接字 IPC 测试 (E216 补丁验证)"
-    command: "ctest --output-on-failure"
+    command: "./test_qt5_qtbase"
 
 # 测试断言总数 (近似值)
-assertion_count: 3
+assertion_count: 2
