@@ -12,3 +12,6 @@ patches:
   - patch_file: "patches/0003-pthread-cancel-stub.patch"
     patch_type: "portability"
     patch_description: "OHOS/musl: provide no-op stubs for pthread_cancel family functions"
+  - patch_file: "patches/0004-socklen-t-ohos.patch"
+    patch_type: "portability"
+    patch_description: "OHOS: define QT_SOCKLEN_T as socklen_t (fix accept4 type mismatch)"
