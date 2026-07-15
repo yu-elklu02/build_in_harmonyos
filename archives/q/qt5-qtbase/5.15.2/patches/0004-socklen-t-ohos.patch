@@ -1,6 +1,6 @@
 --- a/mkspecs/linux-clang/qplatformdefs.h
 +++ b/mkspecs/linux-clang/qplatformdefs.h
-@@ -79,7 +79,7 @@
+@@ -79,6 +79,6 @@
  #undef QT_SOCKLEN_T
  
 -#if defined(__GLIBC__) && (__GLIBC__ >= 2)
