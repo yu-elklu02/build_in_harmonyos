@@ -132,8 +132,36 @@ class Qt5QtbaseConan(ConanFile):
                  dst=os.path.join(self.package_folder, "lib", "cmake"), keep_path=False)
 
     def package_info(self):
-        # zlib is a separate Conan dependency, not bundled
-        self.cpp_info.libs = ["Qt5Core", "Qt5Network", "Qt5Test", "Qt5Concurrent"]
-        self.cpp_info.includedirs = ["include"]
+        # Define components so CMakeDeps generates per-module config files
+        # (Qt5CoreConfig.cmake, Qt5TestConfig.cmake, etc.) matching the
+        # standard Qt5 find_package() and Qt5:: target names.
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.bindirs = ["bin"]
+
+        qt5core = self.cpp_info.components["Qt5Core"]
+        qt5core.libs = ["Qt5Core"]
+        qt5core.includedirs = ["include"]
+        qt5core.requires = ["zlib"]
+        qt5core.set_property("cmake_file_name", "Qt5Core")
+        qt5core.set_property("cmake_target_name", "Qt5::Core")
+
+        qt5network = self.cpp_info.components["Qt5Network"]
+        qt5network.libs = ["Qt5Network"]
+        qt5network.includedirs = ["include"]
+        qt5network.requires = ["Qt5Core"]
+        qt5network.set_property("cmake_file_name", "Qt5Network")
+        qt5network.set_property("cmake_target_name", "Qt5::Network")
+
+        qt5test = self.cpp_info.components["Qt5Test"]
+        qt5test.libs = ["Qt5Test"]
+        qt5test.includedirs = ["include"]
+        qt5test.requires = ["Qt5Core"]
+        qt5test.set_property("cmake_file_name", "Qt5Test")
+        qt5test.set_property("cmake_target_name", "Qt5::Test")
+
+        qt5concurrent = self.cpp_info.components["Qt5Concurrent"]
+        qt5concurrent.libs = ["Qt5Concurrent"]
+        qt5concurrent.includedirs = ["include"]
+        qt5concurrent.requires = ["Qt5Core"]
+        qt5concurrent.set_property("cmake_file_name", "Qt5Concurrent")
+        qt5concurrent.set_property("cmake_target_name", "Qt5::Concurrent")
