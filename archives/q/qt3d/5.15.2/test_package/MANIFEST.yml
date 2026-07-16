@@ -1,0 +1,6 @@
+upstream_tests:
+  - type: build_system
+    description: "Qt3D 源码内嵌构建测试，无独立测试套件"
+  - type: test
+    files: []
+    description: "上游未提供独立测试用例，本次适配新增 test_package 作为烟雾测试"
