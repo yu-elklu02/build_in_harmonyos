@@ -1,0 +1,6 @@
+# 上游测试来源声明
+build_system: "cmake"
+test:
+  - smoke_test:
+      description: "验证 QuaZIP 库基本加载"
+      command: "./test_package"
