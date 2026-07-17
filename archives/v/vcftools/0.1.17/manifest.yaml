@@ -1,0 +1,34 @@
+version: "0.1.17"
+software: vcftools
+status: failed
+build_date: "2026-07-17"
+build_system: autotools
+
+source:
+  url: "https://github.com/vcftools/vcftools/releases/download/v0.1.17/vcftools-0.1.17.tar.gz"
+  sha256: "b9e0e1c3e86533178edb35e02c6c4de9764324ea0973bebfbb747018c2d2a42c"
+
+build:
+  system: autotools
+  configure_options:
+    - "--prefix=/"
+    - "--disable-silent-rules"
+    - "--with-pmdir=lib/perl5/site_perl"
+  dependencies:
+    - "zlib/1.3.1"
+    - "htslib/1.24-r0"
+  cc: clang
+  cxx: clang++
+
+patches_applied: []
+
+test_results:
+  type: official
+  total: 78
+  passed: 0
+  failed: 0
+  note: "75 upstream assertions and 3 consumer scenarios are awaiting OHOS aarch64 CI execution."
+
+validation:
+  conan_create: not_run
+  reason: "Windows host has no OHOS aarch64 worker environment; remote CI is required."

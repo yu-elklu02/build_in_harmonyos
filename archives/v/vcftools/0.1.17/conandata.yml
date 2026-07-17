@@ -1,0 +1,10 @@
+sources:
+  url: "https://github.com/vcftools/vcftools/releases/download/v0.1.17/vcftools-0.1.17.tar.gz"
+  sha256: "b9e0e1c3e86533178edb35e02c6c4de9764324ea0973bebfbb747018c2d2a42c"
+
+upstream_tests:
+  perl_test:
+    url: "https://raw.githubusercontent.com/vcftools/vcftools/v0.1.17/src/perl/test.t"
+    sha256: "509a72d46ddb62c1882952ceb82f6bcd3fc2e109096e3458a4673cbdbc2d29d7"
+
+patches: {}
