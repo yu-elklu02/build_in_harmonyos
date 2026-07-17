@@ -4,7 +4,7 @@
 
 - Target: OpenHarmony aarch64
 - Build system: qmake + make
-- Qt prefix: `/storage/Users/currentUser/usr/local/Qt5`
+- Qt prefix: queried from the qmake available in the Worker PATH
 - Qt dependency: Worker-provided system installation (not a Conan requirement)
 
 ## Adaptation
