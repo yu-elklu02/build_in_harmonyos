@@ -12,8 +12,7 @@ build:
   system: qmake
   configure_options:
     - "QMAKE_STRIP="
-  dependencies:
-    - "qt/5.15.2"
+  dependencies: []
   cc: clang
   cxx: clang++
 
@@ -30,5 +29,6 @@ patches_applied: []
 
 knowledge_gained:
   - "Qt5 addon modules use qmake from the preinstalled Qt5 prefix on the OHOS worker"
+  - "The CI artifact registry does not publish qt/5.15.2, so the system Qt installation must not be declared as a Conan requirement"
   - "QMAKE_STRIP must remain empty because stripped shared libraries cannot be loaded on OHOS"
   - "qmake automatically enables Quick3D only when Qt Quick development modules are available"

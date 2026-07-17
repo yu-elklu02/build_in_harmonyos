@@ -17,9 +17,6 @@ class Qt3dConan(ConanFile):
 
     settings = "os", "compiler", "build_type", "arch"
 
-    def requirements(self):
-        self.requires("qt/5.15.2")
-
     def layout(self):
         basic_layout(self)
 
