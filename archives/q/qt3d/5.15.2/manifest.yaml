@@ -1,0 +1,34 @@
+software: qt3d
+version: "5.15.2"
+status: built
+category: library
+
+source:
+  url: "https://download.qt.io/archive/qt/5.15/5.15.2/submodules/qt3d-everywhere-src-5.15.2.tar.xz"
+  sha256: "03ed6a48c813c75296c19f5d721184ab168280b69d2656cf16f877d3d4c55c1d"
+  tar_format: tar.xz
+
+build:
+  system: qmake
+  configure_options:
+    - "QMAKE_STRIP="
+  dependencies:
+    - "qt/5.15.2"
+  cc: clang
+  cxx: clang++
+
+products:
+  libraries:
+    - libQt53DCore.so
+    - libQt53DRender.so
+    - libQt53DInput.so
+    - libQt53DLogic.so
+    - libQt53DAnimation.so
+    - libQt53DExtras.so
+
+patches_applied: []
+
+knowledge_gained:
+  - "Qt5 addon modules use qmake from the preinstalled Qt5 prefix on the OHOS worker"
+  - "QMAKE_STRIP must remain empty because stripped shared libraries cannot be loaded on OHOS"
+  - "qmake automatically enables Quick3D only when Qt Quick development modules are available"

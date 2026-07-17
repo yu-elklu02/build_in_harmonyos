@@ -1,6 +1,18 @@
+package: qt3d/5.15.2
+homepage: "https://www.qt.io"
+
+upstream_check_command: "make check"
+upstream_test_in_build: false
+upstream_test_command: "make check"
+
 upstream_tests:
-  - type: build_system
-    description: "Qt3D 源码内嵌构建测试，无独立测试套件"
-  - type: test
-    files: []
-    description: "上游未提供独立测试用例，本次适配新增 test_package 作为烟雾测试"
+  - name: "Qt3D auto tests"
+    source: "qt3d-everywhere-src-5.15.2/tests/auto/"
+    description: "251 tst_*.cpp test programs across Core, Render, Input, Animation and Extras"
+
+test_package_tests:
+  - file: test.cpp
+    description: "Create a Qt3D entity hierarchy and attach a QTransform component"
+    command: "./test_qt3d"
+
+assertion_count: 2
