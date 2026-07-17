@@ -6,7 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(qt3d CONFIG REQUIRED)
 
-set(QT5_ROOT "/storage/Users/currentUser/usr/local/Qt5")
+if(DEFINED ENV{QTDIR} AND EXISTS "$ENV{QTDIR}/include/QtCore")
+    set(QT5_ROOT "$ENV{QTDIR}")
+elseif(EXISTS "/storage/Users/currentUser/usr/local/include/QtCore")
+    set(QT5_ROOT "/storage/Users/currentUser/usr/local")
+else()
+    set(QT5_ROOT "/storage/Users/currentUser/usr/local/Qt5")
+endif()
 
 add_executable(test_qt3d test.cpp)
 target_include_directories(test_qt3d PRIVATE

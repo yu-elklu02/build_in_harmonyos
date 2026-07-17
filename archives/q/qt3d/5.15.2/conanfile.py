@@ -1,5 +1,7 @@
 import glob
 import os
+import shutil
+import subprocess
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -29,24 +31,49 @@ class Qt3dConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"][str(self.version)], strip_root=True)
 
-    def _qt_root(self):
-        candidates = [
-            os.environ.get("QTDIR"),
-            "/storage/Users/currentUser/usr/local/Qt5",
-            os.path.expanduser("~/usr/local/Qt5"),
+    def _qt_installation(self):
+        qmake_candidates = [
+            os.environ.get("QMAKE"),
+            shutil.which("qmake-qt5"),
+            shutil.which("qmake5"),
+            shutil.which("qmake"),
+            "/storage/Users/currentUser/usr/local/bin/qmake-qt5",
+            "/storage/Users/currentUser/usr/local/bin/qmake5",
+            "/storage/Users/currentUser/usr/local/bin/qmake",
+            "/storage/Users/currentUser/usr/local/Qt5/bin/qmake",
+            os.path.expanduser("~/usr/local/bin/qmake"),
+            os.path.expanduser("~/usr/local/Qt5/bin/qmake"),
         ]
-        for candidate in candidates:
-            if candidate and os.path.isfile(os.path.join(candidate, "bin", "qmake")):
-                return candidate
+        for qmake in qmake_candidates:
+            if not qmake or not os.path.isfile(qmake):
+                continue
+            try:
+                version = subprocess.run(
+                    [qmake, "-query", "QT_VERSION"],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                ).stdout.strip()
+                if not version.startswith("5."):
+                    continue
+                result = subprocess.run(
+                    [qmake, "-query", "QT_INSTALL_PREFIX"],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+            except (OSError, subprocess.CalledProcessError):
+                continue
+            qt_root = result.stdout.strip() or os.path.dirname(os.path.dirname(qmake))
+            return qmake, qt_root
         raise ConanInvalidConfiguration(
-            "Qt 5.15.2 qmake was not found; set QTDIR to the Qt installation"
+            "Qt 5.15.2 qmake was not found in PATH; set QMAKE to its executable"
         )
 
     def build(self):
-        qt_root = self._qt_root()
+        qmake, qt_root = self._qt_installation()
         qt_bin = os.path.join(qt_root, "bin")
         qt_lib = os.path.join(qt_root, "lib")
-        qmake = os.path.join(qt_bin, "qmake")
 
         os.environ["QTDIR"] = qt_root
         os.environ["PATH"] = qt_bin + os.pathsep + os.environ.get("PATH", "")
@@ -60,7 +87,7 @@ class Qt3dConan(ConanFile):
         self.run('make -j2 QMAKE_STRIP=""')
 
     def package(self):
-        qt_root = self._qt_root()
+        _, qt_root = self._qt_installation()
         stage = os.path.join(self.build_folder, "package-stage")
         self.run(f'make install INSTALL_ROOT="{stage}" QMAKE_STRIP=""')
 
