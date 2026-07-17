@@ -5,7 +5,7 @@
 - Target: OpenHarmony aarch64
 - Build system: qmake + make
 - Qt prefix: `/storage/Users/currentUser/usr/local/Qt5`
-- Conan dependency: `qt/5.15.2`
+- Qt dependency: Worker-provided system installation (not a Conan requirement)
 
 ## Adaptation
 
@@ -15,6 +15,8 @@ Quick3D submodules only when the Qt installation exposes the Qt Quick module.
 
 The qmake install tree is staged with `INSTALL_ROOT`, then Qt3D libraries, headers,
 module metadata and optional plugins are copied into a normal Conan package layout.
+The CI artifact registry does not contain `qt/5.15.2`, so declaring that old wrapper
+reference would fail dependency resolution before the build starts.
 
 ## Tests
 
