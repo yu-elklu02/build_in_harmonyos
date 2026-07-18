@@ -34,3 +34,6 @@ patches:
   - patch_file: "patches/0009-qpluginloader-clang-section-type.patch"
     patch_type: "test"
     patch_description: "Use a writable metadata marker in the qpluginloader test so it shares the plugin pointer section type under Clang"
+  - patch_file: "patches/0010-qlocale-standard-fenv-test.patch"
+    patch_type: "test"
+    patch_description: "Use standard floating-point exception flags in the qlocale test when feenableexcept is unavailable"
