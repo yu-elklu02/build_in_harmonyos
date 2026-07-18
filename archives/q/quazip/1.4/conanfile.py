@@ -15,7 +15,7 @@ class QuazipConan(ConanFile):
     options = {"qt_major": ["5", "6"], "shared": [True, False]}
     default_options = {"qt_major": "5", "shared": True}
 
-    generators = "CMakeDeps", "CMakeToolchain"
+    generators = "CMakeDeps"
 
     def requirements(self):
         self.requires("zlib/1.3.1")
@@ -34,12 +34,15 @@ class QuazipConan(ConanFile):
         tc = CMakeToolchain(self)
         tc.variables["QUAZIP_QT_MAJOR_VERSION"] = self.options.qt_major
         tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
+        tc.variables["QUAZIP_ENABLE_TESTS"] = True
+        tc.variables["QUAZIP_BZIP2"] = False
         tc.generate()
 
     def build(self):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+        cmake.test(cli_args=["--output-on-failure"])
 
     def package(self):
         cmake = CMake(self)
