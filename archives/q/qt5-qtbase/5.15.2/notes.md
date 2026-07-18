@@ -38,5 +38,6 @@ Qt5Core、Qt5Gui 和 Qt5Network。构建由 `-j1` 调整为受控的 `-j4` 并�
 
 ### 6. OHOS qmake 宿主环境
 
-OHOS Worker 上 `QMAKE_HOST.os` 为 `OHOS`。将其加入 `qtAddTargetEnv()` 的
-Unix 宿主列表，使构建期 qmake 工具通过 `LD_LIBRARY_PATH` 加载 Qt 共享库。
+`QMAKE_HOST.os` 直接取 `uname().sysname`，OpenHarmony 的返回值不在 Qt 5.15.2
+白名单中。对已知平台分支之外的 `Q_OS_UNIX` 宿主使用 `LD_LIBRARY_PATH`，
+使构建期 qmake 工具能够加载 Qt 共享库。

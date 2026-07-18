@@ -39,7 +39,7 @@ patches_applied:
   - "0002-abstract-socket-client.patch: QLocalSocket abstract socket"
   - "0003-pthread-cancel-stub.patch: guard pthread_cancel calls with HAVE_PTHREAD_CANCEL feature detection"
   - "0004-socklen-t-ohos.patch: use POSIX socklen_t on supported Linux and OHOS targets"
-  - "0005-qmake-ohos-host.patch: map the OHOS qmake host to LD_LIBRARY_PATH"
+  - "0005-qmake-ohos-host.patch: use LD_LIBRARY_PATH for unrecognized Q_OS_UNIX hosts"
 
 knowledge_gained:
   - "OHOS stripped ELF dlopen 限制 (E215): musl 拒绝加载 stripped 共享库"
@@ -47,4 +47,4 @@ knowledge_gained:
   - 'LD_LIBRARY_PATH 在 OHOS 上被忽略: 用 $ORIGIN RPATH 替代'
   - "qt5-qtbase configure -no-feature-testlib 导致 Qt5Test 缺失"
   - "Qt3D requires QtGui with the OpenGL ES 2 feature enabled"
-  - "qmake host tools on OHOS require LD_LIBRARY_PATH handling in qtAddTargetEnv"
+  - "qmake host tools on OpenHarmony require an LD_LIBRARY_PATH fallback in qtAddTargetEnv"
