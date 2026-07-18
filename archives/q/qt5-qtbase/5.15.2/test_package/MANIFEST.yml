@@ -18,6 +18,14 @@ upstream_test_changes:
     reason: "QtSql is disabled in this package; only the QtSql benchmark subtree is skipped"
   - file: "tests/auto/corelib/kernel/qmetatype/tst_qmetatype.cpp"
     reason: "Replace non-standard pthread_yield with POSIX sched_yield on OHOS"
+  - file: "tests/auto/network/ssl/qsslkey/tst_qsslkey.cpp"
+    reason: "Do not enumerate SSL curves when the configured Qt feature set disables SSL"
+  - file: "tests/auto/corelib/plugin/qpluginloader/fakeplugin.cpp"
+    reason: "Keep test metadata in a section with a Clang-compatible data type"
+  - file: "tests/auto/corelib/text/qlocale/tst_qlocale.cpp"
+    reason: "Check standard floating-point exception flags instead of using non-standard feenableexcept"
+  - file: "Qt feature configuration"
+    reason: "Disable QSystemSemaphore and QSharedMemory because OHOS blocks the System V semaphore syscall; their upstream test directories are excluded by Qt feature guards"
 
 # Upstream suites for every module shipped by this recipe.
 upstream_tests:

@@ -96,6 +96,7 @@ class Qt5QtbaseConan(ConanFile):
                 f'-no-widgets -no-dbus -no-accessibility '
                 f'-opengl es2 -no-xcb -no-eglfs -no-linuxfb '
                 f'-no-feature-sql -no-feature-xml '
+                f'-no-feature-systemsemaphore -no-feature-sharedmemory '
                 f'-make tests -nomake examples '
                 f'-no-iconv -no-glib -no-icu -no-vulkan '
                 f'-no-openssl -no-libproxy -no-system-proxies '

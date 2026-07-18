@@ -16,9 +16,13 @@ build:
     - "-no-widgets -no-dbus -no-accessibility"
     - "-opengl es2 -no-xcb -no-eglfs -no-linuxfb"
     - "-no-feature-sql -no-feature-xml"
-    - "-nomake tests -nomake examples"
-    - "-no-iconv -no-glib -no-icu -no-openssl -no-libproxy"
+    - "-no-feature-systemsemaphore -no-feature-sharedmemory"
+    - "-make tests -nomake examples"
+    - "-no-iconv -no-glib -no-icu -no-vulkan"
+    - "-no-openssl -no-libproxy -no-system-proxies"
+    - "-system-zlib"
     - "-platform linux-clang"
+    - "-recheck-all"
   dependencies:
     - zlib/1.3.1
   cc: clang
@@ -40,6 +44,11 @@ patches_applied:
   - "0003-pthread-cancel-stub.patch: guard pthread_cancel calls with HAVE_PTHREAD_CANCEL feature detection"
   - "0004-socklen-t-ohos.patch: use POSIX socklen_t on supported Linux and OHOS targets"
   - "0005-qmake-ohos-host.patch: use LD_LIBRARY_PATH for unrecognized Q_OS_UNIX hosts"
+  - "0006-benchmark-sql-module.patch: omit QtSql benchmarks when QtSql is disabled"
+  - "0007-qmetatype-sched-yield.patch: use POSIX sched_yield in the qmetatype test"
+  - "0008-qsslkey-no-ssl-test-init.patch: omit SSL curve discovery when SSL is disabled"
+  - "0009-qpluginloader-clang-section-type.patch: use a consistent metadata section type under Clang"
+  - "0010-qlocale-standard-fenv-test.patch: use standard floating-point exception flags"
 
 knowledge_gained:
   - "OHOS stripped ELF dlopen 限制 (E215): musl 拒绝加载 stripped 共享库"
