@@ -13,8 +13,6 @@ class GkrellmTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            # Verify gkrellmd binary runs and prints version
-            self.run("gkrellmd --version || gkrellmd -V || true", env="conanrun")
-            # gkrellmd starts, binds port, then exits — just check it exists
-            self.run("which gkrellmd || ls $(conan cache path gkrellm/2.3.11)/sbin/gkrellmd",
-                     env="conanrun")
+            # Verify gkrellmd binary runs and outputs version info.
+            # No || true — failure must propagate (R9).
+            self.run("gkrellmd --version || gkrellmd -V", env="conanrun")
