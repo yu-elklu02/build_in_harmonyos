@@ -79,20 +79,6 @@ class Qt5QtbaseConan(ConanFile):
         except subprocess.CalledProcessError:
             has_pthread_cancel = False
 
-        # Detect the socket length type instead of branching on a platform name.
-        try:
-            subprocess.run(
-                shlex.split(cxx) + ["-x", "c++", "-", "-o", os.devnull],
-                input=(
-                    b"#include <sys/socket.h>\n"
-                    b"int main(){socklen_t n=0; return accept(-1,nullptr,&n);}\n"
-                ),
-                check=True, capture_output=True, timeout=10,
-            )
-            has_socklen_t = True
-        except subprocess.CalledProcessError:
-            has_socklen_t = False
-
         build_env = Environment()
         build_env.define("CC", cc)
         build_env.define("CXX", cxx)
@@ -101,9 +87,6 @@ class Qt5QtbaseConan(ConanFile):
         build_env.append("LDFLAGS", f"-L{zlib_lib}")
         if has_pthread_cancel:
             build_env.append("CXXFLAGS", "-DHAVE_PTHREAD_CANCEL")
-        if has_socklen_t:
-            build_env.append("CXXFLAGS", "-DQT_USE_SOCKLEN_T")
-
         # Configure Qt5 with Conan-managed compilers and zlib paths.
         with build_env.vars(self).apply():
             self.run(

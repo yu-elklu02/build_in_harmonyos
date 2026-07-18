@@ -1,10 +1,14 @@
 --- a/mkspecs/linux-clang/qplatformdefs.h
 +++ b/mkspecs/linux-clang/qplatformdefs.h
-@@ -82,6 +82,6 @@
+@@ -82,11 +82,5 @@
  #undef QT_SOCKLEN_T
- 
+-
 -#if defined(__GLIBC__) && (__GLIBC__ >= 2)
-+#if defined(__GLIBC__) && (__GLIBC__ >= 2) || defined(QT_USE_SOCKLEN_T)
  #define QT_SOCKLEN_T            socklen_t
- #else
- #define QT_SOCKLEN_T            int
+-#else
+-#define QT_SOCKLEN_T            int
+-#endif
+-
+ #if defined(_XOPEN_SOURCE) && (_XOPEN_SOURCE >= 500)
+ #define QT_SNPRINTF             ::snprintf
+ #define QT_VSNPRINTF            ::vsnprintf

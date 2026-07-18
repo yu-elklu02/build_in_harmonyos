@@ -14,4 +14,7 @@ patches:
     patch_description: "Guard pthread cancellation calls when the toolchain does not provide pthread_cancel"
   - patch_file: "patches/0004-socklen-t-ohos.patch"
     patch_type: "portability"
-    patch_description: "Use feature detection to define QT_SOCKLEN_T as socklen_t"
+    patch_description: "Use POSIX socklen_t for the supported modern Linux and OHOS targets"
+  - patch_file: "patches/0005-qmake-ohos-host.patch"
+    patch_type: "portability"
+    patch_description: "Use LD_LIBRARY_PATH for qmake tools when the build host is OHOS"

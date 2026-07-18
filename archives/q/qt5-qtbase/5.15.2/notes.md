@@ -35,3 +35,8 @@ libQt5Core.so 依赖 libz.so，OHOS 系统中不存在。通过 Conan 依赖
 启用 QtGui 与 OpenGL ES 2，保留无窗口平台配置，向 qt3d 提供 qmake、moc、
 Qt5Core、Qt5Gui 和 Qt5Network。构建由 `-j1` 调整为受控的 `-j4` 并行，
 避免完整 Qt Base 构建超过 CI 的 45 分钟硬限制。
+
+### 6. OHOS qmake 宿主环境
+
+OHOS Worker 上 `QMAKE_HOST.os` 为 `OHOS`。将其加入 `qtAddTargetEnv()` 的
+Unix 宿主列表，使构建期 qmake 工具通过 `LD_LIBRARY_PATH` 加载 Qt 共享库。
