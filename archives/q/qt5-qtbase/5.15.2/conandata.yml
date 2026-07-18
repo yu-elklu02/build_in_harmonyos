@@ -11,7 +11,7 @@ patches:
     patch_description: "OHOS: use abstract Unix domain socket namespace in QLocalSocket"
   - patch_file: "patches/0003-pthread-cancel-stub.patch"
     patch_type: "portability"
-    patch_description: "OHOS/musl: provide no-op stubs for pthread_cancel family functions"
+    patch_description: "Guard pthread cancellation calls when the toolchain does not provide pthread_cancel"
   - patch_file: "patches/0004-socklen-t-ohos.patch"
     patch_type: "portability"
     patch_description: "Use feature detection to define QT_SOCKLEN_T as socklen_t"

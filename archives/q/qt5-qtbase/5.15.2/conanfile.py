@@ -76,7 +76,7 @@ class Qt5QtbaseConan(ConanFile):
                 check=True, capture_output=True, timeout=10,
             )
             has_pthread_cancel = True
-        except Exception:
+        except subprocess.CalledProcessError:
             has_pthread_cancel = False
 
         # Detect the socket length type instead of branching on a platform name.
@@ -90,7 +90,7 @@ class Qt5QtbaseConan(ConanFile):
                 check=True, capture_output=True, timeout=10,
             )
             has_socklen_t = True
-        except Exception:
+        except subprocess.CalledProcessError:
             has_socklen_t = False
 
         build_env = Environment()

@@ -22,7 +22,8 @@ OHOS musl 动态链接器拒绝 dlopen stripped ELF（Permission denied）。
 设置 `QMAKE_STRIP=""` 禁止 strip，保持库文件包含 .symtab 节区。
 
 ### 4. libz.so
-libQt5Core.so 依赖 libz.so，OHOS 系统中不存在。从 zlib 1.2.13 源码编译为共享库。
+libQt5Core.so 依赖 libz.so，OHOS 系统中不存在。通过 Conan 依赖
+`zlib/1.3.1` 提供共享库、头文件和链接路径。
 
 ## 验证结果
 - 待 CI 验证: libQt5Core/Gui/Network/Test/Concurrent + libz.so (全部未 strip)
