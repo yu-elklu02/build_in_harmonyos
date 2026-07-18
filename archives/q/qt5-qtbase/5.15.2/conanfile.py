@@ -96,7 +96,7 @@ class Qt5QtbaseConan(ConanFile):
                 f'-no-widgets -no-dbus -no-accessibility '
                 f'-opengl es2 -no-xcb -no-eglfs -no-linuxfb '
                 f'-no-feature-sql -no-feature-xml '
-                f'-nomake tests -nomake examples '
+                f'-make tests -nomake examples '
                 f'-no-iconv -no-glib -no-icu -no-vulkan '
                 f'-no-openssl -no-libproxy -no-system-proxies '
                 f'-system-zlib '
@@ -106,6 +106,8 @@ class Qt5QtbaseConan(ConanFile):
 
             # Prevent stripping because the OHOS loader rejects stripped ELF files.
             self.run(f'cd "{src_dir}" && make -j4 QMAKE_STRIP=""')
+            # Run the complete upstream suite built for the enabled QtBase modules.
+            self.run(f'cd "{src_dir}" && make check')
 
     def package(self):
         src_dir = self.source_folder
