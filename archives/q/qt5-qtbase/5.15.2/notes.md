@@ -4,7 +4,7 @@
 - 构建系统: configure + make
 - 编译日期: 2026-07-02
 - 编译器: clang/clang++ 15.0.4
-- 状态: published
+- 状态: built（Gui/OpenGL 扩展待 CI 验证）
 
 ## 关键适配
 
@@ -25,6 +25,12 @@ OHOS musl 动态链接器拒绝 dlopen stripped ELF（Permission denied）。
 libQt5Core.so 依赖 libz.so，OHOS 系统中不存在。从 zlib 1.2.13 源码编译为共享库。
 
 ## 验证结果
-- ✅ 库编译成功: libQt5Core/Network/Test/Concurrent + libz.so (全部未 strip)
+- 待 CI 验证: libQt5Core/Gui/Network/Test/Concurrent + libz.so (全部未 strip)
 - ✅ qtremoteobjects 19 个上游测试中 7 个模块通过 (144 个用例 PASS)
 - ✅ 抽象套接字补丁使 local socket IPC 在 OHOS 上工作
+
+### 5. Qt3D 依赖补全
+
+启用 QtGui 与 OpenGL ES 2，保留无窗口平台配置，向 qt3d 提供 qmake、moc、
+Qt5Core、Qt5Gui 和 Qt5Network。构建由 `-j1` 调整为受控的 `-j4` 并行，
+避免完整 Qt Base 构建超过 CI 的 45 分钟硬限制。

@@ -8,7 +8,7 @@ from conan.tools.layout import basic_layout
 class Qt5QtbaseConan(ConanFile):
     name = "qt5-qtbase"
     version = "5.15.2"
-    description = "Qt5 Base module (with Qt5Test + abstract socket patch + no strip)"
+    description = "Qt5 Base Core, Gui, Network and Test modules for OpenHarmony"
     license = "LGPL-3.0"
     homepage = "https://www.qt.io/"
     url = ""
@@ -56,8 +56,7 @@ class Qt5QtbaseConan(ConanFile):
         zlib_inc = os.path.join(zlib.package_folder, "include")
         zlib_lib = os.path.join(zlib.package_folder, "lib")
 
-        # Detect pthread_cancel availability (musl doesn't provide it)
-        # R8: Use feature detection instead of __OHOS__ platform macro
+        # Detect pthread_cancel availability (musl doesn't provide it).
         import subprocess
         try:
             subprocess.run(
@@ -71,6 +70,19 @@ class Qt5QtbaseConan(ConanFile):
         if has_pthread_cancel:
             os.environ["CXXFLAGS"] = os.environ.get("CXXFLAGS", "") + " -DHAVE_PTHREAD_CANCEL"
 
+        # Detect the socket length type instead of branching on a platform name.
+        try:
+            subprocess.run(
+                f'echo \'#include <sys/socket.h>\nint main(){{socklen_t n=0; return accept(-1,nullptr,&n);}}\' | {os.environ.get("CXX","clang++")} -x c++ - -o /dev/null',
+                shell=True, check=True, capture_output=True, timeout=10
+            )
+            has_socklen_t = True
+        except Exception:
+            has_socklen_t = False
+
+        if has_socklen_t:
+            os.environ["CXXFLAGS"] = os.environ.get("CXXFLAGS", "") + " -DQT_USE_SOCKLEN_T"
+
         # Configure Qt5 (with -system-zlib to use Conan-managed zlib)
         os.environ["CFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CFLAGS", "")
         os.environ["CXXFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CXXFLAGS", "")
@@ -80,10 +92,11 @@ class Qt5QtbaseConan(ConanFile):
             f'cd "{src_dir}" && ./configure '
             f'-prefix "{pkg}" '
             f'-opensource -confirm-license '
-            f'-no-gui -no-widgets -no-dbus -no-opengl -no-accessibility '
+            f'-no-widgets -no-dbus -no-accessibility '
+            f'-opengl es2 -no-xcb -no-eglfs -no-linuxfb '
             f'-no-feature-sql -no-feature-xml '
             f'-nomake tests -nomake examples '
-            f'-no-iconv -no-glib -no-icu -no-opengl -no-vulkan '
+            f'-no-iconv -no-glib -no-icu -no-vulkan '
             f'-no-openssl -no-libproxy -no-system-proxies '
             f'-system-zlib '
             f'-platform linux-clang '
@@ -91,7 +104,7 @@ class Qt5QtbaseConan(ConanFile):
         )
 
         # Build with QMAKE_STRIP="" to prevent stripping (OHOS E215)
-        self.run(f'cd "{src_dir}" && make -j1 QMAKE_STRIP=""')
+        self.run(f'cd "{src_dir}" && make -j4 QMAKE_STRIP=""')
 
     def package(self):
         src_dir = self.source_folder
@@ -113,12 +126,12 @@ class Qt5QtbaseConan(ConanFile):
         # Copy headers
         if os.path.isdir(include_dir):
             copy(self, "*", src=include_dir,
-                 dst=os.path.join(self.package_folder, "include"), keep_path=False)
+                 dst=os.path.join(self.package_folder, "include"), keep_path=True)
 
         # Copy mkspecs
         if os.path.isdir(mkspecs_dir):
             copy(self, "*", src=mkspecs_dir,
-                 dst=os.path.join(self.package_folder, "mkspecs"), keep_path=False)
+                 dst=os.path.join(self.package_folder, "mkspecs"), keep_path=True)
 
         # Copy bin tools
         if os.path.isdir(bin_dir):
@@ -129,7 +142,7 @@ class Qt5QtbaseConan(ConanFile):
         cmake_dir = os.path.join(lib_dir, "cmake")
         if os.path.isdir(cmake_dir):
             copy(self, "*", src=cmake_dir,
-                 dst=os.path.join(self.package_folder, "lib", "cmake"), keep_path=False)
+                 dst=os.path.join(self.package_folder, "lib", "cmake"), keep_path=True)
 
     def package_info(self):
         # Define components so CMakeDeps generates per-module config files
@@ -151,6 +164,13 @@ class Qt5QtbaseConan(ConanFile):
         qt5network.requires = ["Qt5Core"]
         qt5network.set_property("cmake_file_name", "Qt5Network")
         qt5network.set_property("cmake_target_name", "Qt5::Network")
+
+        qt5gui = self.cpp_info.components["Qt5Gui"]
+        qt5gui.libs = ["Qt5Gui"]
+        qt5gui.includedirs = ["include"]
+        qt5gui.requires = ["Qt5Core"]
+        qt5gui.set_property("cmake_file_name", "Qt5Gui")
+        qt5gui.set_property("cmake_target_name", "Qt5::Gui")
 
         qt5test = self.cpp_info.components["Qt5Test"]
         qt5test.libs = ["Qt5Test"]

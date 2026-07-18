@@ -1,6 +1,6 @@
 software: qt5-qtbase
 version: "5.15.2"
-status: published
+status: built
 build_date: "2026-07-02"
 category: qt-core
 
@@ -13,7 +13,8 @@ build:
   system: configure+make
   configure_options:
     - "-opensource -confirm-license"
-    - "-no-gui -no-widgets -no-dbus -no-opengl -no-accessibility"
+    - "-no-widgets -no-dbus -no-accessibility"
+    - "-opengl es2 -no-xcb -no-eglfs -no-linuxfb"
     - "-no-feature-sql -no-feature-xml"
     - "-nomake tests -nomake examples"
     - "-no-iconv -no-glib -no-icu -no-openssl -no-libproxy"
@@ -27,19 +28,21 @@ products:
   libraries:
     - libQt5Core.so.5.15.2
     - libQt5Network.so.5.15.2 (with abstract socket patch)
+    - libQt5Gui.so.5.15.2
     - libQt5Test.so.5.15.2
     - libQt5Concurrent.so.5.15.2
   headers:
-    - QtCore, QtNetwork, QtTest, QtConcurrent
+    - QtCore, QtGui, QtNetwork, QtTest, QtConcurrent
 
 patches_applied:
   - "0001-abstract-socket.patch: QLocalServer abstract socket"
   - "0002-abstract-socket-client.patch: QLocalSocket abstract socket"
   - "0003-pthread-cancel-stub.patch: guard pthread_cancel calls with HAVE_PTHREAD_CANCEL feature detection"
-  - "0004-socklen-t-ohos.patch: define QT_SOCKLEN_T as socklen_t on OHOS (fix accept4 type mismatch)"
+  - "0004-socklen-t-ohos.patch: define QT_SOCKLEN_T through socket API feature detection"
 
 knowledge_gained:
   - "OHOS stripped ELF dlopen 限制 (E215): musl 拒绝加载 stripped 共享库"
   - "OHOS Unix 域套接字 bind() 被拒绝: 需使用抽象套接字命名空间"
-  - "LD_LIBRARY_PATH 在 OHOS 上被忽略: 用 \$ORIGIN RPATH 替代"
+  - 'LD_LIBRARY_PATH 在 OHOS 上被忽略: 用 $ORIGIN RPATH 替代'
   - "qt5-qtbase configure -no-feature-testlib 导致 Qt5Test 缺失"
+  - "Qt3D requires QtGui with the OpenGL ES 2 feature enabled"

@@ -21,6 +21,9 @@ upstream_tests:
   - name: "QtNetwork"
     source: qtbase-everywhere-src-5.15.2/tests/auto/network/
     description: "QtNetwork 自动化测试 (socket, ssl, http 等)"
+  - name: "QtGui"
+    source: qtbase-everywhere-src-5.15.2/tests/auto/gui/
+    description: "QtGui 自动化测试 (matrix, image, OpenGL context 等)"
   - name: "QtTest"
     source: qtbase-everywhere-src-5.15.2/tests/auto/testlib/
     description: "QtTest 框架自身测试"
@@ -28,8 +31,8 @@ upstream_tests:
 # test_package 中自带的测试
 test_package_tests:
   - file: test.cpp
-    description: "QLocalServer/QLocalSocket 抽象套接字 IPC 测试 (E216 补丁验证)"
+    description: "QLocalServer/QLocalSocket IPC 与 QtGui 矩阵运算消费者测试"
     command: "./test_qt5_qtbase"
 
 # 测试断言总数 (近似值)
-assertion_count: 2
+assertion_count: 3
