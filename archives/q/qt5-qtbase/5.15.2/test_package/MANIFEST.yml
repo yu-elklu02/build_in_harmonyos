@@ -13,6 +13,12 @@ upstream_check_command: "make check"
 upstream_test_in_build: true
 upstream_test_command: "make check"
 
+upstream_test_changes:
+  - file: "tests/benchmarks/benchmarks.pro"
+    reason: "QtSql is disabled in this package; only the QtSql benchmark subtree is skipped"
+  - file: "tests/auto/corelib/kernel/qmetatype/tst_qmetatype.cpp"
+    reason: "Replace non-standard pthread_yield with POSIX sched_yield on OHOS"
+
 # Upstream suites for every module shipped by this recipe.
 upstream_tests:
   - name: "QtCore"
