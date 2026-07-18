@@ -1,0 +1,8 @@
+[
+  {
+    "name": "vsearch",
+    "description": "Versatile open-source tool for microbiome analysis",
+    "binary": "bin/vsearch",
+    "version_flag": "--version"
+  }
+]

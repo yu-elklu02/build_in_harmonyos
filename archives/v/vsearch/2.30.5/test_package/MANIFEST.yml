@@ -1,0 +1,47 @@
+package: vsearch/2.30.5
+homepage: "https://github.com/torognes/vsearch"
+
+upstream_check_command: "make check"
+upstream_test_in_build: true
+upstream_test_command: "make check"
+
+upstream_tests:
+  - file: test/orient.sh
+    source: vsearch-2.30.5/test/orient.sh
+    description: "序列方向自动检测测试"
+    command: "bash test/orient.sh"
+  - file: test/derep_fulllength.sh
+    source: vsearch-2.30.5/test/derep_fulllength.sh
+    description: "全长去冗余测试"
+    command: "bash test/derep_fulllength.sh"
+  - file: test/chimera.sh
+    source: vsearch-2.30.5/test/chimera.sh
+    description: "嵌合体检测测试"
+    command: "bash test/chimera.sh"
+  - file: test/cluster_fast.sh
+    source: vsearch-2.30.5/test/cluster_fast.sh
+    description: "快速序列聚类测试"
+    command: "bash test/cluster_fast.sh"
+  - file: test/search_exact.sh
+    source: vsearch-2.30.5/test/search_exact.sh
+    description: "精确序列搜索测试"
+    command: "bash test/search_exact.sh"
+  - file: test/fastq_stats.sh
+    source: vsearch-2.30.5/test/fastq_stats.sh
+    description: "FASTQ 质量统计测试"
+    command: "bash test/fastq_stats.sh"
+  - file: test/shuffle.sh
+    source: vsearch-2.30.5/test/shuffle.sh
+    description: "序列随机排序测试"
+    command: "bash test/shuffle.sh"
+  - file: test/sortbylength.sh
+    source: vsearch-2.30.5/test/sortbylength.sh
+    description: "按序列长度排序测试"
+    command: "bash test/sortbylength.sh"
+
+test_package_tests:
+  - file: conanfile.py
+    description: "运行 vsearch --version，验证二进制可执行并正确输出版本号"
+    command: "vsearch --version"
+
+assertion_count: 8
