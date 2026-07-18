@@ -12,17 +12,14 @@ class QuazipConan(ConanFile):
     license = "LGPL-2.1-or-later"
 
     settings = "os", "compiler", "build_type", "arch"
-    options = {"qt_major": ["5", "6"], "shared": [True, False]}
-    default_options = {"qt_major": "5", "shared": True}
+    options = {"shared": [True, False]}
+    default_options = {"shared": True}
 
     generators = "CMakeDeps"
 
     def requirements(self):
         self.requires("zlib/1.3.1")
-        if self.options.qt_major == "5":
-            self.requires("qt/5.15.18")
-        else:
-            self.requires("qt/6.5.3")
+        self.requires("qt5-qtbase/5.15.2")
 
     def layout(self):
         cmake_layout(self)
@@ -32,7 +29,7 @@ class QuazipConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["QUAZIP_QT_MAJOR_VERSION"] = self.options.qt_major
+        tc.variables["QUAZIP_QT_MAJOR_VERSION"] = "5"
         tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
         tc.variables["QUAZIP_ENABLE_TESTS"] = True
         tc.variables["QUAZIP_BZIP2"] = False
@@ -49,5 +46,5 @@ class QuazipConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["quazip1-qt" + str(self.options.qt_major.value)]
-        self.cpp_info.includedirs = ["include/QuaZip-Qt" + str(self.options.qt_major.value)]
+        self.cpp_info.libs = ["quazip1-qt5"]
+        self.cpp_info.includedirs = ["include/QuaZip-Qt5"]

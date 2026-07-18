@@ -1,5 +1,6 @@
 package: quazip/1.4
 homepage: "https://github.com/stachenov/quazip"
+dependency_pr: "https://gitcode.com/OpenHarmonyPCDeveloper/build_in_harmonyos/pull/2919"
 
 upstream_check_command: "ctest --output-on-failure"
 upstream_test_in_build: true
