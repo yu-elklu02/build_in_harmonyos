@@ -1,6 +1,9 @@
 import os
+import shlex
+import subprocess
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
+from conan.tools.env import Environment
 from conan.tools.files import get, copy, apply_conandata_patches, export_conandata_patches
 from conan.tools.layout import basic_layout
 
@@ -37,8 +40,7 @@ class Qt5QtbaseConan(ConanFile):
         get(self, **self.conan_data["sources"], strip_root=True)
 
     def generate(self):
-        # Expose zlib paths to Qt5 configure via build env
-        # (build() also sets os.environ as fallback)
+        # Expose zlib paths to Qt5 configure via Conan's build environment.
         zlib = self.dependencies["zlib"]
         zlib_inc = os.path.join(zlib.package_folder, "include")
         zlib_lib = os.path.join(zlib.package_folder, "lib")
@@ -51,60 +53,76 @@ class Qt5QtbaseConan(ConanFile):
         src_dir = self.source_folder
         pkg = self.package_folder
 
+        compilers = self.conf.get(
+            "tools.build:compiler_executables", default={}, check_type=dict
+        ) or {}
+        cc = compilers.get("c")
+        cxx = compilers.get("cpp") or compilers.get("cxx")
+        if not cc or not cxx:
+            raise ConanInvalidConfiguration(
+                "qt5-qtbase requires c and cpp compiler executables from the Conan profile"
+            )
+
         # Get zlib paths from Conan dependency
         zlib = self.dependencies["zlib"]
         zlib_inc = os.path.join(zlib.package_folder, "include")
         zlib_lib = os.path.join(zlib.package_folder, "lib")
 
         # Detect pthread_cancel availability (musl doesn't provide it).
-        import subprocess
         try:
             subprocess.run(
-                f'echo \'#include <pthread.h>\nint main(){{pthread_cancel(0);return 0;}}\' | {os.environ.get("CXX","clang++")} -x c++ - -o /dev/null -lpthread',
-                shell=True, check=True, capture_output=True, timeout=10
+                shlex.split(cxx) + ["-x", "c++", "-", "-o", os.devnull, "-lpthread"],
+                input=b"#include <pthread.h>\nint main(){pthread_cancel(0);return 0;}\n",
+                check=True, capture_output=True, timeout=10,
             )
             has_pthread_cancel = True
         except Exception:
             has_pthread_cancel = False
 
-        if has_pthread_cancel:
-            os.environ["CXXFLAGS"] = os.environ.get("CXXFLAGS", "") + " -DHAVE_PTHREAD_CANCEL"
-
         # Detect the socket length type instead of branching on a platform name.
         try:
             subprocess.run(
-                f'echo \'#include <sys/socket.h>\nint main(){{socklen_t n=0; return accept(-1,nullptr,&n);}}\' | {os.environ.get("CXX","clang++")} -x c++ - -o /dev/null',
-                shell=True, check=True, capture_output=True, timeout=10
+                shlex.split(cxx) + ["-x", "c++", "-", "-o", os.devnull],
+                input=(
+                    b"#include <sys/socket.h>\n"
+                    b"int main(){socklen_t n=0; return accept(-1,nullptr,&n);}\n"
+                ),
+                check=True, capture_output=True, timeout=10,
             )
             has_socklen_t = True
         except Exception:
             has_socklen_t = False
 
+        build_env = Environment()
+        build_env.define("CC", cc)
+        build_env.define("CXX", cxx)
+        build_env.append("CFLAGS", f"-I{zlib_inc}")
+        build_env.append("CXXFLAGS", f"-I{zlib_inc}")
+        build_env.append("LDFLAGS", f"-L{zlib_lib}")
+        if has_pthread_cancel:
+            build_env.append("CXXFLAGS", "-DHAVE_PTHREAD_CANCEL")
         if has_socklen_t:
-            os.environ["CXXFLAGS"] = os.environ.get("CXXFLAGS", "") + " -DQT_USE_SOCKLEN_T"
+            build_env.append("CXXFLAGS", "-DQT_USE_SOCKLEN_T")
 
-        # Configure Qt5 (with -system-zlib to use Conan-managed zlib)
-        os.environ["CFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CFLAGS", "")
-        os.environ["CXXFLAGS"] = f"-I{zlib_inc} " + os.environ.get("CXXFLAGS", "")
-        os.environ["LDFLAGS"] = f"-L{zlib_lib} " + os.environ.get("LDFLAGS", "")
+        # Configure Qt5 with Conan-managed compilers and zlib paths.
+        with build_env.vars(self).apply():
+            self.run(
+                f'cd "{src_dir}" && ./configure '
+                f'-prefix "{pkg}" '
+                f'-opensource -confirm-license '
+                f'-no-widgets -no-dbus -no-accessibility '
+                f'-opengl es2 -no-xcb -no-eglfs -no-linuxfb '
+                f'-no-feature-sql -no-feature-xml '
+                f'-nomake tests -nomake examples '
+                f'-no-iconv -no-glib -no-icu -no-vulkan '
+                f'-no-openssl -no-libproxy -no-system-proxies '
+                f'-system-zlib '
+                f'-platform linux-clang '
+                f'-recheck-all',
+            )
 
-        self.run(
-            f'cd "{src_dir}" && ./configure '
-            f'-prefix "{pkg}" '
-            f'-opensource -confirm-license '
-            f'-no-widgets -no-dbus -no-accessibility '
-            f'-opengl es2 -no-xcb -no-eglfs -no-linuxfb '
-            f'-no-feature-sql -no-feature-xml '
-            f'-nomake tests -nomake examples '
-            f'-no-iconv -no-glib -no-icu -no-vulkan '
-            f'-no-openssl -no-libproxy -no-system-proxies '
-            f'-system-zlib '
-            f'-platform linux-clang '
-            f'-recheck-all',
-        )
-
-        # Build with QMAKE_STRIP="" to prevent stripping (OHOS E215)
-        self.run(f'cd "{src_dir}" && make -j4 QMAKE_STRIP=""')
+            # Prevent stripping because the OHOS loader rejects stripped ELF files.
+            self.run(f'cd "{src_dir}" && make -j4 QMAKE_STRIP=""')
 
     def package(self):
         src_dir = self.source_folder
