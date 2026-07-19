@@ -54,7 +54,7 @@ class GkrellmConan(ConanFile):
         # OHOS does not provide lm-sensors.  Skipping its configure probe also
         # avoids attempting to link a cross-compiled probe executable.
         self.run(
-            f"make -C \"{server_dir}\" -j2 "
+            f"make -C \"{server_dir}\" -j1 V=1 "
             f"CC=\"{cc}\" without-libsensors=yes",
             env="conanbuild",
         )
