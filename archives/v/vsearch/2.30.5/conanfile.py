@@ -2,16 +2,73 @@
 """Conan recipe — vsearch 2.30.5 (Autotools, C++ bioinformatics tool).
 
 vsearch: Versatile open-source tool for microbiome analysis.
-The GitHub archive tarball does NOT include a pre-generated configure script.
-autogen.sh must be run to generate it. On OHOS, automake/aclocal are in
-versioned HNP directories and must be added to PATH manually.
+The GitHub archive does not include a pre-generated configure script.
+patches/configure is a pre-generated configure (via autoreconf -fi on Ubuntu)
+shipped with this recipe to avoid requiring autoconf/automake on the CI worker.
 """
 import os
 import shutil
 from conan import ConanFile
 from conan.tools.gnu import Autotools, AutotoolsToolchain
-from conan.tools.files import get, apply_conandata_patches, export_conandata_patches
-from conan.tools.env import Environment
+from conan.tools.files import get, apply_conandata_patches, export_conandata_patches, copy
+
+
+class VsearchConan(ConanFile):
+    name = "vsearch"
+    version = "2.30.5"
+    description = (
+        "Versatile open-source tool for microbiome analysis. "
+        "Supports chimera detection, clustering, full-length and prefix "
+        "dereplication, searching, sorting and pairwise alignment."
+    )
+    license = "BSD-2-Clause OR GPL-3.0-or-later"
+    homepage = "https://github.com/torognes/vsearch"
+    url = ""  # CI fills this
+
+    package_type = "application"
+
+    settings = "os", "arch", "compiler", "build_type"
+    exports_sources = "patches/configure"
+
+    def export_sources(self):
+        export_conandata_patches(self)
+
+    def source(self):
+        get(self, **self.conan_data["sources"], strip_root=True)
+        # Copy pre-generated configure into source folder and make executable.
+        # The GitHub archive does not include configure; we ship it with the recipe.
+        src_configure = os.path.join(self.recipe_folder, "patches", "configure")
+        dst_configure = os.path.join(self.source_folder, "configure")
+        shutil.copy2(src_configure, dst_configure)
+        os.chmod(dst_configure, 0o755)
+        self.output.info("Pre-generated configure installed.")
+
+    def generate(self):
+        tc = AutotoolsToolchain(self)
+        tc.configure_args.append("--prefix=/")
+        tc.configure_args.append("--without-zlib")
+        tc.configure_args.append("--without-bz2")
+        tc.generate()
+
+    def build(self):
+        apply_conandata_patches(self)
+        # Restore execute bit on configure after Conan copies sources to build dir
+        configure = os.path.join(self.build_folder, "configure")
+        if os.path.isfile(configure):
+            os.chmod(configure, 0o755)
+        autotools = Autotools(self)
+        autotools.configure()
+        autotools.make()
+        autotools.make(target="check")
+
+    def package(self):
+        autotools = Autotools(self)
+        autotools.install()
+
+    def package_info(self):
+        self.cpp_info.bindirs = ["bin"]
+        self.cpp_info.libs = []
+
 
 
 class VsearchConan(ConanFile):
