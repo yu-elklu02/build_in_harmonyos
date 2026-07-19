@@ -49,8 +49,9 @@ class GkrellmConan(ConanFile):
         env = Environment()
         env.define("CC", cc)
         env.define("CXX", cxx)
-        env.vars(self).save_script("conanbuild")
         PkgConfigDeps(self).generate()
+        env.append_path("PKG_CONFIG_PATH", self.generators_folder)
+        env.vars(self).save_script("conanbuild")
 
     def build(self):
         apply_conandata_patches(self)
