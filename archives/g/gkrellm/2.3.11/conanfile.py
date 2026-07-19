@@ -12,7 +12,6 @@ import os
 from conan import ConanFile
 from conan.tools.files import get, apply_conandata_patches, export_conandata_patches
 from conan.tools.env import VirtualBuildEnv, Environment
-from conan.tools.gnu import PkgConfigDeps
 
 
 class GkrellmConan(ConanFile):
@@ -31,9 +30,6 @@ class GkrellmConan(ConanFile):
 
     settings = "os", "arch", "compiler", "build_type"
 
-    def requirements(self):
-        self.requires("glib/2.84.0")
-
     def export_sources(self):
         export_conandata_patches(self)
 
@@ -49,8 +45,6 @@ class GkrellmConan(ConanFile):
         env = Environment()
         env.define("CC", cc)
         env.define("CXX", cxx)
-        PkgConfigDeps(self).generate()
-        env.append_path("PKG_CONFIG_PATH", self.generators_folder)
         env.vars(self).save_script("conanbuild")
 
     def build(self):
