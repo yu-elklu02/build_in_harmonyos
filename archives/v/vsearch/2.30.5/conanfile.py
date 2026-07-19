@@ -60,30 +60,26 @@ class VsearchConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
-
-        # Build extra PATH for automake/autoconf tools on OHOS HNP
+        # vsearch does not ship a pre-generated configure in its GitHub archive.
+        # autogen.sh calls autoreconf which requires aclocal (automake),
+        # but aclocal is NOT available on the OHOS CI worker.
+        # vsearch DOES commit aclocal.m4 to git, so running autoconf alone
+        # is sufficient to generate configure from configure.ac.
         env = Environment()
-        for tool in ("aclocal", "automake", "autoconf", "autoreconf"):
-            tool_dir = self._find_hnp_tool(tool)
-            if tool_dir:
-                env.prepend_path("PATH", tool_dir)
-                self.output.info(f"Found {tool} at {tool_dir}")
-
-        # Also set explicit AUTOCONF if found in HNP
-        autoconf_path = None
+        # Add autoconf bin to PATH if installed in a versioned HNP directory
         for candidate in [
-            "/data/service/hnp/autoconf.org/autoconf_2.72/bin/autoconf",
-            "/data/service/hnp/bin/autoconf",
-            "/usr/bin/autoconf",
+            "/data/service/hnp/autoconf.org/autoconf_2.72/bin",
+            "/data/service/hnp/bin",
+            "/usr/local/bin",
+            "/usr/bin",
         ]:
-            if os.path.isfile(candidate):
-                autoconf_path = candidate
+            if os.path.isfile(os.path.join(candidate, "autoconf")):
+                env.prepend_path("PATH", candidate)
+                self.output.info(f"Using autoconf from {candidate}")
                 break
-        if autoconf_path:
-            env.define("AUTOCONF", autoconf_path)
-
         with env.vars(self).apply():
-            self.run("sh autogen.sh")
+            # Generate configure from configure.ac using pre-committed aclocal.m4
+            self.run("autoconf")
 
     def generate(self):
         tc = AutotoolsToolchain(self)
