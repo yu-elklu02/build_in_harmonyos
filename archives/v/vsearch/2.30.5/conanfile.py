@@ -45,12 +45,20 @@ class VsearchConan(ConanFile):
 
     def build(self):
         apply_conandata_patches(self)
-        # OHOS HMDFS loses execute bits when copying files — restore them.
-        configure = os.path.join(self.source_folder, "configure")
-        if os.path.isfile(configure):
-            os.chmod(configure, 0o755)
+        # On OHOS HMDFS, files copied to build dir lose execute bits.
+        # Use 'sh configure' instead of './configure' to bypass permission issue.
+        self.run(
+            "sh configure "
+            "--prefix=/ "
+            "--bindir=${prefix}/bin "
+            "--sbindir=${prefix}/bin "
+            "--libdir=${prefix}/lib "
+            "--includedir=${prefix}/include "
+            "--without-zlib "
+            "--without-bz2",
+            env="conanbuild"
+        )
         autotools = Autotools(self)
-        autotools.configure()
         autotools.make()
         # Run upstream test suite (shell scripts in test/)
         autotools.make(target="check")
