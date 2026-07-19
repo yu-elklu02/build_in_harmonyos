@@ -61,12 +61,13 @@ class VsearchConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
         # vsearch does not ship a pre-generated configure in its GitHub archive.
-        # autogen.sh calls autoreconf which requires aclocal (automake),
-        # but aclocal is NOT available on the OHOS CI worker.
-        # vsearch DOES commit aclocal.m4 to git, so running autoconf alone
-        # is sufficient to generate configure from configure.ac.
+        # configure.ac uses AM_* macros (automake), so we need both autoconf
+        # and automake's m4 macro files. On OHOS CI, automake is not in PATH
+        # but its m4 files may exist in versioned HNP directories.
         env = Environment()
-        # Add autoconf bin to PATH if installed in a versioned HNP directory
+
+        # Find autoconf binary
+        autoconf_bin = None
         for candidate in [
             "/data/service/hnp/autoconf.org/autoconf_2.72/bin",
             "/data/service/hnp/bin",
@@ -74,12 +75,41 @@ class VsearchConan(ConanFile):
             "/usr/bin",
         ]:
             if os.path.isfile(os.path.join(candidate, "autoconf")):
+                autoconf_bin = candidate
                 env.prepend_path("PATH", candidate)
                 self.output.info(f"Using autoconf from {candidate}")
                 break
+
+        # Find automake m4 macro files (needed for AM_* macros in configure.ac)
+        aclocal_dirs = []
+        search_roots = [
+            "/data/service/hnp/automake.org",
+            "/data/service/hnp",
+            "/usr/share",
+            "/usr/local/share",
+        ]
+        for root in search_roots:
+            if not os.path.isdir(root):
+                continue
+            # Direct aclocal dir
+            direct = os.path.join(root, "aclocal")
+            if os.path.isdir(direct):
+                aclocal_dirs.append(direct)
+                self.output.info(f"Found aclocal m4 at {direct}")
+            # Versioned subdir: automake.org/automake_1.17/share/aclocal
+            try:
+                for entry in os.listdir(root):
+                    candidate = os.path.join(root, entry, "share", "aclocal")
+                    if os.path.isdir(candidate):
+                        aclocal_dirs.append(candidate)
+                        self.output.info(f"Found aclocal m4 at {candidate}")
+            except (PermissionError, NotADirectoryError):
+                pass
+
+        # Build autoconf command with -I flags for each aclocal directory
+        include_flags = " ".join(f"-I {d}" for d in aclocal_dirs)
         with env.vars(self).apply():
-            # Generate configure from configure.ac using pre-committed aclocal.m4
-            self.run("autoconf")
+            self.run(f"autoconf {include_flags}")
 
     def generate(self):
         tc = AutotoolsToolchain(self)
