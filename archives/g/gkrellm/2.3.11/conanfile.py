@@ -50,10 +50,12 @@ class GkrellmConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         server_dir = os.path.join(self.source_folder, "server")
-        # gkrellmd: no GTK/X11, build the daemon only
+        cc = self.conf.get("tools.build:compiler_executables", {}).get("c", "clang")
+        # OHOS does not provide lm-sensors.  Skipping its configure probe also
+        # avoids attempting to link a cross-compiled probe executable.
         self.run(
             f"make -C \"{server_dir}\" -j2 "
-            "CC=$CC CFLAGS='-O2 -fPIC' PREFIX=/",
+            f"CC=\"{cc}\" without-libsensors=yes",
             env="conanbuild",
         )
 
@@ -62,10 +64,10 @@ class GkrellmConan(ConanFile):
         install_root = self.package_folder
         self.run(
             f"make -C \"{server_dir}\" install "
-            f"PREFIX=\"{install_root}\"",
+            f"PREFIX=\"{install_root}\" without-libsensors=yes",
             env="conanbuild",
         )
 
     def package_info(self):
-        self.cpp_info.bindirs = ["sbin"]
+        self.cpp_info.bindirs = ["bin"]
         self.cpp_info.libs = []
