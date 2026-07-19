@@ -13,6 +13,5 @@ class GkrellmTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            # Verify gkrellmd binary runs and outputs version info.
-            # No || true — failure must propagate (R9).
-            self.run("gkrellmd --version || gkrellmd -V", env="conanrun")
+            # Run test.sh to verify gkrellmd binary exists and is executable
+            self.run("sh test.sh", env="conanrun")
