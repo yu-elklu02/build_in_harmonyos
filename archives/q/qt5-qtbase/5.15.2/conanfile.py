@@ -166,6 +166,11 @@ class Qt5QtbaseConan(ConanFile):
             copy(self, "*", src=bin_dir,
                  dst=os.path.join(self.package_folder, "bin"), keep_path=False)
 
+        plugins_dir = os.path.join(src_dir, "plugins")
+        if os.path.isdir(plugins_dir):
+            copy(self, "*", src=plugins_dir,
+                 dst=os.path.join(self.package_folder, "plugins"), keep_path=True)
+
         # Copy cmake configs
         cmake_dir = os.path.join(lib_dir, "cmake")
         if os.path.isdir(cmake_dir):
