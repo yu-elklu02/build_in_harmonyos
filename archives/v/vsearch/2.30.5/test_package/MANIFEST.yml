@@ -40,8 +40,21 @@ upstream_tests:
     command: "bash test/sortbylength.sh"
 
 test_package_tests:
-  - file: conanfile.py
-    description: "运行 vsearch --version，验证二进制可执行并正确输出版本号"
-    command: "vsearch --version"
+  - file: test.sh
+    name: "derep_fulllength"
+    description: "合并重复的全长序列并验证计数"
+    command: "vsearch --derep_fulllength input.fasta --output derep.fasta --sizeout"
+  - file: test.sh
+    name: "sortbylength"
+    description: "按序列长度降序排序"
+    command: "vsearch --sortbylength input.fasta --output sorted.fasta"
+  - file: test.sh
+    name: "search_exact"
+    description: "对内置 FASTA 数据执行精确序列搜索"
+    command: "vsearch --search_exact input.fasta --db input.fasta --userout exact.tsv --userfields query+target+id"
+  - file: test.sh
+    name: "fastq_filter"
+    description: "过滤有效 FASTQ 读段并验证输出"
+    command: "vsearch --fastq_filter reads.fastq --fastqout filtered.fastq"
 
-assertion_count: 8
+assertion_count: 10
