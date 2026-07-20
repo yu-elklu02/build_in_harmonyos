@@ -110,13 +110,8 @@ class Qt5QtbaseConan(ConanFile):
             # OHOS SELinux sandbox: chmod-based permission tests in tst_QDir fail
             # because all dirs appear readable/writable under the sandbox.
             # Run make check per-subdirectory, skipping io/ which contains tst_qdir.
-            if self.settings.os == "OHOS":
-                build_dir = os.path.join(src_dir, "..")  # build folder
-                # Find the actual build dir by looking for tests/auto
+            if str(self.settings.os) == "OHOS":
                 tests_auto = os.path.join(src_dir, "tests", "auto", "corelib")
-                if not os.path.isdir(tests_auto):
-                    # In-source build: tests are in src_dir
-                    tests_auto = os.path.join(src_dir, "tests", "auto", "corelib")
                 for subdir in ("kernel", "global", "codecs", "tools"):
                     subdir_path = os.path.join(tests_auto, subdir)
                     if os.path.isdir(subdir_path):
