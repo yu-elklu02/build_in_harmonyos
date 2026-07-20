@@ -17,12 +17,23 @@ class Qt5QtbaseTestConan(ConanFile):
     def build(self):
         cmake = CMake(self)
         package_folder = self.dependencies["qt5-qtbase"].package_folder
-        cmake.configure(variables={
+        variables = {
             "Qt5Core_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Core"),
             "Qt5Gui_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Gui"),
             "Qt5Network_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Network"),
             "Qt5Test_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Test"),
-        })
+        }
+        if str(self.settings.os) == "OHOS":
+            compilers = self.conf.get(
+                "tools.build:compiler_executables", default={}, check_type=dict
+            ) or {}
+            compiler = compilers.get("cpp") or compilers.get("cxx")
+            if compiler:
+                compiler_dir = os.path.dirname(os.path.realpath(compiler))
+                variables["OHOS_CXX_RUNTIME_DIR"] = os.path.join(
+                    compiler_dir, "..", "lib", "aarch64-linux-ohos"
+                )
+        cmake.configure(variables=variables)
         cmake.build()
 
     def test(self):
