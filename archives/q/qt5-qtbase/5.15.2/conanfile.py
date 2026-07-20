@@ -2,7 +2,7 @@ import os
 import shlex
 import subprocess
 from conan import ConanFile
-from conan.errors import ConanInvalidConfiguration
+from conan.errors import ConanException, ConanInvalidConfiguration
 from conan.tools.env import Environment
 from conan.tools.files import get, copy, apply_conandata_patches, export_conandata_patches
 from conan.tools.layout import basic_layout
@@ -37,7 +37,22 @@ class Qt5QtbaseConan(ConanFile):
             )
 
     def source(self):
-        get(self, **self.conan_data["sources"], strip_root=True)
+        source_data = self.conan_data["sources"]
+        urls = source_data["url"]
+        if isinstance(urls, str):
+            urls = [urls]
+        for url in urls:
+            try:
+                get(
+                    self,
+                    url=url,
+                    sha256=source_data["sha256"],
+                    strip_root=True,
+                )
+                return
+            except ConanException as error:
+                self.output.warning(f"Failed to download Qt5 source from {url}: {error}")
+        raise ConanInvalidConfiguration("Unable to download Qt5 source from all mirrors")
 
     def generate(self):
         # Expose zlib paths to Qt5 configure via Conan's build environment.
