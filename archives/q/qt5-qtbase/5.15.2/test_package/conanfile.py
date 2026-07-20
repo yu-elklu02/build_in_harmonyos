@@ -16,7 +16,13 @@ class Qt5QtbaseTestConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        cmake.configure()
+        package_folder = self.dependencies["qt5-qtbase"].package_folder
+        cmake.configure(variables={
+            "Qt5Core_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Core"),
+            "Qt5Gui_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Gui"),
+            "Qt5Network_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Network"),
+            "Qt5Test_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Test"),
+        })
         cmake.build()
 
     def test(self):
