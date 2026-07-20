@@ -167,7 +167,7 @@ class Qt5QtbaseConan(ConanFile):
         qt5core = self.cpp_info.components["Qt5Core"]
         qt5core.libs = ["Qt5Core"]
         qt5core.includedirs = ["include"]
-        qt5core.requires = ["zlib"]
+        qt5core.requires = ["zlib::zlib"]
         qt5core.set_property("cmake_file_name", "Qt5Core")
         qt5core.set_property("cmake_target_name", "Qt5::Core")
 
