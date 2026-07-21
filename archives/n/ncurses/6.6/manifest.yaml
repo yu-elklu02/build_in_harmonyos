@@ -1,0 +1,20 @@
+version: "6.6"
+status: built
+build_date: "2026-07-21"
+
+source:
+  url: "https://invisible-mirror.net/archives/ncurses/ncurses-6.6.tar.gz"
+  sha256: "355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11"
+  tar_format: tar.gz
+
+build:
+  system: autotools
+  configure_options:
+    - "--enable-widec"
+    - "--without-ada"
+    - "--without-cxx"
+    - "--without-progs"
+  cc: clang
+
+patches_applied: []
+knowledge_gained: []

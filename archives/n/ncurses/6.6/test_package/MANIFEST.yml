@@ -1,0 +1,9 @@
+package: ncurses/6.6
+homepage: https://invisible-island.net/ncurses/
+upstream_test_in_build: false
+upstream_tests: []
+test_package_tests:
+  - file: test.c
+    description: "Compile and run a wide ncurses header and link test"
+    command: "./test_ncurses"
+assertion_count: 1
