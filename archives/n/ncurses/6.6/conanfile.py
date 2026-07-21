@@ -59,6 +59,7 @@ class NcursesConan(ConanFile):
         tc.generate()
 
     def build(self):
+        self._wrap_configure_with_ohos_shell()
         autotools = Autotools(self)
         autotools.configure()
         autotools.make(args=["-j1"])
@@ -74,3 +75,22 @@ class NcursesConan(ConanFile):
         self.cpp_info.set_property("pkg_config_name", "ncursesw")
         self.cpp_info.set_property("cmake_file_name", "ncurses")
         self.cpp_info.set_property("cmake_target_name", "ncurses::ncurses")
+
+    def _wrap_configure_with_ohos_shell(self):
+        if str(self.settings.os) != "OHOS":
+            return
+
+        configure = os.path.join(self.build_folder, "configure")
+        original = configure + ".real"
+        if not os.path.isfile(configure) or os.path.exists(original):
+            return
+
+        os.replace(configure, original)
+        with open(configure, "w", encoding="utf-8") as file:
+            file.write(
+                "#!/data/service/hnp/bin/bash\n"
+                "export CONFIG_SHELL=/data/service/hnp/bin/bash\n"
+                "export SHELL=/data/service/hnp/bin/bash\n"
+                'exec "$(dirname "$0")/configure.real" "$@"\n'
+            )
+        os.chmod(configure, 0o755)
