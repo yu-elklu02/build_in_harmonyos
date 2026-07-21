@@ -34,7 +34,15 @@ class NcursesConan(ConanFile):
         self.folders.build = "."
 
     def source(self):
-        get(self, **self.conan_data["sources"], strip_root=True)
+        sources = dict(self.conan_data["sources"])
+        mirror_url = sources.pop("mirror_url", None)
+        try:
+            get(self, **sources, strip_root=True)
+        except Exception as error:
+            if not mirror_url:
+                raise
+            self.output.warning(f"Primary source failed ({error}); trying GNU mirror")
+            get(self, url=mirror_url, sha256=sources["sha256"], strip_root=True)
 
     def generate(self):
         tc = AutotoolsToolchain(self)
