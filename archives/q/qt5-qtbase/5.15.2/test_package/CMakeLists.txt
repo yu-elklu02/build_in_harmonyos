@@ -6,7 +6,7 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Test REQUIRED)
 add_executable(test_qt5_qtbase test.cpp)
-target_link_libraries(test_qt5_qtbase Qt5::Core Qt5::Gui Qt5::Network Qt5::Test)
+target_link_libraries(test_qt5_qtbase PRIVATE Qt5::Core Qt5::Gui Qt5::Network Qt5::Test)
 target_link_options(test_qt5_qtbase PRIVATE -stdlib=libc++)
 if(DEFINED OHOS_CXX_RUNTIME_DIR)
     target_link_libraries(test_qt5_qtbase PRIVATE
