@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import shlex
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -59,9 +60,11 @@ class NcursesConan(ConanFile):
         tc.generate()
 
     def build(self):
-        self._wrap_configure_with_ohos_shell()
         autotools = Autotools(self)
-        autotools.configure()
+        if str(self.settings.os) == "OHOS":
+            self._configure_with_ohos_shell()
+        else:
+            autotools.configure()
         autotools.make(args=["-j1"])
 
     def package(self):
@@ -76,21 +79,28 @@ class NcursesConan(ConanFile):
         self.cpp_info.set_property("cmake_file_name", "ncurses")
         self.cpp_info.set_property("cmake_target_name", "ncurses::ncurses")
 
-    def _wrap_configure_with_ohos_shell(self):
-        if str(self.settings.os) != "OHOS":
-            return
-
+    def _configure_with_ohos_shell(self):
         configure = os.path.join(self.build_folder, "configure")
-        original = configure + ".real"
-        if not os.path.isfile(configure) or os.path.exists(original):
-            return
-
-        os.replace(configure, original)
-        with open(configure, "w", encoding="utf-8") as file:
-            file.write(
-                "#!/data/service/hnp/bin/bash\n"
-                "export CONFIG_SHELL=/data/service/hnp/bin/bash\n"
-                "export SHELL=/data/service/hnp/bin/bash\n"
-                'exec "$(dirname "$0")/configure.real" "$@"\n'
-            )
-        os.chmod(configure, 0o755)
+        args = [
+            "--disable-shared",
+            "--enable-static",
+            "--prefix=/",
+            "--bindir=${prefix}/bin",
+            "--sbindir=${prefix}/bin",
+            "--libdir=${prefix}/lib",
+            "--includedir=${prefix}/include",
+            "--oldincludedir=${prefix}/include",
+            "--host=aarch64-ohos",
+            "--build=aarch64-linux-gnu",
+            "--enable-widec",
+            "--without-ada",
+            "--without-cxx",
+            "--without-cxx-binding",
+            "--without-manpages",
+            "--without-progs",
+            "--without-tests",
+            "--with-termlib",
+        ]
+        shell = "/data/service/hnp/bin/bash"
+        command = " ".join([shlex.quote(configure)] + [shlex.quote(arg) for arg in args])
+        self.run(f"CONFIG_SHELL={shell} SHELL={shell} {command}")
