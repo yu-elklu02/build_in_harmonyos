@@ -103,5 +103,7 @@ class NcursesConan(ConanFile):
             "--with-termlib",
         ]
         shell = "/data/service/hnp/bin/bash"
-        command = " ".join([shlex.quote(configure)] + [shlex.quote(arg) for arg in args])
+        command = " ".join(
+            [shlex.quote(shell), shlex.quote(configure)] + [shlex.quote(arg) for arg in args]
+        )
         self.run(f"CONFIG_SHELL={shell} SHELL={shell} {command}")
