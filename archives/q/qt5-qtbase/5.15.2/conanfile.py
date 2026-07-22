@@ -76,7 +76,11 @@ class Qt5QtbaseConan(ConanFile):
                 check=True, capture_output=True, timeout=10,
             )
             has_pthread_cancel = True
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, FileNotFoundError,
+                subprocess.TimeoutExpired, OSError):
+            self.output.warning(
+                "pthread_cancel detection failed; disabling HAVE_PTHREAD_CANCEL"
+            )
             has_pthread_cancel = False
 
         build_env = Environment()
@@ -107,20 +111,16 @@ class Qt5QtbaseConan(ConanFile):
 
             # Prevent stripping because the OHOS loader rejects stripped ELF files.
             self.run(f'cd "{src_dir}" && make -j4 QMAKE_STRIP=""')
-            # OHOS SELinux sandbox: chmod-based permission tests in tst_QDir fail
-            # because all dirs appear readable/writable under the sandbox.
-            # Run make check per-subdirectory, skipping io/ which contains tst_qdir.
+            # OHOS SELinux sandbox makes chmod-based permission changes
+            # ineffective. Skip only the four affected tst_QDir functions.
             if self.settings.os == "OHOS":
-                build_dir = os.path.join(src_dir, "..")  # build folder
-                # Find the actual build dir by looking for tests/auto
-                tests_auto = os.path.join(src_dir, "tests", "auto", "corelib")
-                if not os.path.isdir(tests_auto):
-                    # In-source build: tests are in src_dir
-                    tests_auto = os.path.join(src_dir, "tests", "auto", "corelib")
-                for subdir in ("kernel", "global", "codecs", "tools"):
-                    subdir_path = os.path.join(tests_auto, subdir)
-                    if os.path.isdir(subdir_path):
-                        self.run(f'make -C "{subdir_path}" check')
+                skipped_tests = (
+                    "-skip tst_QDir::entryListWithTestFiles "
+                    "-skip tst_QDir::removeRecursivelyFailure "
+                    "-skip tst_QDir::isReadable "
+                    "-skip tst_QDir::cdNonreadable"
+                )
+                self.run(f'cd "{src_dir}" && make check TESTARGS="{skipped_tests}"')
             else:
                 self.run(f'cd "{src_dir}" && make check')
 
@@ -187,6 +187,7 @@ class Qt5QtbaseConan(ConanFile):
         qt5gui.libs = ["Qt5Gui"]
         qt5gui.includedirs = ["include"]
         qt5gui.requires = ["Qt5Core"]
+        qt5gui.system_libs = ["EGL", "GLESv2"]
         qt5gui.set_property("cmake_file_name", "Qt5Gui")
         qt5gui.set_property("cmake_target_name", "Qt5::Gui")
 

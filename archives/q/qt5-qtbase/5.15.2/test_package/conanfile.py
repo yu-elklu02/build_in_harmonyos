@@ -27,7 +27,8 @@ class Qt5QtbaseTestConan(ConanFile):
         libdir = os.path.join(dep.package_folder, dep.cpp_info.libdirs[0])
         zlib_libdir = os.path.join(zlib.package_folder, zlib.cpp_info.libdirs[0])
         test_bin = os.path.join(self.cpp.build.bindirs[0] if self.cpp.build.bindirs else ".", "test_qt5_qtbase")
+        library_paths = [libdir, zlib_libdir, os.environ.get("LD_LIBRARY_PATH")]
         os.environ["LD_LIBRARY_PATH"] = ":".join(
-            [libdir, zlib_libdir, os.environ.get("LD_LIBRARY_PATH", "")]
+            path for path in library_paths if path
         )
         self.run(test_bin)
