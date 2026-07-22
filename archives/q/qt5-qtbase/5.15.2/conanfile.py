@@ -1,5 +1,6 @@
 import os
 import shlex
+import shutil
 import subprocess
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -93,8 +94,11 @@ class Qt5QtbaseConan(ConanFile):
             build_env.append("CXXFLAGS", "-DHAVE_PTHREAD_CANCEL")
         # Configure Qt5 with Conan-managed compilers and zlib paths.
         with build_env.vars(self).apply():
+            configure_shell = os.environ.get("CONFIG_SHELL") or shutil.which("sh")
+            if not configure_shell:
+                raise ConanInvalidConfiguration("A POSIX shell is required to run Qt configure")
             self.run(
-                f'cd "{src_dir}" && ./configure '
+                f'cd "{src_dir}" && {shlex.quote(configure_shell)} ./configure '
                 f'-prefix "{pkg}" '
                 f'-opensource -confirm-license '
                 f'-no-widgets -no-dbus -no-accessibility '
