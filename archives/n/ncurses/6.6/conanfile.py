@@ -81,6 +81,7 @@ class NcursesConan(ConanFile):
 
     def _configure_with_ohos_shell(self):
         configure = os.path.join(self.build_folder, "configure")
+        os.chmod(configure, 0o755)
         args = [
             "--disable-shared",
             "--enable-static",
