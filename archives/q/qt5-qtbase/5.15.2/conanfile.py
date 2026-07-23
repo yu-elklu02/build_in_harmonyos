@@ -19,6 +19,8 @@ _OHOS_SKIPPED_CORELIB_TESTS = {
     "time",
     # musl's POSIX collation lacks the locale features exercised by QCollator.
     "text/qcollator",
+    # musl does not implement pthread_cancel, required by QThread::terminate.
+    "thread/qthread",
 }
 
 
@@ -140,7 +142,7 @@ class Qt5QtbaseConan(ConanFile):
                     suite_dir = os.path.join(corelib_dir, suite)
                     if not os.path.isdir(suite_dir):
                         continue
-                    if suite not in ("io", "text"):
+                    if suite not in ("io", "text", "thread"):
                         if (suite not in _OHOS_SKIPPED_CORELIB_TESTS and
                                 self._has_make_check_target(suite_dir)):
                             self.run(test_command.format(suite_dir))
