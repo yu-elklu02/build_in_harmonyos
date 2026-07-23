@@ -133,6 +133,7 @@ class Qt5QtbaseConan(ConanFile):
             # SELinux/timezone-incompatible suites declared above.
             if self.settings.os == "OHOS":
                 corelib_dir = os.path.join(src_dir, "tests", "auto", "corelib")
+                test_command = 'QT_QPA_PLATFORM=offscreen make -C "{}" check'
                 for suite in sorted(os.listdir(corelib_dir)):
                     suite_dir = os.path.join(corelib_dir, suite)
                     if not os.path.isdir(suite_dir):
@@ -140,7 +141,7 @@ class Qt5QtbaseConan(ConanFile):
                     if suite != "io":
                         if (suite not in _OHOS_SKIPPED_CORELIB_TESTS and
                                 self._has_make_check_target(suite_dir)):
-                            self.run(f'make -C "{suite_dir}" check')
+                            self.run(test_command.format(suite_dir))
                         continue
                     for io_test in sorted(os.listdir(suite_dir)):
                         test_dir = os.path.join(suite_dir, io_test)
@@ -148,7 +149,7 @@ class Qt5QtbaseConan(ConanFile):
                         if (test_name not in _OHOS_SKIPPED_CORELIB_TESTS and
                                 os.path.isdir(test_dir) and
                                 self._has_make_check_target(test_dir)):
-                            self.run(f'make -C "{test_dir}" check')
+                            self.run(test_command.format(test_dir))
             else:
                 self.run(f'cd "{src_dir}" && make check')
 
