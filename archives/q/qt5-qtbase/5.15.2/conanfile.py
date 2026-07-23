@@ -90,6 +90,8 @@ class Qt5QtbaseConan(ConanFile):
         build_env.append("CFLAGS", f"-I{zlib_inc}")
         build_env.append("CXXFLAGS", f"-I{zlib_inc}")
         build_env.append("LDFLAGS", f"-L{zlib_lib}")
+        symlink_shim_dir = self._create_symlink_shim()
+        build_env.prepend_path("PATH", symlink_shim_dir)
         if has_pthread_cancel:
             build_env.append("CXXFLAGS", "-DHAVE_PTHREAD_CANCEL")
         # Configure Qt5 with Conan-managed compilers and zlib paths.
@@ -127,6 +129,29 @@ class Qt5QtbaseConan(ConanFile):
                 self.run(f'cd "{src_dir}" && make check TESTARGS="{skipped_tests}"')
             else:
                 self.run(f'cd "{src_dir}" && make check')
+
+    def _create_symlink_shim(self):
+        """Copy Qt ABI aliases when the OHOS workspace rejects symlinks."""
+        shim_dir = os.path.join(self.build_folder, "conan_tools")
+        os.makedirs(shim_dir, exist_ok=True)
+        shim = os.path.join(shim_dir, "ln")
+        real_ln = shutil.which("ln") or "/system/bin/ln"
+        with open(shim, "w", encoding="utf-8") as shim_file:
+            shim_file.write(
+                "#!/bin/sh\n"
+                f"if {shlex.quote(real_ln)} \"$@\"; then\n"
+                "  exit 0\n"
+                "fi\n"
+                "if [ \"$1\" = \"-s\" ]; then\n"
+                "  shift\n"
+                "  rm -f \"$2\"\n"
+                "  cp -f \"$1\" \"$2\"\n"
+                "  exit $?\n"
+                "fi\n"
+                "exit 1\n"
+            )
+        os.chmod(shim, 0o755)
+        return shim_dir
 
     def package(self):
         src_dir = self.source_folder
