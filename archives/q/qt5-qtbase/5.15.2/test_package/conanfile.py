@@ -16,13 +16,7 @@ class Qt5QtbaseTestConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        package_folder = self.dependencies["qt5-qtbase"].package_folder
-        variables = {
-            "Qt5Core_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Core"),
-            "Qt5Gui_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Gui"),
-            "Qt5Network_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Network"),
-            "Qt5Test_DIR": os.path.join(package_folder, "lib", "cmake", "Qt5Test"),
-        }
+        variables = {}
         if str(self.settings.os) == "OHOS":
             compilers = self.conf.get(
                 "tools.build:compiler_executables", default={}, check_type=dict
@@ -40,9 +34,12 @@ class Qt5QtbaseTestConan(ConanFile):
         # Run test binary directly with LD_LIBRARY_PATH set to the
         # package's lib dir (OHOS conanrun env doesn't set it)
         dep = self.dependencies["qt5-qtbase"]
+        zlib = self.dependencies["zlib"]
         libdir = os.path.join(dep.package_folder, dep.cpp_info.libdirs[0])
+        zlib_libdir = os.path.join(zlib.package_folder, "lib")
         test_bin = os.path.join(self.cpp.build.bindirs[0] if self.cpp.build.bindirs else ".", "test_qt5_qtbase")
+        library_paths = [libdir, zlib_libdir, os.environ.get("LD_LIBRARY_PATH")]
         os.environ["LD_LIBRARY_PATH"] = ":".join(
-            [libdir, os.environ.get("LD_LIBRARY_PATH", "")]
+            path for path in library_paths if path
         )
         self.run(test_bin)
