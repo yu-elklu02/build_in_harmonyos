@@ -52,4 +52,4 @@ test_package_tests:
     command: "./test_qt5_qtbase"
 
 # The consumer test remains a separate package/link/runtime check.
-assertion_count: 3
+assertion_count: 7

@@ -42,4 +42,8 @@ class Qt5QtbaseTestConan(ConanFile):
         os.environ["LD_LIBRARY_PATH"] = ":".join(
             path for path in library_paths if path
         )
-        self.run(test_bin)
+        os.environ["QT_QPA_PLATFORM"] = "offscreen"
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+            dep.package_folder, "plugins", "platforms"
+        )
+        self.run(test_bin, ignore_errors=False)
