@@ -214,6 +214,12 @@ class Qt5QtbaseConan(ConanFile):
             copy(self, "*", src=include_dir,
                  dst=os.path.join(self.package_folder, "include"), keep_path=True)
 
+        # Qt's installed module headers are forwarding headers which retain
+        # relative includes into src/. Ship the referenced headers, but not
+        # the C++ implementation sources.
+        copy(self, "*.h", src=os.path.join(src_dir, "src"),
+             dst=os.path.join(self.package_folder, "src"), keep_path=True)
+
         # Copy mkspecs
         if os.path.isdir(mkspecs_dir):
             copy(self, "*", src=mkspecs_dir,
