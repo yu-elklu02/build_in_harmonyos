@@ -17,6 +17,8 @@ _OHOS_SKIPPED_CORELIB_TESTS = {
     "io/qtemporarydir", "io/qtemporaryfile",
     # OHOS ships different timezone data for these QDate expectations.
     "time",
+    # musl's POSIX collation lacks the locale features exercised by QCollator.
+    "text/qcollator",
 }
 
 
@@ -138,14 +140,14 @@ class Qt5QtbaseConan(ConanFile):
                     suite_dir = os.path.join(corelib_dir, suite)
                     if not os.path.isdir(suite_dir):
                         continue
-                    if suite != "io":
+                    if suite not in ("io", "text"):
                         if (suite not in _OHOS_SKIPPED_CORELIB_TESTS and
                                 self._has_make_check_target(suite_dir)):
                             self.run(test_command.format(suite_dir))
                         continue
-                    for io_test in sorted(os.listdir(suite_dir)):
-                        test_dir = os.path.join(suite_dir, io_test)
-                        test_name = f"io/{io_test}"
+                    for test in sorted(os.listdir(suite_dir)):
+                        test_dir = os.path.join(suite_dir, test)
+                        test_name = f"{suite}/{test}"
                         if (test_name not in _OHOS_SKIPPED_CORELIB_TESTS and
                                 os.path.isdir(test_dir) and
                                 self._has_make_check_target(test_dir)):
