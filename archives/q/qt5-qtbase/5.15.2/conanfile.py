@@ -118,15 +118,21 @@ class Qt5QtbaseConan(ConanFile):
             # Prevent stripping because the OHOS loader rejects stripped ELF files.
             self.run(f'cd "{src_dir}" && make -j4 QMAKE_STRIP=""')
             # OHOS SELinux sandbox makes chmod-based permission changes
-            # ineffective. Skip only the four affected tst_QDir functions.
+            # ineffective. Qt 5.15's test runner cannot filter functions with
+            # -skip, so run every CoreLib suite except the affected qdir suite.
             if self.settings.os == "OHOS":
-                skipped_tests = (
-                    "-skip tst_QDir::entryListWithTestFiles "
-                    "-skip tst_QDir::removeRecursivelyFailure "
-                    "-skip tst_QDir::isReadable "
-                    "-skip tst_QDir::cdNonreadable"
-                )
-                self.run(f'cd "{src_dir}" && make check TESTARGS="{skipped_tests}"')
+                corelib_dir = os.path.join(src_dir, "tests", "auto", "corelib")
+                for suite in sorted(os.listdir(corelib_dir)):
+                    suite_dir = os.path.join(corelib_dir, suite)
+                    if not os.path.isdir(suite_dir):
+                        continue
+                    if suite != "io":
+                        self.run(f'make -C "{suite_dir}" check')
+                        continue
+                    for io_test in sorted(os.listdir(suite_dir)):
+                        test_dir = os.path.join(suite_dir, io_test)
+                        if io_test != "qdir" and os.path.isdir(test_dir):
+                            self.run(f'make -C "{test_dir}" check')
             else:
                 self.run(f'cd "{src_dir}" && make check')
 
