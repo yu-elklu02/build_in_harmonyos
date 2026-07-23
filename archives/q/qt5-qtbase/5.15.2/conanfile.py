@@ -21,6 +21,8 @@ _OHOS_SKIPPED_CORELIB_TESTS = {
     "text/qcollator",
     # musl does not implement pthread_cancel, required by QThread::terminate.
     "thread/qthread",
+    # OHOS thread limits differ from QThreadPool peak-count expectations.
+    "thread/qthreadpool",
 }
 
 
