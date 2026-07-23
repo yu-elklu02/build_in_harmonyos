@@ -239,21 +239,21 @@ class Qt5QtbaseConan(ConanFile):
 
         qt5core = self.cpp_info.components["Qt5Core"]
         qt5core.libs = ["Qt5Core"]
-        qt5core.includedirs = ["include"]
+        qt5core.includedirs = ["include", "include/QtCore"]
         qt5core.requires = ["zlib::zlib"]
         qt5core.set_property("cmake_file_name", "Qt5Core")
         qt5core.set_property("cmake_target_name", "Qt5::Core")
 
         qt5network = self.cpp_info.components["Qt5Network"]
         qt5network.libs = ["Qt5Network"]
-        qt5network.includedirs = ["include"]
+        qt5network.includedirs = ["include", "include/QtNetwork"]
         qt5network.requires = ["Qt5Core"]
         qt5network.set_property("cmake_file_name", "Qt5Network")
         qt5network.set_property("cmake_target_name", "Qt5::Network")
 
         qt5gui = self.cpp_info.components["Qt5Gui"]
         qt5gui.libs = ["Qt5Gui"]
-        qt5gui.includedirs = ["include"]
+        qt5gui.includedirs = ["include", "include/QtGui"]
         qt5gui.requires = ["Qt5Core"]
         qt5gui.system_libs = ["EGL", "GLESv2"]
         qt5gui.set_property("cmake_file_name", "Qt5Gui")
@@ -261,14 +261,14 @@ class Qt5QtbaseConan(ConanFile):
 
         qt5test = self.cpp_info.components["Qt5Test"]
         qt5test.libs = ["Qt5Test"]
-        qt5test.includedirs = ["include"]
+        qt5test.includedirs = ["include", "include/QtTest"]
         qt5test.requires = ["Qt5Core"]
         qt5test.set_property("cmake_file_name", "Qt5Test")
         qt5test.set_property("cmake_target_name", "Qt5::Test")
 
         qt5concurrent = self.cpp_info.components["Qt5Concurrent"]
         qt5concurrent.libs = ["Qt5Concurrent"]
-        qt5concurrent.includedirs = ["include"]
+        qt5concurrent.includedirs = ["include", "include/QtConcurrent"]
         qt5concurrent.requires = ["Qt5Core"]
         qt5concurrent.set_property("cmake_file_name", "Qt5Concurrent")
         qt5concurrent.set_property("cmake_target_name", "Qt5::Concurrent")
