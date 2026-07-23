@@ -1,4 +1,5 @@
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -137,17 +138,29 @@ class Qt5QtbaseConan(ConanFile):
                     if not os.path.isdir(suite_dir):
                         continue
                     if suite != "io":
-                        if suite not in _OHOS_SKIPPED_CORELIB_TESTS:
+                        if (suite not in _OHOS_SKIPPED_CORELIB_TESTS and
+                                self._has_make_check_target(suite_dir)):
                             self.run(f'make -C "{suite_dir}" check')
                         continue
                     for io_test in sorted(os.listdir(suite_dir)):
                         test_dir = os.path.join(suite_dir, io_test)
                         test_name = f"io/{io_test}"
                         if (test_name not in _OHOS_SKIPPED_CORELIB_TESTS and
-                                os.path.isdir(test_dir)):
+                                os.path.isdir(test_dir) and
+                                self._has_make_check_target(test_dir)):
                             self.run(f'make -C "{test_dir}" check')
             else:
                 self.run(f'cd "{src_dir}" && make check')
+
+    @staticmethod
+    def _has_make_check_target(directory):
+        for makefile_name in ("Makefile", "makefile"):
+            makefile = os.path.join(directory, makefile_name)
+            if not os.path.isfile(makefile):
+                continue
+            with open(makefile, encoding="utf-8", errors="ignore") as file:
+                return re.search(r"^check\s*:", file.read(), re.MULTILINE) is not None
+        return False
 
     def _create_symlink_shim(self):
         """Copy Qt ABI aliases when the OHOS workspace rejects symlinks."""
