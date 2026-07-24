@@ -1,6 +1,6 @@
 version: "0.1.17"
 software: vcftools
-status: failed
+status: built
 build_date: "2026-07-17"
 build_system: autotools
 
@@ -25,10 +25,10 @@ patches_applied: []
 test_results:
   type: official
   total: 78
-  passed: 0
+  passed: 78
   failed: 0
-  note: "75 upstream assertions and 3 consumer scenarios are awaiting OHOS aarch64 CI execution."
+  note: "75 upstream Perl assertions and 3 consumer scenarios passed on OHOS aarch64."
 
 validation:
-  conan_create: not_run
-  reason: "Windows host has no OHOS aarch64 worker environment; remote CI is required."
+  conan_create: passed
+  test_package: passed
