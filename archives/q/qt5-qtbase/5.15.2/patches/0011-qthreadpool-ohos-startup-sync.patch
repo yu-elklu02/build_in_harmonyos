@@ -1,9 +1,21 @@
 --- tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
 +++ tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
-@@ -804,7 +804,13 @@ void tst_QThreadPool::tryStartPeakThreadCount()
-     QThreadPool threadPool;
- 
-     for (int i = 0; i < 4*QThread::idealThreadCount(); ++i) {
+@@ -806,5 +806,11 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+     for (int i = 0; i < 20; ++i) {
+-        if (threadPool.tryStart(&task) == false)
++        if (threadPool.tryStart(&task) == false) {
+             QTest::qWait(10);
++        } else {
++#ifdef QT_OHOS_THREAD_START_ASYNC
++            // OHOS may defer scheduling a newly-created worker. Wait until
++            // it is running before attempting to fill the next pool slot.
++            QTRY_VERIFY(activeThreads.loadRelaxed() >= qMin(i + 1, QThread::idealThreadCount()));
++#endif
++        }
+     }
+     QCOMPARE(peakActiveThreads.loadRelaxed(), QThread::idealThreadCount());
+@@ -812,5 +818,11 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+     for (int i = 0; i < 20; ++i) {
 -        if (threadPool.tryStart(&task) == false)
 +        if (threadPool.tryStart(&task) == false) {
              QTest::qWait(10);
