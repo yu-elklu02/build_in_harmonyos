@@ -34,11 +34,9 @@ class VsearchConan(ConanFile):
 
         # The GitHub archive does not include configure; ship a generated copy
         # to avoid requiring Autotools generators on the OHOS CI worker.
-        # exports_sources are materialized next to self.source_folder, not in
-        # self.recipe_folder, during Conan's source() phase.
-        src_configure = os.path.join(
-            os.path.dirname(self.source_folder), "patches", "configure"
-        )
+        # Conan materializes exports_sources under self.source_folder during
+        # source(), alongside the extracted upstream source tree.
+        src_configure = os.path.join(self.source_folder, "patches", "configure")
         dst_configure = os.path.join(self.source_folder, "configure")
         shutil.copy2(src_configure, dst_configure)
         os.chmod(dst_configure, 0o755)
