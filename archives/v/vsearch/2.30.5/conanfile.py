@@ -22,7 +22,9 @@ class VsearchConan(ConanFile):
     package_type = "application"
 
     settings = "os", "arch", "compiler", "build_type"
-    exports_sources = "patches/configure"
+    # Export the directory so source() can access patches/configure from the
+    # exported recipe cache, preserving the path used below.
+    exports_sources = "patches/*"
 
     def export_sources(self):
         export_conandata_patches(self)
