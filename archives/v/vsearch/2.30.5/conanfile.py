@@ -49,7 +49,6 @@ class VsearchConan(ConanFile):
         if str(self.settings.os) == "OHOS":
             tmpdir = os.path.expanduser("~/tmp/vsearch")
             os.makedirs(tmpdir, exist_ok=True)
-            self.buildenv_info.define_path("TMPDIR", tmpdir)
 
         tc = AutotoolsToolchain(self)
         tc.configure_args.append("--prefix=/")
@@ -62,6 +61,13 @@ class VsearchConan(ConanFile):
 
     def build(self):
         apply_conandata_patches(self)
+
+        if str(self.settings.os) == "OHOS":
+            tmpdir = os.path.expanduser("~/tmp/vsearch")
+            os.makedirs(tmpdir, exist_ok=True)
+            # Conan 2.29 does not add recipe buildenv_info to conanbuildenv.
+            # Set TMPDIR on this process so configure and config.status inherit it.
+            os.environ["TMPDIR"] = tmpdir
 
         # Conan source copies can lose the executable bit on OHOS HMDFS.
         configure = os.path.join(self.build_folder, "configure")
