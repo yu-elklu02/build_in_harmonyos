@@ -13,5 +13,4 @@ class VsearchTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            # Verify the vsearch binary runs and prints version
-            self.run("vsearch --version", env="conanrun")
+            self.run("sh test.sh", env="conanrun")
