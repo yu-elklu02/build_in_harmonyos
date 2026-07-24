@@ -1,20 +1,18 @@
 --- tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
 +++ tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
-@@ -785,6 +785,7 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+@@ -785,5 +785,6 @@ void tst_QThreadPool::tryStartPeakThreadCount()
  class CounterTask : public QRunnable
  {
  public:
 +    QSemaphore started;
      CounterTask() { setAutoDelete(false); }
- 
-     void run()
-@@ -794,6 +795,7 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+    void run()
+@@ -794,5 +795,6 @@ void tst_QThreadPool::tryStartPeakThreadCount()
          activeThreads.ref();
          peakActiveThreads.storeRelaxed(qMax(peakActiveThreads.loadRelaxed(), activeThreads.loadRelaxed()));
      }
 +    started.release();
- 
-     QTest::qWait(100);
+    QTest::qWait(100);
      {
 @@ -806,5 +808,7 @@ void tst_QThreadPool::tryStartPeakThreadCount()
      for (int i = 0; i < 20; ++i) {
