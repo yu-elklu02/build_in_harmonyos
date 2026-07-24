@@ -32,19 +32,22 @@ class VsearchConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
-        # The GitHub archive does not include configure; ship a generated copy
-        # to avoid requiring Autotools generators on the OHOS CI worker.
-        # Conan materializes exports_sources under self.source_folder during
-        # source(), alongside the extracted upstream source tree.
-        src_configure = os.path.join(self.source_folder, "patches", "configure")
-        dst_configure = os.path.join(self.source_folder, "configure")
-        shutil.copy2(src_configure, dst_configure)
-        os.chmod(dst_configure, 0o755)
-        self.output.info("Pre-generated configure installed.")
+        # The GitHub archive omits the generated configure script and its
+        # Automake support files. Ship the matching files for offline CI use.
+        auxiliary_files = (
+            "configure", "compile", "missing", "install-sh", "depcomp",
+            "config.guess", "config.sub",
+        )
+        for filename in auxiliary_files:
+            source = os.path.join(self.source_folder, "patches", filename)
+            destination = os.path.join(self.source_folder, filename)
+            shutil.copy2(source, destination)
+            os.chmod(destination, 0o755)
+        self.output.info("Pre-generated Autotools files installed.")
 
     def generate(self):
         tc = AutotoolsToolchain(self)
-        tc.configure_args.extend(["--prefix=/", "--without-zlib", "--without-bz2"])
+        tc.configure_args.append("--prefix=/")
         tc.generate()
 
     def build(self):
