@@ -1,6 +1,6 @@
 --- tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
 +++ tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
-@@ -785,4 +785,5 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+@@ -785,3 +785,4 @@ void tst_QThreadPool::tryStartPeakThreadCount()
  class CounterTask : public QRunnable
  {
  public:
