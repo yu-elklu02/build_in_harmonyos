@@ -48,6 +48,11 @@ class VsearchConan(ConanFile):
     def generate(self):
         tc = AutotoolsToolchain(self)
         tc.configure_args.append("--prefix=/")
+        if str(self.settings.os) == "OHOS":
+            # The upstream configure script rejects config.guess' HarmonyOS
+            # output. Use the OHOS triplet accepted by the bundled config.sub.
+            triplet = "aarch64-unknown-linux-ohos"
+            tc.configure_args.extend([f"--build={triplet}", f"--host={triplet}"])
         tc.generate()
 
     def build(self):
