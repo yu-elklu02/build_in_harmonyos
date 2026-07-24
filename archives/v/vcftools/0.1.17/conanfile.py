@@ -108,7 +108,7 @@ class VcftoolsConan(ConanFile):
         self.run(
             "perl test.t",
             cwd=os.path.dirname(test_path),
-            env="conanrun",
+            env=["conanrun", "vcftools_tmpdir"],
         )
 
     def package(self):
