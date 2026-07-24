@@ -1,6 +1,6 @@
 --- tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
 +++ tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
-@@ -806,5 +806,11 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+@@ -806,5 +806,12 @@ void tst_QThreadPool::tryStartPeakThreadCount()
      for (int i = 0; i < 20; ++i) {
 -        if (threadPool.tryStart(&task) == false)
 +        if (threadPool.tryStart(&task) == false) {
@@ -14,7 +14,7 @@
 +        }
      }
      QCOMPARE(peakActiveThreads.loadRelaxed(), QThread::idealThreadCount());
-@@ -812,5 +818,11 @@ void tst_QThreadPool::tryStartPeakThreadCount()
+@@ -812,5 +818,12 @@ void tst_QThreadPool::tryStartPeakThreadCount()
      for (int i = 0; i < 20; ++i) {
 -        if (threadPool.tryStart(&task) == false)
 +        if (threadPool.tryStart(&task) == false) {
