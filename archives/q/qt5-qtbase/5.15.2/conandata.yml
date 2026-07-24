@@ -37,3 +37,6 @@ patches:
   - patch_file: "patches/0010-qlocale-standard-fenv-test.patch"
     patch_type: "test"
     patch_description: "Use standard floating-point exception flags in the qlocale test when feenableexcept is unavailable"
+  - patch_file: "patches/0011-qthreadpool-ohos-startup-sync.patch"
+    patch_type: "test"
+    patch_description: "Wait for asynchronously scheduled OHOS workers before measuring QThreadPool peak concurrency"
