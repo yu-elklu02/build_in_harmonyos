@@ -10,6 +10,7 @@ class Qt5QtbaseTestConan(ConanFile):
 
     def requirements(self):
         self.requires(self.tested_reference_str)
+        self.requires("zlib/1.3.1")
 
     def layout(self):
         cmake_layout(self)

@@ -124,8 +124,6 @@ class Qt5QtbaseConan(ConanFile):
         build_env.append("LDFLAGS", f"-L{zlib_lib}")
         symlink_shim_dir = self._create_symlink_shim()
         build_env.prepend_path("PATH", symlink_shim_dir)
-        if self.settings.os == "OHOS":
-            build_env.append("CXXFLAGS", "-DQT_OHOS_THREAD_START_ASYNC")
         if has_pthread_cancel:
             build_env.append("CXXFLAGS", "-DHAVE_PTHREAD_CANCEL")
         # Configure Qt5 with Conan-managed compilers and zlib paths.
