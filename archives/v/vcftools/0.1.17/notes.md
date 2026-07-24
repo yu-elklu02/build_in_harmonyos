@@ -49,8 +49,8 @@ indel statistics, consensus, contrast, ploidy handling, and Perl APIs.
 
 - Source archive SHA256: verified on Windows.
 - Conan recipe syntax and repository static gates: run locally where possible.
-- OHOS aarch64 `conan create`: not available on this Windows host; must run in
-  the repository CI worker.
-- W0 remote query: the CNB endpoint returned `system acceleration policy not
-  enabled` to the Windows client. The dependency exists in the repository as
-  `htslib/1.24-r0`; CI must confirm that its recipe and binary are published.
+- OHOS aarch64 `conan create`: passed locally, including package creation and
+  `test_package` execution.
+- Upstream Perl suite: 75/75 assertions passed.
+- Consumer package validation: 3/3 scenarios passed (version, allele
+  frequency, and `vcf-validator`/`PERL5LIB` checks).

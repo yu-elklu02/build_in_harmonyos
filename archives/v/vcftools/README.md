@@ -7,7 +7,7 @@ filtering, comparing, and transforming Variant Call Format (VCF) files.
 
 | Version | Status | Build system | Notes |
 |---------|--------|--------------|-------|
-| 0.1.17 | failed | Autotools | Awaiting OHOS aarch64 CI verification |
+| 0.1.17 | built | Autotools | OHOS aarch64 local validation passed: 75 upstream assertions and 3 consumer scenarios |
 
 ## Dependencies
 
