@@ -1,26 +1,7 @@
 --- tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
 +++ tests/auto/corelib/thread/qthreadpool/tst_qthreadpool.cpp
-@@ -806,5 +806,10 @@ void tst_QThreadPool::tryStartPeakThreadCount()
-     for (int i = 0; i < 20; ++i) {
--        if (threadPool.tryStart(&task) == false)
-+        if (threadPool.tryStart(&task) == false) {
-             QTest::qWait(10);
-+        } else {
-+            // Wait for a worker to run before attempting to fill the next
-+            // pool slot; this keeps the peak-concurrency check deterministic.
-+            QTRY_VERIFY(activeThreads.loadRelaxed() >= qMin(i + 1, QThread::idealThreadCount()));
-+        }
+@@ -795,3 +795,3 @@ void tst_QThreadPool::tryStartPeakThreadCount()
      }
-     QCOMPARE(peakActiveThreads.loadRelaxed(), QThread::idealThreadCount());
-@@ -812,5 +816,10 @@ void tst_QThreadPool::tryStartPeakThreadCount()
-     for (int i = 0; i < 20; ++i) {
--        if (threadPool.tryStart(&task) == false)
-+        if (threadPool.tryStart(&task) == false) {
-             QTest::qWait(10);
-+        } else {
-+            // Wait for a worker to run before attempting to fill the next
-+            // pool slot; this keeps the peak-concurrency check deterministic.
-+            QTRY_VERIFY(activeThreads.loadRelaxed() >= qMin(i + 1, QThread::idealThreadCount()));
-+        }
-     }
-     QCOMPARE(peakActiveThreads.loadRelaxed(), QThread::idealThreadCount());
+-    QTest::qWait(100);
++    QThread::msleep(100);
+     {
