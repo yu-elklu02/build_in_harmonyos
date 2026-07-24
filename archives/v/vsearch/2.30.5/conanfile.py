@@ -46,6 +46,11 @@ class VsearchConan(ConanFile):
         self.output.info("Pre-generated Autotools files installed.")
 
     def generate(self):
+        if str(self.settings.os) == "OHOS":
+            tmpdir = os.path.expanduser("~/tmp/vsearch")
+            os.makedirs(tmpdir, exist_ok=True)
+            self.buildenv_info.define_path("TMPDIR", tmpdir)
+
         tc = AutotoolsToolchain(self)
         tc.configure_args.append("--prefix=/")
         if str(self.settings.os) == "OHOS":
