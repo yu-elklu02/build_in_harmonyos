@@ -33,9 +33,17 @@ class VsearchConan(ConanFile):
 
     def source(self):
         source = self.conan_data["sources"]
-        git = Git(self)
+        clone_folder = os.path.join(self.source_folder, "_upstream")
+        git = Git(self, clone_folder)
         git.clone(url=source["url"], target=".")
         git.checkout(commit=source["commit"])
+
+        # exports_sources has already placed patches/ in source_folder, so
+        # clone in a child directory and then merge the upstream source tree.
+        for entry in os.listdir(clone_folder):
+            if entry != ".git":
+                shutil.move(os.path.join(clone_folder, entry), self.source_folder)
+        shutil.rmtree(clone_folder)
 
         # The upstream repository omits generated Autotools output. Ship the
         # matching scripts and templates so offline CI can run configure.
