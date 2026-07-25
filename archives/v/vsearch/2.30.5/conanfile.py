@@ -97,6 +97,20 @@ class VsearchConan(ConanFile):
 
         autotools = Autotools(self)
         autotools.configure()
+
+        # On OHOS HMDFS, make can incorrectly consider config.status newer
+        # than the files it just generated. Keep the configured outputs newer
+        # to prevent a second config.status invocation during make.
+        generated_outputs = (
+            "Makefile", "config.h", "stamp-h1",
+            os.path.join("src", "Makefile"),
+            os.path.join("man", "Makefile"),
+        )
+        for filename in generated_outputs:
+            output = os.path.join(self.build_folder, filename)
+            if os.path.isfile(output):
+                os.utime(output, None)
+
         autotools.make()
         autotools.make(target="check")
 
