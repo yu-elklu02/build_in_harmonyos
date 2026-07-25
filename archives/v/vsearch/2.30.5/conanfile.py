@@ -174,8 +174,19 @@ class VsearchConan(ConanFile):
             if os.path.isfile(output):
                 os.utime(output, None)
 
-        autotools.make()
-        autotools.make(target="check")
+        make_args = None
+        if str(self.settings.os) == "OHOS":
+            # configure has already generated these files successfully. Do
+            # not let make re-run config.status on HMDFS, where Autoconf's
+            # private temporary directory cannot be written by the worker.
+            make_args = [
+                "--old-file=Makefile",
+                "--old-file=src/Makefile",
+                "--old-file=man/Makefile",
+                "--old-file=config.h",
+            ]
+        autotools.make(args=make_args)
+        autotools.make(target="check", args=make_args)
 
     def package(self):
         Autotools(self).install()
