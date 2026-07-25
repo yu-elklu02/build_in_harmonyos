@@ -104,11 +104,12 @@ class VsearchConan(ConanFile):
             expected_tmpdir not in contents or expected_fallback not in contents
         ):
             raise ConanException(
-                "Could not patch configure temporary directory handling"
+                f"Could not patch {configure} temporary directory handling"
             )
         if patched != contents:
             with open(configure, "w", encoding="utf-8", newline="") as file:
                 file.write(patched)
+            os.utime(configure, None)
 
     def build(self):
         apply_conandata_patches(self)
@@ -134,16 +135,24 @@ class VsearchConan(ConanFile):
             os.environ["TMPDIR"] = tmpdir
 
         # Conan source copies can lose the executable bit on OHOS HMDFS.
-        configure = os.path.join(self.build_folder, "configure")
-        if os.path.isfile(configure):
-            os.chmod(configure, 0o755)
+        source_configure = os.path.join(self.source_folder, "configure")
+        if os.path.isfile(source_configure):
+            os.chmod(source_configure, 0o755)
         if str(self.settings.os) == "OHOS":
-            # Patch the template before it generates config.status. make may
-            # regenerate config.status, so patching only that output is too late.
-            self._patch_configure_tempdir(configure)
+            # Autotools.configure() runs source_folder/configure and writes
+            # config.status in build_folder. Patch the actual template first;
+            # make may regenerate config.status later from this same template.
+            self._patch_configure_tempdir(source_configure)
 
         autotools = Autotools(self)
         autotools.configure()
+
+        if str(self.settings.os) == "OHOS":
+            # Assert the generated output has the same safe temporary-file
+            # handling before make can invoke it again.
+            self._patch_configure_tempdir(
+                os.path.join(self.build_folder, "config.status")
+            )
 
         # On OHOS HMDFS, make can incorrectly consider config.status newer
         # than the files it just generated. Keep the configured outputs newer
