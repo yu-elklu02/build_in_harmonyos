@@ -9,8 +9,9 @@ import shutil
 
 from conan import ConanFile
 from conan.errors import ConanException
-from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches
 from conan.tools.gnu import Autotools, AutotoolsToolchain
+from conan.tools.scm import Git
 
 
 class VsearchConan(ConanFile):
@@ -31,9 +32,12 @@ class VsearchConan(ConanFile):
         export_conandata_patches(self)
 
     def source(self):
-        get(self, **self.conan_data["sources"], strip_root=True)
+        source = self.conan_data["sources"]
+        git = Git(self)
+        git.clone(url=source["url"], target=".")
+        git.checkout(commit=source["commit"])
 
-        # The GitHub archive omits generated Autotools output. Ship the
+        # The upstream repository omits generated Autotools output. Ship the
         # matching scripts and templates so offline CI can run configure.
         executable_files = (
             "configure", "compile", "missing", "install-sh", "depcomp",

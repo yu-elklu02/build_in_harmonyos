@@ -1,3 +1,5 @@
 sources:
-  url: "https://github.com/torognes/vsearch/archive/refs/tags/v2.30.5.tar.gz"
-  sha256: "b6ecfa61721bb7805974cdb7d490d56b4ad3ed12b0baaa170fd96ff711d92929"
+  # GitCode mirror of github.com/torognes/vsearch. The commit is the
+  # upstream v2.30.5 tag target, pinning the source content immutably.
+  url: "https://gitcode.com/gh_mirrors/vs/vsearch.git"
+  commit: "b67138b3f908b56c420855a14ffb3e2ddc3d780e"
