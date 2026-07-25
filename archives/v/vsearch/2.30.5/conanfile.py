@@ -111,6 +111,17 @@ class VsearchConan(ConanFile):
                 file.write(patched)
             os.utime(configure, None)
 
+    @staticmethod
+    def _disable_config_status_remake(makefile):
+        """Keep make from regenerating files configure has already created."""
+        dependency = "Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status"
+        with open(makefile, encoding="utf-8") as file:
+            contents = file.read()
+        if dependency not in contents:
+            raise ConanException(f"Could not find config.status rule in {makefile}")
+        with open(makefile, "w", encoding="utf-8", newline="") as file:
+            file.write(contents.replace(dependency, "Makefile: $(srcdir)/Makefile.in", 1))
+
     def build(self):
         apply_conandata_patches(self)
 
@@ -160,6 +171,17 @@ class VsearchConan(ConanFile):
             self._patch_configure_tempdir(
                 os.path.join(self.build_folder, "config.status")
             )
+            # HMDFS can make config.status appear newer than every generated
+            # Makefile. Configuration already completed, so remove only the
+            # automatic remake dependency that would invoke it again.
+            for filename in (
+                "Makefile",
+                os.path.join("src", "Makefile"),
+                os.path.join("man", "Makefile"),
+            ):
+                self._disable_config_status_remake(
+                    os.path.join(self.build_folder, filename)
+                )
 
         # On OHOS HMDFS, make can incorrectly consider config.status newer
         # than the files it just generated. Keep the configured outputs newer
@@ -174,22 +196,8 @@ class VsearchConan(ConanFile):
             if os.path.isfile(output):
                 os.utime(output, None)
 
-        make_args = None
-        if str(self.settings.os) == "OHOS":
-            # configure has already generated these files successfully. Do
-            # not let make regenerate configure or re-run config.status on
-            # HMDFS, where Autoconf's private temporary directory cannot be
-            # written by the worker.
-            make_args = [
-                "--old-file=configure",
-                "--old-file=config.status",
-                "--old-file=Makefile",
-                "--old-file=src/Makefile",
-                "--old-file=man/Makefile",
-                "--old-file=config.h",
-            ]
-        autotools.make(args=make_args)
-        autotools.make(target="check", args=make_args)
+        autotools.make()
+        autotools.make(target="check")
 
     def package(self):
         Autotools(self).install()
