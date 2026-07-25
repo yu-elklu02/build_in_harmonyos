@@ -153,8 +153,10 @@ class VsearchConan(ConanFile):
         autotools.configure()
 
         if str(self.settings.os) == "OHOS":
-            # Assert the generated output has the same safe temporary-file
-            # handling before make can invoke it again.
+            # Autotools.configure() can refresh the build-folder script from
+            # Conan's copied source tree. Patch it again with the generated
+            # config.status before make can invoke either file.
+            self._patch_configure_tempdir(build_configure)
             self._patch_configure_tempdir(
                 os.path.join(self.build_folder, "config.status")
             )
