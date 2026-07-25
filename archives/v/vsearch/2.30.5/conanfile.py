@@ -70,6 +70,19 @@ class VsearchConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
 
+        # shutil.copy2() preserves the generated templates' original mtime.
+        # Refresh them before configure so make does not try to run the
+        # unavailable aclocal/automake tools on the OHOS build worker.
+        generated_templates = (
+            "aclocal.m4", "config.h.in", "Makefile.in",
+            os.path.join("src", "Makefile.in"),
+            os.path.join("man", "Makefile.in"),
+        )
+        for filename in generated_templates:
+            template = os.path.join(self.build_folder, filename)
+            if os.path.isfile(template):
+                os.utime(template, None)
+
         if str(self.settings.os) == "OHOS":
             tmpdir = os.path.expanduser("~/tmp/vsearch")
             os.makedirs(tmpdir, exist_ok=True)
