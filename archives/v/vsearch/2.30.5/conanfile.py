@@ -136,13 +136,18 @@ class VsearchConan(ConanFile):
 
         # Conan source copies can lose the executable bit on OHOS HMDFS.
         source_configure = os.path.join(self.source_folder, "configure")
-        if os.path.isfile(source_configure):
-            os.chmod(source_configure, 0o755)
+        build_configure = os.path.join(self.build_folder, "configure")
         if str(self.settings.os) == "OHOS":
-            # Autotools.configure() runs source_folder/configure and writes
-            # config.status in build_folder. Patch the actual template first;
-            # make may regenerate config.status later from this same template.
-            self._patch_configure_tempdir(source_configure)
+            # Conan may copy the source tree into build_folder before build().
+            # Patch both templates because this Autotools helper executes the
+            # build-folder copy, and make can regenerate config.status from it.
+            for configure in (source_configure, build_configure):
+                if not os.path.isfile(configure):
+                    raise ConanException(f"Missing configure script: {configure}")
+                os.chmod(configure, 0o755)
+                self._patch_configure_tempdir(configure)
+        elif os.path.isfile(build_configure):
+            os.chmod(build_configure, 0o755)
 
         autotools = Autotools(self)
         autotools.configure()
