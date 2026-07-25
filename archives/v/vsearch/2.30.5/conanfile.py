@@ -177,9 +177,11 @@ class VsearchConan(ConanFile):
         make_args = None
         if str(self.settings.os) == "OHOS":
             # configure has already generated these files successfully. Do
-            # not let make re-run config.status on HMDFS, where Autoconf's
-            # private temporary directory cannot be written by the worker.
+            # not let make regenerate configure or re-run config.status on
+            # HMDFS, where Autoconf's private temporary directory cannot be
+            # written by the worker.
             make_args = [
+                "--old-file=configure",
                 "--old-file=config.status",
                 "--old-file=Makefile",
                 "--old-file=src/Makefile",
