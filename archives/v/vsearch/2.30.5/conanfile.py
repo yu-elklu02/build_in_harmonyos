@@ -32,16 +32,24 @@ class VsearchConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
-        # The GitHub archive omits the generated configure script and its
-        # Automake support files. Ship the matching files for offline CI use.
-        auxiliary_files = (
+        # The GitHub archive omits generated Autotools output. Ship the
+        # matching scripts and templates so offline CI can run configure.
+        executable_files = (
             "configure", "compile", "missing", "install-sh", "depcomp",
             "config.guess", "config.sub",
         )
-        for filename in auxiliary_files:
+        template_files = (
+            "config.h.in", "Makefile.in",
+            os.path.join("src", "Makefile.in"),
+            os.path.join("man", "Makefile.in"),
+        )
+        for filename in executable_files + template_files:
             source = os.path.join(self.source_folder, "patches", filename)
             destination = os.path.join(self.source_folder, filename)
+            os.makedirs(os.path.dirname(destination), exist_ok=True)
             shutil.copy2(source, destination)
+        for filename in executable_files:
+            destination = os.path.join(self.source_folder, filename)
             os.chmod(destination, 0o755)
         self.output.info("Pre-generated Autotools files installed.")
 
