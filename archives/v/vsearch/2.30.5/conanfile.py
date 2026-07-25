@@ -83,6 +83,33 @@ class VsearchConan(ConanFile):
             tc.configure_args.extend([f"--build={triplet}", f"--host={triplet}"])
         tc.generate()
 
+    @staticmethod
+    def _patch_configure_tempdir(configure):
+        """Make generated config.status use a writable OHOS temporary directory."""
+        with open(configure, encoding="utf-8") as file:
+            contents = file.read()
+        patched = contents.replace(
+            '(umask 077 && mktemp -d "./confXXXXXX")',
+            '(umask 002 && mktemp -d "${TMPDIR:-.}/confXXXXXX")',
+        ).replace(
+            'tmp=./conf$$-$RANDOM',
+            'tmp=${TMPDIR:-.}/conf$$-$RANDOM',
+        ).replace(
+            '(umask 077 && mkdir "$tmp")',
+            '(umask 002 && mkdir "$tmp")',
+        )
+        expected_tmpdir = '(umask 002 && mktemp -d "${TMPDIR:-.}/confXXXXXX")'
+        expected_fallback = '(umask 002 && mkdir "$tmp")'
+        if patched == contents and (
+            expected_tmpdir not in contents or expected_fallback not in contents
+        ):
+            raise ConanException(
+                "Could not patch configure temporary directory handling"
+            )
+        if patched != contents:
+            with open(configure, "w", encoding="utf-8", newline="") as file:
+                file.write(patched)
+
     def build(self):
         apply_conandata_patches(self)
 
@@ -110,35 +137,13 @@ class VsearchConan(ConanFile):
         configure = os.path.join(self.build_folder, "configure")
         if os.path.isfile(configure):
             os.chmod(configure, 0o755)
+        if str(self.settings.os) == "OHOS":
+            # Patch the template before it generates config.status. make may
+            # regenerate config.status, so patching only that output is too late.
+            self._patch_configure_tempdir(configure)
 
         autotools = Autotools(self)
         autotools.configure()
-
-        if str(self.settings.os) == "OHOS":
-            config_status = os.path.join(self.build_folder, "config.status")
-            with open(config_status, encoding="utf-8") as file:
-                contents = file.read()
-            patched = contents.replace(
-                '(umask 077 && mktemp -d "./confXXXXXX")',
-                '(umask 002 && mktemp -d "${TMPDIR:-.}/confXXXXXX")',
-            ).replace(
-                'tmp=./conf$$-$RANDOM',
-                'tmp=${TMPDIR:-.}/conf$$-$RANDOM',
-            ).replace(
-                '(umask 077 && mkdir "$tmp")',
-                '(umask 002 && mkdir "$tmp")',
-            )
-            expected_tmpdir = '(umask 002 && mktemp -d "${TMPDIR:-.}/confXXXXXX")'
-            expected_fallback = '(umask 002 && mkdir "$tmp")'
-            if patched == contents and (
-                expected_tmpdir not in contents or expected_fallback not in contents
-            ):
-                raise ConanException(
-                    "Could not patch config.status temporary directory handling"
-                )
-            if patched != contents:
-                with open(config_status, "w", encoding="utf-8", newline="") as file:
-                    file.write(patched)
 
         # On OHOS HMDFS, make can incorrectly consider config.status newer
         # than the files it just generated. Keep the configured outputs newer
