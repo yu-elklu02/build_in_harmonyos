@@ -180,6 +180,7 @@ class VsearchConan(ConanFile):
             # not let make re-run config.status on HMDFS, where Autoconf's
             # private temporary directory cannot be written by the worker.
             make_args = [
+                "--old-file=config.status",
                 "--old-file=Makefile",
                 "--old-file=src/Makefile",
                 "--old-file=man/Makefile",
