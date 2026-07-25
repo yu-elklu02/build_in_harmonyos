@@ -39,7 +39,7 @@ class VsearchConan(ConanFile):
             "config.guess", "config.sub",
         )
         template_files = (
-            "config.h.in", "Makefile.in",
+            "aclocal.m4", "config.h.in", "Makefile.in",
             os.path.join("src", "Makefile.in"),
             os.path.join("man", "Makefile.in"),
         )
