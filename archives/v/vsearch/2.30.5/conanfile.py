@@ -36,7 +36,10 @@ class VsearchConan(ConanFile):
         clone_folder = os.path.join(self.source_folder, "_upstream")
         git = Git(self, clone_folder)
         git.clone(url=source["url"], target=".")
-        git.checkout(commit=source["commit"])
+        # On OHOS the Conan worker UID can differ from the cache directory
+        # owner. Trust only this just-cloned directory for this checkout;
+        # do not persist a global safe.directory exception.
+        git.run(f'-c safe.directory="{clone_folder}" checkout {source["commit"]}')
 
         # exports_sources has already placed patches/ in source_folder, so
         # clone in a child directory and then merge the upstream source tree.
