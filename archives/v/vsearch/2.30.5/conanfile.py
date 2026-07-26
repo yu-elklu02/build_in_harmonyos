@@ -112,15 +112,63 @@ class VsearchConan(ConanFile):
             os.utime(configure, None)
 
     @staticmethod
-    def _disable_config_status_remake(makefile):
-        """Keep make from regenerating files configure has already created."""
-        dependency = "Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status"
+    def _verify_config_status_tempdir(config_status):
+        with open(config_status, encoding="utf-8") as file:
+            contents = file.read()
+        stale_patterns = (
+            '(umask 077 && mktemp -d "./confXXXXXX")',
+            'tmp=./conf$$-$RANDOM',
+            '(umask 077 && mkdir "$tmp")',
+        )
+        remaining = [pattern for pattern in stale_patterns if pattern in contents]
+        if remaining:
+            raise ConanException(
+                f"config.status still uses HMDFS-incompatible temp dirs: {remaining}"
+            )
+
+    @staticmethod
+    def _disable_autotools_remake_rules(makefile):
+        """Keep make from regenerating Autotools files shipped by the recipe."""
         with open(makefile, encoding="utf-8") as file:
             contents = file.read()
-        if dependency not in contents:
-            raise ConanException(f"Could not find config.status rule in {makefile}")
+
+        replacements = (
+            (
+                "Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status",
+                "Makefile: $(srcdir)/Makefile.in",
+            ),
+            (
+                "$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)",
+                "$(top_builddir)/config.status:",
+            ),
+            (
+                "$(top_srcdir)/configure: $(am__configure_deps)",
+                "$(top_srcdir)/configure:",
+            ),
+            (
+                "$(ACLOCAL_M4): $(am__aclocal_m4_deps)",
+                "$(ACLOCAL_M4):",
+            ),
+            (
+                "$(srcdir)/Makefile.in: $(srcdir)/Makefile.am $(am__configure_deps)",
+                "$(srcdir)/Makefile.in:",
+            ),
+            (
+                "stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status",
+                "stamp-h1:",
+            ),
+        )
+
+        patched = contents
+        changed = False
+        for old, new in replacements:
+            if old in patched:
+                patched = patched.replace(old, new, 1)
+                changed = True
+        if not changed:
+            raise ConanException(f"Could not find Autotools remake rules in {makefile}")
         with open(makefile, "w", encoding="utf-8", newline="") as file:
-            file.write(contents.replace(dependency, "Makefile: $(srcdir)/Makefile.in", 1))
+            file.write(patched)
 
     def build(self):
         apply_conandata_patches(self)
@@ -171,15 +219,19 @@ class VsearchConan(ConanFile):
             self._patch_configure_tempdir(
                 os.path.join(self.build_folder, "config.status")
             )
-            # HMDFS can make config.status appear newer than every generated
-            # Makefile. Configuration already completed, so remove only the
-            # automatic remake dependency that would invoke it again.
+            self._verify_config_status_tempdir(
+                os.path.join(self.build_folder, "config.status")
+            )
+            # HMDFS can make configure/config.status appear newer than the
+            # files they just generated. Configuration already completed, so
+            # disable only the maintainer remake rules that would invoke them
+            # again during make.
             for filename in (
                 "Makefile",
                 os.path.join("src", "Makefile"),
                 os.path.join("man", "Makefile"),
             ):
-                self._disable_config_status_remake(
+                self._disable_autotools_remake_rules(
                     os.path.join(self.build_folder, filename)
                 )
 
