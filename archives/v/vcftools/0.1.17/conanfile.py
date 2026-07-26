@@ -166,6 +166,19 @@ class VcftoolsConan(ConanFile):
             "chdir($path);",
         )
 
+        # These three helpers receive $path rather than an examples/ path in
+        # the upstream script.  Keep every helper on the same absolute
+        # examples/ directory after the release-layout rewrite above.
+        replace_in_file(
+            self, test_path, "test_merge($path,", 'test_merge("$path/../../examples",'
+        )
+        replace_in_file(
+            self, test_path, "test_compare($path,", 'test_compare("$path/../../examples",'
+        )
+        replace_in_file(
+            self, test_path, "test_isec($path,", 'test_isec("$path/../../examples",'
+        )
+
         # Data::Dumper's textual hash order varies between Perl releases.
         # Compare the generated statistics as Perl data structures instead.
         replace_in_file(
