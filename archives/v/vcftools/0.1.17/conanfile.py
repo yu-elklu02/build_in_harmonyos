@@ -143,6 +143,15 @@ class VcftoolsConan(ConanFile):
             "$path/../../examples",
         )
 
+        # The release archive keeps examples/ at the source root while the
+        # Perl tools remain in src/perl/.  Adjust only test command paths.
+        replace_in_file(
+            self,
+            test_path,
+            "../perl/",
+            "../src/perl/",
+        )
+
         self.run(
             "perl test.t",
             cwd=os.path.dirname(test_path),
