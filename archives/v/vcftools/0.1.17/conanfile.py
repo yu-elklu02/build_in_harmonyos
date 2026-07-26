@@ -63,7 +63,10 @@ class VcftoolsConan(ConanFile):
         VirtualRunEnv(self).generate()
 
         tc = AutotoolsToolchain(self)
+        triplet = "aarch64-unknown-linux-ohos"
         tc.configure_args.extend([
+            f"--build={triplet}",
+            f"--host={triplet}",
             "--prefix=/",
             "--disable-silent-rules",
             "--with-pmdir=lib/perl5/site_perl",
