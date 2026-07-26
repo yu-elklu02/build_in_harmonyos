@@ -33,6 +33,9 @@ class GkrellmConan(ConanFile):
     def export_sources(self):
         export_conandata_patches(self)
 
+    def requirements(self):
+        self.requires("glib/2.84.0")
+
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
@@ -45,12 +48,14 @@ class GkrellmConan(ConanFile):
         cc = self.conf.get("tools.build:compiler_executables", {}).get("c", "clang")
         # OHOS does not provide lm-sensors.  Skipping its configure probe also
         # avoids attempting to link a cross-compiled probe executable.
-        glib_prefix = os.path.expanduser("~/usr/local")
-        glib_includes = (
-            f"-I{os.path.join(glib_prefix, 'include', 'glib-2.0')} "
-            f"-I{os.path.join(glib_prefix, 'lib', 'glib-2.0', 'include')}"
+        glib = self.dependencies["glib"].cpp_info
+        glib_includes = " ".join(f"-I{path}" for path in glib.includedirs)
+        glib_libs = " ".join(
+            [f"-L{path}" for path in glib.libdirs]
+            + [f"-l{library}" for library in glib.libs]
+            + [f"-l{library}" for library in glib.system_libs]
+            + glib.exelinkflags
         )
-        glib_libs = "-lglib-2.0 -lgmodule-2.0 -lgthread-2.0 -lintl"
         self.run(
             f"make -C \"{server_dir}\" -j1 V=1 "
             f"CC=\"{cc}\" PKG_CONFIG=true "
