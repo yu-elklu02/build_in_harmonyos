@@ -8,6 +8,7 @@ indexed VCF operations.
 import os
 
 from conan import ConanFile
+from conan.errors import ConanException
 from conan.tools.env import Environment, VirtualRunEnv
 from conan.tools.files import (
     apply_conandata_patches,
@@ -82,8 +83,41 @@ class VcftoolsConan(ConanFile):
         env.define_path("TMPDIR", tmpdir)
         env.vars(self).save_script("vcftools_tmpdir")
 
+    @staticmethod
+    def _patch_configure_tempdir(configure):
+        """Keep config.status temporary scripts off the HMDFS build directory."""
+        with open(configure, encoding="utf-8") as file:
+            contents = file.read()
+        patched = contents.replace(
+            '(umask 077 && mktemp -d "./confXXXXXX")',
+            '(umask 002 && mktemp -d "${TMPDIR:-.}/confXXXXXX")',
+        ).replace(
+            'tmp=./conf$$-$RANDOM',
+            'tmp=${TMPDIR:-.}/conf$$-$RANDOM',
+        ).replace(
+            '(umask 077 && mkdir "$tmp")',
+            '(umask 002 && mkdir "$tmp")',
+        )
+        if patched == contents:
+            raise ConanException(
+                f"Could not patch {configure} temporary directory handling"
+            )
+        with open(configure, "w", encoding="utf-8", newline="") as file:
+            file.write(patched)
+        os.utime(configure, None)
+
     def build(self):
         apply_conandata_patches(self)
+
+        if str(self.settings.os) == "OHOS":
+            tmpdir = os.path.expanduser("~/tmp/vcftools")
+            os.makedirs(tmpdir, exist_ok=True)
+            # Make configure and the generated config.status use an executable
+            # temporary directory instead of the HMDFS-backed build folder.
+            os.environ["TMPDIR"] = tmpdir
+            configure = os.path.join(self.build_folder, "configure")
+            os.chmod(configure, 0o755)
+            self._patch_configure_tempdir(configure)
 
         autotools = Autotools(self)
         autotools.configure()
