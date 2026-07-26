@@ -65,7 +65,8 @@ class VcftoolsConan(ConanFile):
         tc = AutotoolsToolchain(self)
         triplet = "aarch64-unknown-linux-ohos"
         tc.configure_args.extend([
-            f"--build={triplet}",
+            # Do not set --build to the target triplet: Autoconf would then
+            # treat this as a native build and try to run target binaries.
             f"--host={triplet}",
             "--prefix=/",
             "--disable-silent-rules",
