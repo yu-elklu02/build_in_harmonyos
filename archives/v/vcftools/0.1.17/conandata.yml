@@ -7,4 +7,7 @@ upstream_tests:
     url: "https://raw.githubusercontent.com/vcftools/vcftools/v0.1.17/src/perl/test.t"
     sha256: "509a72d46ddb62c1882952ceb82f6bcd3fc2e109096e3458a4673cbdbc2d29d7"
 
-patches: {}
+patches:
+  - patch_file: "patches/0001-replace-removed-random-shuffle.patch"
+    sha256: "72ba2e13c6c03297e5c458f4ff015d3e01d526e02fdcd878afe99fcb6ea3fd2f"
+    description: "Replace removed std::random_shuffle with C++17 std::shuffle"
