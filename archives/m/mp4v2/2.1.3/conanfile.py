@@ -43,8 +43,10 @@ class Mp4v2Conan(ConanFile):
         cmake.build()
 
         # Mirror the 28 standardUsage.exp assertions from the upstream DejaGnu suite.
+        self.output.info("Running 28 upstream standardUsage.exp assertions")
         for tool in ("mp4art", "mp4file", "mp4subtitle", "mp4track"):
             self._test_standard_usage(os.path.join(self.build_folder, tool))
+        self.output.info("Upstream standardUsage.exp assertions passed")
 
     def _test_standard_usage(self, tool):
         cases = (
