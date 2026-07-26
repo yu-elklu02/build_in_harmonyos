@@ -192,6 +192,61 @@ class VcftoolsConan(ConanFile):
     );''',
         )
 
+        # Perl hash ordering must not affect VCF semantic comparisons.  INFO
+        # attributes and FILTER header declarations are unordered VCF fields.
+        replace_in_file(
+            self,
+            test_path,
+            "my $path = $FindBin::RealBin;",
+            '''my $path = $FindBin::RealBin;
+
+sub normalize_vcf_info
+{
+    my ($line) = @_;
+    return $line if $line =~ /^#/;
+    my @fields = split(/\\t/,$line,-1);
+    return $line if @fields < 8;
+    $fields[7] = join(';',sort split(/;/,$fields[7]));
+    return join("\\t",@fields);
+}
+
+sub normalize_annotate_output
+{
+    my (@lines) = @_;
+    my @filters = sort grep { /^##FILTER=/ } @lines;
+    my @out;
+    my $inserted_filters = 0;
+    for my $line (@lines)
+    {
+        if ( $line =~ /^##FILTER=/ )
+        {
+            if ( !$inserted_filters ) { push @out,join('',@filters); $inserted_filters=1; }
+            next;
+        }
+        push @out,normalize_vcf_info($line);
+    }
+    return @out;
+}''',
+        )
+        replace_in_file(
+            self,
+            test_path,
+            '    is_deeply(\\@out,\\@exp,"Testing vcf-annotate .. $cmd");',
+            '    is_deeply([normalize_annotate_output(@out)],[normalize_annotate_output(@exp)],"Testing vcf-annotate .. $cmd");',
+        )
+        replace_in_file(
+            self,
+            test_path,
+            'is_deeply(\\@out,\\@exp,"Testing vcf-contrast .. $cmd");',
+            'is_deeply([map { normalize_vcf_info($_) } @out],[map { normalize_vcf_info($_) } @exp],"Testing vcf-contrast .. $cmd");',
+        )
+        replace_in_file(
+            self,
+            test_path,
+            " | vcf-query -f '",
+            " | perl -I../src/perl/ -MVcf ../src/perl/vcf-query -f '",
+        )
+
         self.run(
             "perl test.t",
             cwd=os.path.dirname(test_path),
