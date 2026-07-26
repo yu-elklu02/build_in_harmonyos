@@ -11,7 +11,7 @@ Build system: plain Makefile in the server/ subdirectory.
 import os
 from conan import ConanFile
 from conan.tools.files import get, apply_conandata_patches, export_conandata_patches
-from conan.tools.env import VirtualBuildEnv, Environment
+from conan.tools.env import VirtualBuildEnv
 
 
 class GkrellmConan(ConanFile):
@@ -37,15 +37,7 @@ class GkrellmConan(ConanFile):
         get(self, **self.conan_data["sources"], strip_root=True)
 
     def generate(self):
-        # R33: obtain compiler paths from Conan conf, not bare shell variables
-        vbe = VirtualBuildEnv(self)
-        vbe.generate()
-        cc = self.conf.get("tools.build:compiler_executables", {}).get("c", "clang")
-        cxx = self.conf.get("tools.build:compiler_executables", {}).get("cpp", "clang++")
-        env = Environment()
-        env.define("CC", cc)
-        env.define("CXX", cxx)
-        env.vars(self).save_script("conanbuild")
+        VirtualBuildEnv(self).generate()
 
     def build(self):
         apply_conandata_patches(self)
@@ -53,9 +45,10 @@ class GkrellmConan(ConanFile):
         cc = self.conf.get("tools.build:compiler_executables", {}).get("c", "clang")
         # OHOS does not provide lm-sensors.  Skipping its configure probe also
         # avoids attempting to link a cross-compiled probe executable.
+        glib_prefix = os.path.expanduser("~/usr/local")
         glib_includes = (
-            "-I$HOME/usr/local/include/glib-2.0 "
-            "-I$HOME/usr/local/lib/glib-2.0/include"
+            f"-I{os.path.join(glib_prefix, 'include', 'glib-2.0')} "
+            f"-I{os.path.join(glib_prefix, 'lib', 'glib-2.0', 'include')}"
         )
         glib_libs = "-lglib-2.0 -lgmodule-2.0 -lgthread-2.0 -lintl"
         self.run(
