@@ -14,4 +14,4 @@ class GkrellmTestConan(ConanFile):
     def test(self):
         if can_run(self):
             # Run test.sh to verify gkrellmd binary exists and is executable
-            self.run("sh test.sh", env="conanrun")
+            self.run("bash test.sh", env="conanrun")
