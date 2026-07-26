@@ -93,7 +93,13 @@ class Qt5QtbaseConan(ConanFile):
         try:
             subprocess.run(
                 shlex.split(cxx) + ["-x", "c++", "-", "-o", os.devnull, "-lpthread"],
-                input=b"#include <pthread.h>\nint main(){pthread_cancel(0);return 0;}\n",
+                input=(
+                    b"#include <pthread.h>\n"
+                    b"int main() {\n"
+                    b"    int (*volatile cancel)(pthread_t) = &pthread_cancel;\n"
+                    b"    return cancel == nullptr;\n"
+                    b"}\n"
+                ),
                 check=True, capture_output=True, timeout=10,
             )
             has_pthread_cancel = True
