@@ -16,6 +16,8 @@ class Mp4v2Conan(ConanFile):
     homepage = "https://mp4v2.org/"
     description = "A C++ library for reading and writing MP4 files"
 
+    exports_sources = "patches/*"
+
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": True, "fPIC": True}
