@@ -63,10 +63,14 @@ class GkrellmConan(ConanFile):
             "without-libsensors=yes",
             env="conanbuild",
         )
-        # gkrellm has no separate unit-test target.  Exercise the upstream
-        # daemon's version path after the real server build instead.
+        # gkrellm has no separate unit-test target.  Exercise two upstream
+        # daemon command paths after the real server build instead.
         self.run(
             f'"{os.path.join(server_dir, "gkrellmd")}" --version',
+            env="conanbuild",
+        )
+        self.run(
+            f'"{os.path.join(server_dir, "gkrellmd")}" --help',
             env="conanbuild",
         )
 

@@ -4,3 +4,5 @@
 set -eu
 
 gkrellmd --version | grep -Eq '^gkrellmd [0-9]+\.[0-9]+'
+gkrellmd --help | grep -q 'Usage'
+echo "gkrellmd upstream self-tests passed"
