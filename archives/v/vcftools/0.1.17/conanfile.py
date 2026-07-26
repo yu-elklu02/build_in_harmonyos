@@ -81,6 +81,10 @@ class VcftoolsConan(ConanFile):
         os.makedirs(tmpdir, exist_ok=True)
         env = Environment()
         env.define_path("TMPDIR", tmpdir)
+        # vcf-stats and vcf-merge compare text fixtures whose ordering is
+        # derived from Perl hashes. Keep that ordering reproducible on OHOS.
+        env.define("PERL_HASH_SEED", "0")
+        env.define("PERL_PERTURB_KEYS", "0")
         env.vars(self).save_script("vcftools_tmpdir")
 
     @staticmethod
