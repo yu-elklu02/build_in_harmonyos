@@ -114,6 +114,11 @@ class Qt5QtbaseConan(ConanFile):
         build_env.prepend_path("PATH", symlink_shim_dir)
         if has_pthread_cancel:
             build_env.append("CXXFLAGS", "-DHAVE_PTHREAD_CANCEL")
+        if self.settings.os == "OHOS":
+            # Qt 5.15 predates OpenHarmony platform detection.  Keep the
+            # portability patches scoped to the target rather than Linux.
+            build_env.append("CFLAGS", "-DQ_OS_OHOS")
+            build_env.append("CXXFLAGS", "-DQ_OS_OHOS")
         # Configure Qt5 with Conan-managed compilers and zlib paths.
         with build_env.vars(self).apply():
             configure_shell = os.environ.get("CONFIG_SHELL") or shutil.which("sh")
