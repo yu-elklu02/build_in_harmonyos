@@ -2,10 +2,13 @@ package: gkrellm/2.3.11
 homepage: "https://github.com/toppk/gkrellm"
 
 upstream_check_command: "make check"
-upstream_test_in_build: false
-upstream_test_command: ""
+upstream_test_in_build: true
+upstream_test_command: "server/gkrellmd --version"
 
-upstream_tests: []
+upstream_tests:
+  - name: "gkrellmd version self-test"
+    command: "server/gkrellmd --version"
+    description: "运行上游守护进程的版本查询路径，验证构建产物可执行。"
 
 test_package_tests:
   - file: conanfile.py
