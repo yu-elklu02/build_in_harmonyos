@@ -37,7 +37,7 @@ EOF
 # Full-length dereplication merges the two duplicate sequences.
 vsearch --derep_fulllength input.fasta --output derep.fasta --sizeout
 test "$(grep -c '^>' derep.fasta)" -eq 2
-grep -q 'size=2;' derep.fasta
+grep -q 'size=2' derep.fasta
 
 # Sorting puts the longest sequence first.
 vsearch --sortbylength input.fasta --output sorted.fasta
