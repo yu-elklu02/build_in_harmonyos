@@ -51,6 +51,9 @@ class Mp4v2Conan(ConanFile):
         self.output.info("Upstream standardUsage.exp assertions passed")
 
     def _test_standard_usage(self, tool):
+        environment = os.environ.copy()
+        library_path = "LD_LIBRARY_PATH"
+        environment[library_path] = self.build_folder + os.pathsep + environment.get(library_path, "")
         cases = (
             ((), 1, (r"^Usage: \S+", r"^Try.*-h.*--help")),
             (("-h",), 0, (r"^Usage: \S+", r"\s+--help", r"\s+--version")),
@@ -68,6 +71,7 @@ class Mp4v2Conan(ConanFile):
                 stderr=subprocess.STDOUT,
                 text=True,
                 check=False,
+                env=environment,
             )
             if completed.returncode != expected_returncode:
                 raise ConanException(
