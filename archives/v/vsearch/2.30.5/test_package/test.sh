@@ -16,22 +16,22 @@ vsearch --version
 
 cat > input.fasta <<'EOF'
 >duplicate_a
-ACGTACGT
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
 >duplicate_b
-ACGTACGT
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
 >short_sequence
-ACGT
+ACGTACGTACGTACGTACGTACGTACGTACGT
 EOF
 
 cat > reads.fastq <<'EOF'
 @read_1
-ACGTACGT
+ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
 +
-IIIIIIII
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 @read_2
-ACGT
+ACGTACGTACGTACGTACGTACGTACGTACGT
 +
-IIII
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 EOF
 
 # Full-length dereplication merges the two duplicate sequences.
@@ -41,7 +41,7 @@ grep -q 'size=2;' derep.fasta
 
 # Sorting puts the longest sequence first.
 vsearch --sortbylength input.fasta --output sorted.fasta
-sed -n '2p' sorted.fasta | grep -qx 'ACGTACGT'
+sed -n '2p' sorted.fasta | grep -qx 'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'
 
 # Exact search reports each of the three query sequences.
 vsearch --search_exact input.fasta --db input.fasta --userout exact.tsv --userfields query+target+id
