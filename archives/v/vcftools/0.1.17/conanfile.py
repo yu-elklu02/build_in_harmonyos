@@ -156,6 +156,29 @@ class VcftoolsConan(ConanFile):
             "../src/perl/",
         )
 
+        # The release archive stores examples/ at the source root.  The test
+        # helpers already receive that absolute directory, so avoid a second
+        # relative traversal before opening their expected-output fixtures.
+        replace_in_file(
+            self,
+            test_path,
+            'chdir("$path/../examples");',
+            "chdir($path);",
+        )
+
+        # Data::Dumper's textual hash order varies between Perl releases.
+        # Compare the generated statistics as Perl data structures instead.
+        replace_in_file(
+            self,
+            test_path,
+            '    is_deeply(\\@out,\\@exp,"Testing vcf-stats .. $cmd");',
+            '''    is_deeply(
+        eval("no strict; " . join('', @out)),
+        eval("no strict; " . join('', @exp)),
+        "Testing vcf-stats .. $cmd"
+    );''',
+        )
+
         self.run(
             "perl test.t",
             cwd=os.path.dirname(test_path),

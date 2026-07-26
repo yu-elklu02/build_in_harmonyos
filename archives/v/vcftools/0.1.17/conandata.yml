@@ -11,3 +11,6 @@ patches:
   - patch_file: "patches/0001-replace-removed-random-shuffle.patch"
     sha256: "6c152e9675ed8bffc1c283e26d1bb81279d140fdc7f9fb8bcd276610bdbf184c"
     description: "Replace removed std::random_shuffle with C++17 std::shuffle"
+  - patch_file: "patches/0002-stabilize-vcf-merge-format-order.patch"
+    sha256: "352fa6681a2f1483a60ac9bc913bb60f6e1893b69939e9d2655e3f62353ae3a9"
+    description: "Emit merged FORMAT fields in a deterministic VCF order"
