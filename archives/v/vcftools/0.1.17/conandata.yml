@@ -14,3 +14,6 @@ patches:
   - patch_file: "patches/0002-stabilize-vcf-merge-format-order.patch"
     sha256: "352fa6681a2f1483a60ac9bc913bb60f6e1893b69939e9d2655e3f62353ae3a9"
     description: "Emit merged FORMAT fields in a deterministic VCF order"
+  - patch_file: "patches/0003-load-relative-ploidy-file.patch"
+    sha256: "7434432d8231d77a5de6591374e8448755387c377ef256a7f44d47d87517edd8"
+    description: "Load relative ploidy definitions outside Perl module search paths"
