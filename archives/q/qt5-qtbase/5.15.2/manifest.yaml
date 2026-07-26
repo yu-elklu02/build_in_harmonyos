@@ -49,6 +49,7 @@ patches_applied:
   - "0008-qsslkey-no-ssl-test-init.patch: omit SSL curve discovery when SSL is disabled"
   - "0009-qpluginloader-clang-section-type.patch: use a consistent metadata section type under Clang"
   - "0010-qlocale-standard-fenv-test.patch: use standard floating-point exception flags"
+  - "0011-qthreadpool-ohos-startup-sync.patch: synchronize OHOS thread pool startup"
 
 knowledge_gained:
   - "OHOS stripped ELF dlopen 限制 (E215): musl 拒绝加载 stripped 共享库"

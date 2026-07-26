@@ -70,15 +70,6 @@ class Qt5QtbaseConan(ConanFile):
                 self.output.warning(f"Failed to download Qt5 source from {url}: {error}")
         raise ConanInvalidConfiguration("Unable to download Qt5 source from all mirrors")
 
-    def generate(self):
-        # Expose zlib paths to Qt5 configure via Conan's build environment.
-        zlib = self.dependencies["zlib"]
-        zlib_inc = os.path.join(zlib.package_folder, "include")
-        zlib_lib = os.path.join(zlib.package_folder, "lib")
-        self.buildenv_info.append("CFLAGS", f"-I{zlib_inc}")
-        self.buildenv_info.append("CXXFLAGS", f"-I{zlib_inc}")
-        self.buildenv_info.append("LDFLAGS", f"-L{zlib_lib}")
-
     def build(self):
         apply_conandata_patches(self)
         src_dir = self.source_folder

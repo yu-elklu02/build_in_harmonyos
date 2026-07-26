@@ -6,7 +6,7 @@
   "versions": {
     "5.15.2": {
       "ref": "qt5-qtbase/5.15.2",
-      "binary": true
+      "binary": false
     }
   }
 }

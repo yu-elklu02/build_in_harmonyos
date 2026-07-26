@@ -3,8 +3,10 @@ project(test_qt5_qtbase CXX)
 find_package(qt5-qtbase CONFIG REQUIRED)
 add_executable(test_qt5_qtbase test.cpp)
 target_link_libraries(test_qt5_qtbase PRIVATE Qt5::Core Qt5::Gui Qt5::Network Qt5::Test)
-target_link_options(test_qt5_qtbase PRIVATE -stdlib=libc++)
-if(DEFINED OHOS_CXX_RUNTIME_DIR)
+if(CMAKE_SYSTEM_NAME STREQUAL "OHOS")
+    target_link_options(test_qt5_qtbase PRIVATE -stdlib=libc++)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "OHOS" AND DEFINED OHOS_CXX_RUNTIME_DIR)
     target_link_libraries(test_qt5_qtbase PRIVATE
         "${OHOS_CXX_RUNTIME_DIR}/libc++.so"
         "${OHOS_CXX_RUNTIME_DIR}/libc++abi.a"
