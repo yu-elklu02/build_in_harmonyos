@@ -48,7 +48,7 @@ upstream_tests:
 # test_package 中自带的测试
 test_package_tests:
   - file: test.cpp
-    description: "QLocalServer/QLocalSocket IPC 与 QtGui 矩阵运算消费者测试"
+    description: "QtNetwork loopback 地址解析与 QtGui 矩阵运算消费者测试"
     command: "./test_qt5_qtbase"
 
 # The consumer test remains a separate package/link/runtime check.

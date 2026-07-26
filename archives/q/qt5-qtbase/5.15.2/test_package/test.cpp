@@ -1,6 +1,5 @@
 #include <QGuiApplication>
-#include <QLocalServer>
-#include <QLocalSocket>
+#include <QHostAddress>
 #include <QLibrary>
 #include <QMatrix4x4>
 #include <QOffscreenSurface>
@@ -10,14 +9,11 @@
 
 int main(int argc, char *argv[]) {
     QGuiApplication application(argc, argv);
-    QLocalServer::removeServer("test_socket");
-    QLocalServer server;
-    if (!server.listen("test_socket"))
-        return 1;
 
-    QLocalSocket client;
-    client.connectToServer("test_socket");
-    if (!client.waitForConnected(1000))
+    // Use a QtNetwork API that does not require an AF_UNIX socket bind, which
+    // is restricted by the OHOS sandbox.
+    const QHostAddress loopback(QStringLiteral("127.0.0.1"));
+    if (!loopback.isLoopback())
         return 2;
 
     QMatrix4x4 transform;
