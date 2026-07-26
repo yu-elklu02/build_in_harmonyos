@@ -43,9 +43,9 @@ grep -q 'size=2' derep.fasta
 vsearch --sortbylength input.fasta --output sorted.fasta
 sed -n '2p' sorted.fasta | grep -qx 'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'
 
-# Exact search reports each of the three query sequences.
+# Exact search reports every matching query-target pair.
 vsearch --search_exact input.fasta --db input.fasta --userout exact.tsv --userfields query+target+id
-test "$(grep -c '^' exact.tsv)" -eq 3
+test "$(grep -c '^' exact.tsv)" -eq 5
 grep -q '^duplicate_a' exact.tsv
 
 # FASTQ filtering preserves both valid reads.
