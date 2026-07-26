@@ -162,7 +162,7 @@ class VcftoolsConan(ConanFile):
         replace_in_file(
             self,
             test_path,
-            'chdir("$path/../examples");',
+            'chdir("$path/../../examples");',
             "chdir($path);",
         )
 
