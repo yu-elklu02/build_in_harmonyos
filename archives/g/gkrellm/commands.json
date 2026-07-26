@@ -4,6 +4,6 @@
   "homepage": "https://github.com/toppk/gkrellm",
   "type": "tool",
   "versions": {
-    "2.3.11": { "ref": "gkrellm/2.3.11", "binary": false }
+    "2.3.11": { "ref": "gkrellm/2.3.11", "binary": true }
   }
 }

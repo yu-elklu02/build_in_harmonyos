@@ -10,6 +10,7 @@ Build system: plain Makefile in the server/ subdirectory.
 """
 import os
 from conan import ConanFile
+from conan.tools.build import can_run
 from conan.tools.files import get, apply_conandata_patches, export_conandata_patches
 from conan.tools.env import VirtualBuildEnv
 
@@ -64,15 +65,12 @@ class GkrellmConan(ConanFile):
             env="conanbuild",
         )
         # gkrellm has no separate unit-test target.  Exercise two upstream
-        # daemon command paths after the real server build instead.
-        self.run(
-            f'"{os.path.join(server_dir, "gkrellmd")}" --version',
-            env="conanbuild",
-        )
-        self.run(
-            f'"{os.path.join(server_dir, "gkrellmd")}" --help',
-            env="conanbuild",
-        )
+        # daemon command paths after the real server build when target code
+        # can run on the build machine.
+        if can_run(self):
+            daemon = os.path.join(server_dir, "gkrellmd")
+            self.run(f'"{daemon}" --version', env="conanbuild")
+            self.run(f'"{daemon}" --help', env="conanbuild")
 
     def package(self):
         server_dir = os.path.join(self.source_folder, "server")
