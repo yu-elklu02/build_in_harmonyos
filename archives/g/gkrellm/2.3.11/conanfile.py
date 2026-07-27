@@ -77,7 +77,8 @@ class GkrellmConan(ConanFile):
         install_root = self.package_folder
         self.run(
             f"make -C \"{server_dir}\" install "
-            f"PREFIX=\"{install_root}\" without-libsensors=yes",
+            f"PREFIX=\"{install_root}\" PKG_CONFIG=true STRIP=\"\" "
+            "without-libsensors=yes",
             env="conanbuild",
         )
 
