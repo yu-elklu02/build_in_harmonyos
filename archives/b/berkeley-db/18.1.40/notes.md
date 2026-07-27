@@ -11,3 +11,7 @@ The bundled Autoconf `config.status` creates temporary AWK scripts with mode
 0700. On HMDFS this prevents the script reader from accessing them, so the
 recipe applies a portability patch that creates the temporary directory with
 mode 0755 instead.
+
+The source archive does not contain every entry listed by `install_docs`.
+The package installs headers, libraries, and standard utilities but omits
+those unavailable documentation files.

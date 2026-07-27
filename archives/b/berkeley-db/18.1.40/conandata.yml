@@ -7,3 +7,6 @@ patches:
     - patch_file: "patches/0001-fix-hmdfs-configure-temp-permissions.patch"
       patch_description: "Allow config.status to read generated AWK scripts on HMDFS"
       patch_type: "portability"
+    - patch_file: "patches/0002-skip-missing-document-install.patch"
+      patch_description: "Do not install documentation absent from the source archive"
+      patch_type: "portability"
