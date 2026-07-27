@@ -1,16 +1,8 @@
 --- a/dist/configure
 +++ b/dist/configure
-@@ -26390,11 +26390,11 @@
- # Create a (secure) tmp directory for tmp files.
- 
- {
+@@ -26393 +26393 @@
 -  tmp=`(umask 077 && mktemp -d "./confXXXXXX") 2>/dev/null` &&
 +  tmp=`(umask 022 && mktemp -d "./confXXXXXX") 2>/dev/null` &&
-   test -d "$tmp"
- }  ||
- {
-   tmp=./conf$$-$RANDOM
+@@ -26398 +26398 @@
 -  (umask 077 && mkdir "$tmp")
 +  (umask 022 && mkdir "$tmp")
- } || as_fn_error $? "cannot create a temporary directory in ." "$LINENO" 5
- ac_tmp=$tmp
