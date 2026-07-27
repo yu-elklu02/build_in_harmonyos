@@ -3,7 +3,7 @@ import os
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import can_run
-from conan.tools.files import get
+from conan.tools.files import apply_conandata_patches, get
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 
@@ -15,6 +15,7 @@ class BerkeleyDbConan(ConanFile):
     license = "AGPL-3.0-only OR LicenseRef-Oracle-Berkeley-DB"
     url = "https://www.oracle.com/database/technologies/related/berkeleydb.html"
     package_type = "library"
+    exports_sources = "conandata.yml", "patches/*"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = {"shared": False}
@@ -43,6 +44,7 @@ class BerkeleyDbConan(ConanFile):
         tc.generate()
 
     def build(self):
+        apply_conandata_patches(self)
         autotools = Autotools(self)
         autotools.configure(build_script_folder="dist")
         autotools.make()

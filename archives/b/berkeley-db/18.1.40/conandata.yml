@@ -2,3 +2,8 @@ sources:
   "18.1.40":
     url: "https://download.oracle.com/berkeley-db/db-18.1.40.tar.gz"
     sha256: "0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8"
+patches:
+  "18.1.40":
+    - patch_file: "patches/0001-fix-hmdfs-configure-temp-permissions.patch"
+      patch_description: "Allow config.status to read generated AWK scripts on HMDFS"
+      patch_type: "portability"
