@@ -160,7 +160,7 @@ def run_local_ci(software: str, version: str, pdir: str | None = None) -> int:
     Returns 0 if pass, 1 if fail.
     """
     project = Path(pdir) if pdir else Path(find_project_dir())
-    setup_sh = project / "ci" / "conan" "setup.sh"
+    setup_sh = project / "ci" / "conan" / "setup.sh"
     build_sh = project / "ci" / "conan" / "build_and_test.sh"
 
     if not build_sh.exists():
@@ -172,7 +172,7 @@ def run_local_ci(software: str, version: str, pdir: str | None = None) -> int:
     # Run setup.sh
     if setup_sh.exists():
         log_info("  [1/2] setup.sh...")
-        rc, out = _run(["bash", str(setup_sh)], cwd=str(project), timeout=120)
+        rc, out = _run(["zsh", str(setup_sh)], cwd=str(project), timeout=120)
         if rc != 0:
             log_fail(f"  ❌ setup.sh 失败 (RC={rc})")
             return 1
@@ -180,11 +180,11 @@ def run_local_ci(software: str, version: str, pdir: str | None = None) -> int:
 
     # Run build_and_test.sh
     log_info(f"  [2/2] build_and_test.sh {software}/{version}...")
-    pkg_spec = f"{software}/{version}"
+    pkg_spec = f"archives/{software[0]}/{software}/{version}"
     rc, out = _run(
-        ["bash", str(build_sh), pkg_spec],
+        ["zsh", str(build_sh), pkg_spec],
         cwd=str(project),
-        env_extra={"CI_PACKAGES": pkg_spec},
+        env_extra={"CI_PACKAGES": pkg_spec, "CI_REPO_ROOT": str(project)},
         timeout=600,
     )
     if rc != 0:

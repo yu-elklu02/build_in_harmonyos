@@ -1,6 +1,33 @@
 """Logging and path utilities for ohc."""
 import os
+import shutil
 import sys
+
+# ── Executable finder ──
+
+_COMMON_BIN_DIRS = [
+    "/data/service/hnp/bin",
+    "/usr/local/bin",
+    "/usr/bin",
+    "/system/bin",
+]
+
+
+def find_executable(name: str) -> str:
+    """Find an executable: env var {NAME}_BIN → PATH → common dirs → fallback."""
+    env_key = f"{name.upper()}_BIN"
+    env_val = os.environ.get(env_key, "").strip()
+    if env_val and os.path.isfile(env_val) and os.access(env_val, os.X_OK):
+        return env_val
+    found = shutil.which(name)
+    if found:
+        return found
+    for bin_dir in _COMMON_BIN_DIRS:
+        candidate = os.path.join(bin_dir, name)
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+    return name
+
 
 # ── ANSI colors ──
 _RED = "\033[31m"
@@ -41,6 +68,9 @@ def find_project_dir() -> str:
     Search order:
     1. OHC_PROJECT_DIR environment variable
     2. Walk upward from this script's location to find SKILL.md
+    3. ATOMCODE_HOME environment variable (AtomCode platform)
+    4. ~/.atomcode/skills/ (AtomCode platform default path)
+    5. ~/.opendesk/ (OpenDesk platform fallback)
     """
     env = os.environ.get("OHC_PROJECT_DIR")
     if env and os.path.isfile(os.path.join(env, "SKILL.md")):
@@ -55,6 +85,20 @@ def find_project_dir() -> str:
         if parent == d:
             break
         d = parent
+
+    # AtomCode platform
+    ac_home = os.environ.get("ATOMCODE_HOME", os.path.expanduser("~/.atomcode"))
+    for root in [ac_home, os.path.join(os.path.expanduser("~/.atomcode"), "skills")]:
+        skill = os.path.join(root, "openharmony-compile-agent", "SKILL.md")
+        if os.path.isfile(skill):
+            return os.path.dirname(skill)
+
+    # OpenDesk platform fallback
+    od_root = os.path.expanduser("~/.opendesk")
+    for apps_dir in ["apps/skills/resources", ""]:
+        search = os.path.join(od_root, apps_dir, "openharmony-compile-agent", "SKILL.md")
+        if os.path.isfile(search):
+            return os.path.dirname(search)
 
     # Fallback: cwd
     return os.getcwd()

@@ -405,19 +405,91 @@ def cmd_ci_status(args):
 
 
 def cmd_reply_comment(args):
-    """回复 PR 评论。"""
-    body = {"body": args.body}
-    path = f"/repos/{args.repo}/pulls/{args.number}/discussions/{args.discussion_id}/comments"
+    """回复 PR 评论。
+
+    使用简单评论 API (POST /repos/{repo}/pulls/{number}/comments) 配合
+    in_reply_to 参数回复指定讨论。discussions API 需要额外权限，
+    简单评论 API 兼容性更好。
+    """
+    body = {"body": args.body, "in_reply_to": args.discussion_id}
+    path = f"/repos/{args.repo}/pulls/{args.number}/comments"
     result = api_request("POST", path, body=body)
 
     print("✅ 回复成功")
-    print(f"   comment_id: {result.get('id', 'N/A')}")
-    print(f"   URL: {result.get('html_url', 'N/A')}")
+    print(f"   note_id: {result.get('note_id', 'N/A')}")
+    print(f"   discussion_id: {args.discussion_id}")
 
     if args.json:
         print("\n--- JSON ---")
         print(json.dumps(result, ensure_ascii=False, indent=2))
     return result
+
+
+def cmd_resolve_comment(args):
+    """修改检视意见解决状态（标记为已解决/未解决）。
+
+    API: PUT /repos/{owner}/{repo}/pulls/{number}/comments/{discussion_id}
+    Body: {"resolved": true/false}
+    """
+    resolved = not args.unresolved if args.unresolved else True
+    body = {"resolved": resolved}
+    path = f"/repos/{args.repo}/pulls/{args.number}/comments/{args.discussion_id}"
+    result = api_request("PUT", path, body=body)
+
+    status_text = "已解决" if resolved else "未解决"
+    print(f"✅ 检视意见标记为{status_text}")
+    print(f"   discussion_id: {args.discussion_id}")
+
+    if args.json:
+        print("\n--- JSON ---")
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    return result
+
+
+def cmd_handle_review_opinion(args):
+    """处理单条检视意见：回复 + （接纳时）标记已解决。
+
+    封装检视意见处理流程，确保规则一致性：
+    - accept: 回复"已修复: {reason}" + 标记已解决
+    - reject: 回复"不接纳: {reason}。请审核人员评估..."（不标记已解决）
+
+    AI 只需传入 action 和 reason，脚本保证流程正确。
+    """
+    if args.action == "accept":
+        reply_body = f"✅ 已修复: {args.reason}"
+    else:
+        reply_body = (f"❌ 不接纳: {args.reason}\n\n"
+                       "请审核人员评估是否无需解决，"
+                       "如无需解决，由审核人员标记已解决。")
+
+    # Step 1: 回复评论
+    reply_data = {"body": reply_body, "in_reply_to": args.discussion_id}
+    reply_path = f"/repos/{args.repo}/pulls/{args.number}/comments"
+    reply_result = api_request("POST", reply_path, body=reply_data)
+
+    print(f"✅ 已回复检视意见 ({args.action})")
+    print(f"   discussion_id: {args.discussion_id}")
+    print(f"   回复内容: {reply_body[:100]}")
+
+    # Step 2: 标记已解决（仅接纳时）
+    if args.action == "accept":
+        resolve_data = {"resolved": True}
+        resolve_path = f"/repos/{args.repo}/pulls/{args.number}/comments/{args.discussion_id}"
+        resolve_result = api_request("PUT", resolve_path, body=resolve_data)
+        print(f"✅ 已标记为已解决")
+    else:
+        print(f"⏸️  未标记已解决（拒绝意见，留待审核人员评估）")
+
+    if args.json:
+        output = {
+            "action": args.action,
+            "discussion_id": args.discussion_id,
+            "reply_body": reply_body,
+            "resolved": args.action == "accept",
+        }
+        print("\n--- JSON ---")
+        print(json.dumps(output, ensure_ascii=False, indent=2))
+    return {"action": args.action, "resolved": args.action == "accept"}
 
 
 def cmd_update_pr(args):
@@ -590,6 +662,173 @@ def cmd_get_review_comments(args):
     return review_comments
 
 
+# ── AI Review 监控 ────────────────────────────────────────────────
+
+# atomgit-bot 评论分类关键词
+SUMMARY_GENERATING_MARKERS = ["正在生成合并请求摘要", "正在生成合并请求摘要，请稍候"]
+REVIEW_IN_PROGRESS_MARKERS = ["AI 代码检视正在进行中", "AI 代码检视正在进行中，请稍候"]
+SUMMARY_READY_MARKERS = ["变更摘要"]
+# CI 状态评论关键词（ohpcd-robot 等，非检视意见，不需要回复）
+CI_STATUS_MARKERS = ["CI 校验", "CI 构建", "CI 检验", "CI 自动", "CI流水线",
+                     "校验排队", "校验通过", "校验失败",
+                     "构建已启动", "构建成功", "构建失败"]
+
+
+def classify_comment(body: str) -> str:
+    """将 bot 评论内容分类。
+
+    Returns:
+        "summary_generating" — 正在生成摘要
+        "review_in_progress" — AI 检视进行中
+        "summary_ready"      — 变更摘要已生成
+        "ci_status"          — CI 状态通知（非检视意见，不需要回复）
+        "review_opinion"     — 检视意见（需处理）
+        "unknown"            — 未知类型
+    """
+    if not body:
+        return "unknown"
+    for marker in SUMMARY_GENERATING_MARKERS:
+        if marker in body:
+            return "summary_generating"
+    for marker in REVIEW_IN_PROGRESS_MARKERS:
+        if marker in body:
+            return "review_in_progress"
+    for marker in SUMMARY_READY_MARKERS:
+        if marker in body:
+            return "summary_ready"
+    # CI 状态通知（非检视意见）
+    for marker in CI_STATUS_MARKERS:
+        if marker in body:
+            return "ci_status"
+    return "review_opinion"
+
+
+def cmd_monitor_review(args):
+    """监控 atomgit-bot AI 检视状态，返回结构化 JSON。
+
+    检视状态 (state):
+        no_bot_comments    — 尚无 atomgit-bot 评论
+        generating         — 仅含"正在生成"和"检视进行中"，尚未出摘要
+        summary_ready      — 变更摘要已生成，无检视意见
+        has_opinions       — 已出现检视意见，需 AI 评估处理
+
+    输出 JSON 字段:
+        state              — 上述状态之一
+        phase              — 数字阶段 (0=未开始, 1=等待摘要, 2=摘要就绪, 3=有检视意见)
+        summary_content    — 变更摘要评论全文 (state=summary_ready/has_opinions 时)
+        review_opinions    — 检视意见列表 [{comment_id, body, created_at, discussion_id}]
+        bot_comment_count  — atomgit-bot 评论总数
+        all_comments_count — 全部评论数 (含人工)
+    """
+    path = f"/repos/{args.repo}/pulls/{args.number}/comments"
+    params = {"per_page": 100, "page": 1}
+
+    all_comments = []
+    while True:
+        result = api_request("GET", path, params=params)
+        if not result:
+            break
+        all_comments.extend(result)
+        if len(result) < params["per_page"]:
+            break
+        params["page"] += 1
+
+    # 筛选 atomgit-bot 评论（按时间排序）
+    bot_comments = [
+        c for c in all_comments
+        if is_bot_user(c.get("user", {}).get("login", ""))
+    ]
+    # 按创建时间排序
+    bot_comments.sort(key=lambda c: c.get("created_at", ""))
+
+    # 分类每条评论
+    classified = []
+    summary_content = None
+    review_opinions = []
+
+    for c in bot_comments:
+        body = c.get("body", "")
+        category = classify_comment(body)
+        entry = {
+            "comment_id": c.get("id", ""),
+            "discussion_id": c.get("discussion_id", c.get("in_reply_to", "")),
+            "created_at": c.get("created_at", ""),
+            "category": category,
+            "body": body,
+        }
+        classified.append(entry)
+
+        if category == "summary_ready":
+            summary_content = body
+        elif category == "review_opinion":
+            review_opinions.append({
+                "comment_id": c.get("id", ""),
+                "discussion_id": c.get("discussion_id", c.get("in_reply_to", "")),
+                "created_at": c.get("created_at", ""),
+                "body": body,
+            })
+
+    # 判断整体状态
+    categories = [c["category"] for c in classified]
+    has_summary = "summary_ready" in categories
+    has_opinions = len(review_opinions) > 0
+
+    if not bot_comments:
+        state = "no_bot_comments"
+        phase = 0
+    elif not has_summary and not has_opinions:
+        # 只有"正在生成"和"检视进行中"
+        state = "generating"
+        phase = 1
+    elif has_summary and not has_opinions:
+        state = "summary_ready"
+        phase = 2
+    elif has_opinions:
+        state = "has_opinions"
+        phase = 3
+    else:
+        state = "unknown"
+        phase = 0
+
+    output = {
+        "state": state,
+        "phase": phase,
+        "summary_content": summary_content,
+        "review_opinions": review_opinions,
+        "bot_comment_count": len(bot_comments),
+        "all_comments_count": len(all_comments),
+        "classified_comments": classified,
+    }
+
+    # 人类可读输出
+    state_desc = {
+        "no_bot_comments": "尚无 atomgit-bot 评论",
+        "generating": "⏳ AI 检视进行中（摘要尚未生成）",
+        "summary_ready": "📋 变更摘要已生成，等待检视意见",
+        "has_opinions": "🔍 已有检视意见，需评估处理",
+        "unknown": "❓ 未知状态",
+    }
+    print(f"AI Review 状态: {state_desc.get(state, state)}")
+    print(f"  Phase: {phase}")
+    print(f"  atomgit-bot 评论数: {len(bot_comments)}")
+    print(f"  全部评论数: {len(all_comments)}")
+    if summary_content:
+        print(f"\n--- 变更摘要 ---")
+        print(truncate(summary_content, 2000))
+    if review_opinions:
+        print(f"\n--- 检视意见 ({len(review_opinions)} 条) ---")
+        for i, op in enumerate(review_opinions):
+            print(f"\n[{i+1}] comment_id: {op['comment_id']}")
+            if op.get("discussion_id"):
+                print(f"    discussion_id: {op['discussion_id']}")
+            print(f"    {truncate(op['body'], 800)}")
+
+    if args.json:
+        print("\n--- JSON ---")
+        print(json.dumps(output, ensure_ascii=False, indent=2))
+    return output
+
+
 # ── CLI ───────────────────────────────────────────────────────────
 
 def main():
@@ -645,6 +884,24 @@ def main():
     p.add_argument("--body", required=True, help="回复内容")
     p.set_defaults(func=cmd_reply_comment)
 
+    # resolve-comment
+    p = sub.add_parser("resolve-comment", help="修改检视意见解决状态 (标记为已解决/未解决)")
+    p.add_argument("--repo", required=True)
+    p.add_argument("--number", type=int, required=True)
+    p.add_argument("--discussion-id", required=True, help="讨论 ID")
+    p.add_argument("--unresolved", action="store_true", help="标记为未解决 (默认标记为已解决)")
+    p.set_defaults(func=cmd_resolve_comment)
+
+    # handle-review-opinion
+    p = sub.add_parser("handle-review-opinion", help="处理单条检视意见 (回复+标记已解决)")
+    p.add_argument("--repo", required=True)
+    p.add_argument("--number", type=int, required=True)
+    p.add_argument("--discussion-id", required=True, help="检视意见讨论 ID")
+    p.add_argument("--action", required=True, choices=["accept", "reject"],
+                   help="accept=接纳并修复(回复+标记已解决), reject=拒绝(仅回复)")
+    p.add_argument("--reason", required=True, help="修复说明或拒绝原因")
+    p.set_defaults(func=cmd_handle_review_opinion)
+
     # update-pr
     p = sub.add_parser("update-pr", help="更新 PR 信息")
     p.add_argument("--repo", required=True)
@@ -680,6 +937,12 @@ def main():
     p.add_argument("--number", type=int, required=True)
     p.add_argument("--max-length", type=int, default=800)
     p.set_defaults(func=cmd_get_review_comments)
+
+    # monitor-review
+    p = sub.add_parser("monitor-review", help="监控 atomgit-bot AI 检视状态")
+    p.add_argument("--repo", required=True)
+    p.add_argument("--number", type=int, required=True)
+    p.set_defaults(func=cmd_monitor_review)
 
     args = parser.parse_args()
     if not args.command:

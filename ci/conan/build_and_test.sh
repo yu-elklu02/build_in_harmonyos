@@ -105,6 +105,8 @@ for pkg_dir in "${PACKAGES[@]}"; do
     echo ""
     echo "━━━ Building: ${pkg_name}/${pkg_ver} ━━━"
 
+    # Unset CONAN_USER/CONAN_CHANNEL to prevent channel injection into dependency resolution
+    unset CONAN_USER CONAN_CHANNEL
     # ── conan create (BUG-10: explicit profile + settings) ──
     # Build profile args as array for safe word-splitting
     CONAN_CREATE_ARGS=()
@@ -282,6 +284,26 @@ PYEOF
                 fi
             fi
         fi
+    fi
+
+    # ── L0i-1: Export local recipes for unpublished dependencies (R36 fallback) ──
+    # When dependencies are not yet published to the registry, export their
+    # recipes from the local archives/ directory so --build=missing can compile
+    # them from source during conan create.
+    if [ -n "${UNPUBLISHED_DEPS:-}" ]; then
+        for dep_ref in $UNPUBLISHED_DEPS; do
+            dep_name=$(echo "$dep_ref" | cut -d'/' -f1)
+            dep_ver=$(echo "$dep_ref" | cut -d'/' -f2)
+            local_recipe=$(find "$REPO_ROOT/archives" -path "*/${dep_name}/${dep_ver}/conanfile.py" -not -path "*/test_package/*" 2>/dev/null | head -1)
+            if [ -n "$local_recipe" ]; then
+                echo "[step] Exporting local recipe for missing dependency: $dep_ref"
+                conan export "$(dirname "$local_recipe")" 2>/dev/null && \
+                    echo "        [ok] local recipe exported: $dep_ref" || \
+                    echo "        [warn] failed to export local recipe: $dep_ref"
+            else
+                echo "        [warn] no local recipe found for: $dep_ref"
+            fi
+        done
     fi
 
     # ── L0j: 版本号占用检查 (R37) ──
