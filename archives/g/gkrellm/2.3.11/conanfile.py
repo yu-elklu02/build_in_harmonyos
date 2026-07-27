@@ -59,7 +59,7 @@ class GkrellmConan(ConanFile):
         )
         self.run(
             f"make -C \"{server_dir}\" -j1 V=1 "
-            f"CC=\"{cc}\" PKG_CONFIG=true "
+            f"CC=\"{cc}\" LDFLAGS=\"\" PKG_CONFIG=true "
             f"PKG_INCLUDE='{glib_includes}' PKG_LIB='{glib_libs}' "
             "without-libsensors=yes",
             env="conanbuild",
