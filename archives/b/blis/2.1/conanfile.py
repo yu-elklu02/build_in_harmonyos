@@ -70,6 +70,7 @@ class BlisConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["blis"]
+        self.cpp_info.includedirs = ["include", "include/arm64"]
         self.cpp_info.set_property("cmake_file_name", "BLIS")
         self.cpp_info.set_property("cmake_target_name", "BLIS::BLIS")
         self.cpp_info.set_property("pkg_config_name", "blis")
