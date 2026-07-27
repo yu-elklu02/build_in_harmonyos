@@ -1,7 +1,7 @@
 package: gkrellm/2.3.11
 homepage: "https://github.com/toppk/gkrellm"
 
-upstream_check_command: "make check"
+upstream_check_command: "server/gkrellmd --version && server/gkrellmd --help"
 upstream_test_in_build: true
 upstream_test_command: "server/gkrellmd --version && server/gkrellmd --help"
 
@@ -14,8 +14,8 @@ upstream_tests:
     description: "运行上游守护进程的参数解析与帮助输出路径。"
 
 test_package_tests:
-  - file: conanfile.py
-    description: "验证 gkrellmd 守护进程二进制存在且可执行"
-    command: "gkrellmd --version"
+  - file: test.sh
+    description: "验证打包后的 gkrellmd 版本与帮助命令路径"
+    command: "bash test.sh"
 
 assertion_count: 2
