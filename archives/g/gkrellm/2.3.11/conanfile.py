@@ -46,7 +46,10 @@ class GkrellmConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         server_dir = os.path.join(self.source_folder, "server")
-        cc = self.conf.get("tools.build:compiler_executables", {}).get("c", "clang")
+        compilers = self.conf.get(
+            "tools.build:compiler_executables", default={}, check_type=dict
+        )
+        cc = compilers.get("c") or "clang"
         # OHOS does not provide lm-sensors.  Skipping its configure probe also
         # avoids attempting to link a cross-compiled probe executable.
         glib = self.dependencies["glib"].cpp_info

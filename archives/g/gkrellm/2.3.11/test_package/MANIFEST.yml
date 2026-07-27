@@ -15,7 +15,7 @@ upstream_tests:
 
 test_package_tests:
   - file: test.sh
-    description: "验证打包后的 gkrellmd 版本与帮助命令路径"
+    description: "验证 gkrellmd 命令路径、守护进程启动与本机 TCP 监听"
     command: "bash test.sh"
 
-assertion_count: 2
+assertion_count: 5
