@@ -1,0 +1,12 @@
+package: "berkeley-db/18.1.40"
+homepage: "https://www.oracle.com/database/technologies/related/berkeleydb.html"
+upstream_check_command: "./test_mutex -p 2 -n 10 -l 10"
+upstream_test_in_build: true
+upstream_test_command: "make test_mutex"
+upstream_tests:
+  - "test_mutex multi-process mutex test"
+test_package_tests:
+  - file: test.c
+    description: "Creates a B-tree database, stores a value, reads it back, and verifies its bytes."
+    command: "./test_package"
+assertion_count: 4
