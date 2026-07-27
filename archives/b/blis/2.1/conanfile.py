@@ -55,7 +55,7 @@ class BlisConan(ConanFile):
         copy(
             self,
             "libblis.a",
-            os.path.join(self.build_folder, "lib", "arm64"),
+            os.path.join(os.path.dirname(self.build_folder), "lib", "arm64"),
             os.path.join(self.package_folder, "lib"),
             keep_path=False,
         )
