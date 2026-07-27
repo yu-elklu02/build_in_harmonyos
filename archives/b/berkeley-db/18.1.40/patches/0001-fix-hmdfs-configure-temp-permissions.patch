@@ -1,6 +1,6 @@
 --- a/dist/configure
 +++ b/dist/configure
-@@ -26390,12 +26390,12 @@
+@@ -26390,11 +26390,11 @@
  # Create a (secure) tmp directory for tmp files.
  
  {
