@@ -1,5 +1,3 @@
-import os
-
 from conan import ConanFile
 from conan.tools.build import cross_building
 
@@ -22,4 +20,4 @@ class BlisTestPackage(ConanFile):
 
     def test(self):
         if not cross_building(self):
-            self.run(os.path.join(self.cpp.build.bindirs[0], "test_blis"), env="conanrun")
+            self.run("./test_blis", env="conanrun")
