@@ -52,7 +52,20 @@ class BlisConan(ConanFile):
         self.run("make check -j1", cwd=self.source_folder)
 
     def package(self):
-        self.run("make install", cwd=self.source_folder)
+        copy(
+            self,
+            "libblis.a",
+            self.source_folder,
+            os.path.join(self.package_folder, "lib"),
+            keep_path=False,
+        )
+        copy(
+            self,
+            "*.h",
+            os.path.join(self.source_folder, "include"),
+            os.path.join(self.package_folder, "include"),
+            keep_path=True,
+        )
         copy(self, "LICENSE", self.source_folder, os.path.join(self.package_folder, "licenses"))
 
     def package_info(self):
