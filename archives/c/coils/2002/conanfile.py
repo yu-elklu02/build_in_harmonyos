@@ -47,6 +47,7 @@ class CoilsConan(ConanFile):
                 f'"{os.path.join(source, "1srya.fa")}" > "{output}"'
             )
             self.run(f'grep -q "^>1srya " "{output}"')
+            self.run(f'grep -q "xxxxxxxx" "{output}"')
 
     def package(self):
         copy(self, "ncoils", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"))

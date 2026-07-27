@@ -1,5 +1,3 @@
-import os
-
 from conan import ConanFile
 from conan.tools.build import can_run
 
@@ -16,9 +14,4 @@ class CoilsTestConan(ConanFile):
         if not can_run(self):
             return
 
-        package = self.dependencies["coils"].package_folder
-        ncoils = os.path.join(package, "bin", "ncoils")
-        sample = os.path.join(self.source_folder, "1srya.fa")
-        output = os.path.join(self.build_folder, "1srya-coils.fasta")
-        self.run(f'"{ncoils}" -f < "{sample}" > "{output}"', env="conanrun")
-        self.run(f'grep -q "^>1srya " "{output}"', env="conanrun")
+        self.run("sh test_coils.sh", cwd=self.source_folder, env="conanrun")
