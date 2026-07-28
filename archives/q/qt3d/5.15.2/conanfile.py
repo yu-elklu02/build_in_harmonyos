@@ -5,7 +5,7 @@ import shlex
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.env import Environment
-from conan.tools.files import copy, get
+from conan.tools.files import copy, get, save
 from conan.tools.layout import basic_layout
 
 
@@ -69,14 +69,27 @@ class Qt3dConan(ConanFile):
         quoted_test_dir = shlex.quote(test_dir)
         quoted_qmake = shlex.quote(qmake)
         _, qt_root = self._qt_installation()
+        qtconf = os.path.join(self.build_folder, "qt3d-test-qt.conf")
+        save(
+            self,
+            qtconf,
+            "[Paths]\n"
+            f"Prefix = {qt_root}\n"
+            "Headers = include\n"
+            "Libraries = lib\n"
+            "Binaries = bin\n"
+            "Plugins = plugins\n"
+            "Imports = imports\n"
+            "Qml2Imports = qml\n"
+            "Translations = translations\n"
+            "ArchData = .\n"
+            "Data = .\n",
+        )
         test_env = Environment()
         # qmake creates Qt3D's module .pri files in the Conan build folder.
-        # Preserve the installed Qt5 module root as well, so QMAKEPATH does
-        # not hide Qt5Core and Qt5Test from the qmake executable.
-        test_env.define(
-            "QMAKEPATH",
-            os.pathsep.join((self.build_folder, qt_root)),
-        )
+        # qt.conf supplies Qt5 modules from the installed Conan package instead
+        # of the transient build directory embedded in the qmake executable.
+        test_env.define("QMAKEPATH", self.build_folder)
         test_env.prepend_path(
             "LD_LIBRARY_PATH", os.path.join(self.build_folder, "lib")
         )
@@ -84,7 +97,8 @@ class Qt3dConan(ConanFile):
 
         with test_env.vars(self).apply():
             self.run(
-                f"cd {quoted_test_dir} && {quoted_qmake} qaspectjob.pro QMAKE_STRIP=''"
+                f"cd {quoted_test_dir} && {quoted_qmake} -qtconf "
+                f"{shlex.quote(qtconf)} qaspectjob.pro QMAKE_STRIP=''"
             )
             self.run(f"cd {quoted_test_dir} && make -j2 QMAKE_STRIP=''")
             self.run(

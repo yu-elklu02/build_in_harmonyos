@@ -23,8 +23,9 @@ The recipe builds and runs the upstream non-graphical
 `tests/auto/core/qaspectjob` suite. It covers Qt3D aspect-job dependency
 addition, removal and expired-dependency cleanup without requiring graphics
 services, private Qt modules or an OpenGL context.
-The test qmake invocation searches both the Qt3D build output and the installed
-`qt5-qtbase` package, without depending on any Conan cache build-folder layout.
+The test qmake invocation uses a generated `qt.conf` pointing at the installed
+`qt5-qtbase` package, while `QMAKEPATH` supplies Qt3D build output. This avoids
+the transient Conan cache build-directory paths embedded in the Qt qmake binary.
 The remaining upstream suites are not built in this basic-adaptation path because
 many require private Qt modules, graphics services and platform plugins unavailable
 on the worker.
