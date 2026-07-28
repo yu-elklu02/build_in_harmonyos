@@ -1,18 +1,21 @@
 package: qt3d/5.15.2
 homepage: "https://www.qt.io"
 
-upstream_check_command: "cd tests/auto/core/qaspectjob && qmake qaspectjob.pro && make -j2 && QT_QPA_PLATFORM=offscreen ./tst_qaspectjob"
-upstream_test_in_build: true
-upstream_test_command: "QT_QPA_PLATFORM=offscreen ./tst_qaspectjob"
+upstream_check_command: "./test_upstream_qaspectjob"
+upstream_test_in_build: false
+upstream_test_command: "./test_upstream_qaspectjob"
 
 upstream_tests:
   - name: "tst_QAspectJob"
     source: "qt3d-everywhere-src-5.15.2/tests/auto/core/qaspectjob"
-    description: "Public Qt3DCore aspect-job dependency operations; 5 tests passed on OHOS"
+    description: "Public Qt3DCore aspect-job dependency test copied from the upstream suite and compiled with Conan CMake dependencies"
 
 test_package_tests:
   - file: test.cpp
     description: "Create a Qt3D entity hierarchy, attach a QTransform, and construct Qt3DRender QRenderSettings with a render-policy assertion"
     command: "./test_qt3d"
+  - file: test_upstream_qaspectjob.cpp
+    description: "Run the upstream tst_QAspectJob source through the packaged Qt3D Core library"
+    command: "./test_upstream_qaspectjob"
 
-assertion_count: 3
+assertion_count: 15

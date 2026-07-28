@@ -19,13 +19,12 @@ The target CI resolves `qt5-qtbase/5.15.2` from the registry.
 
 ## Tests
 
-The recipe builds and runs the upstream non-graphical
-`tests/auto/core/qaspectjob` suite. It covers Qt3D aspect-job dependency
-addition, removal and expired-dependency cleanup without requiring graphics
-services, private Qt modules or an OpenGL context.
-The test qmake invocation uses a generated `qt.conf` pointing at the installed
-`qt5-qtbase` package, while `QMAKEPATH` supplies Qt3D build output. This avoids
-the transient Conan cache build-directory paths embedded in the Qt qmake binary.
+The test package builds and runs the upstream non-graphical
+`tests/auto/core/qaspectjob/tst_qaspectjob.cpp` suite against the packaged
+Qt3D Core library. It covers Qt3D aspect-job dependency addition, removal and
+expired-dependency cleanup without requiring graphics services, private Qt
+modules or an OpenGL context. It is built through Conan-generated CMake targets
+instead of qmake because the Qt5 dependency package does not ship qmake mkspecs.
 The remaining upstream suites are not built in this basic-adaptation path because
 many require private Qt modules, graphics services and platform plugins unavailable
 on the worker.
@@ -41,4 +40,4 @@ stack and remains outside this basic adaptation path.
 
 - Source checksum verified: pass
 - Recipe/YAML static checks: pass
-- OHOS build, upstream `tst_QAspectJob` (5/5) and consumer test: pass
+- OHOS build and both test-package executables: pending CI validation
