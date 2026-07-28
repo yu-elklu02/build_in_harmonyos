@@ -2,6 +2,7 @@ import os
 from conan import ConanFile
 from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.env import Environment
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
 
 
@@ -84,7 +85,13 @@ class QuazipConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-        self.run("ctest --output-on-failure", cwd=self.build_folder)
+        qt5_lib = os.path.join(
+            self.dependencies["qt5-qtbase"].package_folder, "lib"
+        )
+        env = Environment()
+        env.prepend_path("LD_LIBRARY_PATH", qt5_lib)
+        with env.vars(self).apply():
+            self.run("ctest --output-on-failure", cwd=self.build_folder)
 
     def package(self):
         cmake = CMake(self)
