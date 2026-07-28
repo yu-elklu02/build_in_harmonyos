@@ -2,7 +2,7 @@ import glob
 import os
 
 from conan import ConanFile
-from conan.errors import ConanInvalidConfiguration
+from conan.errors import ConanException, ConanInvalidConfiguration
 from conan.tools.env import Environment
 from conan.tools.files import copy, get
 from conan.tools.layout import basic_layout
@@ -60,45 +60,32 @@ class Qt3dConan(ConanFile):
             self.run('make -j2 QMAKE_STRIP=""')
 
     def package(self):
-        _, qt_root = self._qt_installation()
-        stage = os.path.join(self.build_folder, "package-stage")
-        with self._qt_environment(qt_root).vars(self).apply():
-            self.run(f'make install INSTALL_ROOT="{stage}" QMAKE_STRIP=""')
-
-        staged_prefix = os.path.join(stage, qt_root.lstrip("/\\"))
-        staged_lib = os.path.join(staged_prefix, "lib")
-
+        # The qmake project does not declare install rules for the addon.
+        # Package its completed build artifacts directly.
+        build_root = self.build_folder
         copy(
             self,
             "libQt53D*.so*",
-            src=staged_lib,
+            src=build_root,
             dst=os.path.join(self.package_folder, "lib"),
             keep_path=False,
         )
         copy(
             self,
             "libQt53D*.prl",
-            src=staged_lib,
+            src=build_root,
             dst=os.path.join(self.package_folder, "lib"),
             keep_path=False,
         )
         copy(
             self,
-            "*",
-            src=os.path.join(staged_prefix, "include"),
+            "*.h",
+            src=os.path.join(self.source_folder, "src"),
             dst=os.path.join(self.package_folder, "include"),
+            keep_path=True,
         )
 
-        modules_dir = os.path.join(staged_prefix, "mkspecs", "modules")
-        copy(
-            self,
-            "qt_lib_3d*.pri",
-            src=modules_dir,
-            dst=os.path.join(self.package_folder, "mkspecs", "modules"),
-            keep_path=False,
-        )
-
-        for cmake_dir in glob.glob(os.path.join(staged_lib, "cmake", "Qt53D*")):
+        for cmake_dir in glob.glob(os.path.join(build_root, "lib", "cmake", "Qt53D*")):
             copy(
                 self,
                 "*",
@@ -108,12 +95,10 @@ class Qt3dConan(ConanFile):
                 ),
             )
 
-        for directory in ("plugins", "qml"):
-            copy(
-                self,
-                "*",
-                src=os.path.join(staged_prefix, directory),
-                dst=os.path.join(self.package_folder, directory),
+        package_lib = os.path.join(self.package_folder, "lib")
+        if not glob.glob(os.path.join(package_lib, "libQt53DCore.so*")):
+            raise ConanException(
+                "Qt3D build completed without producing libQt53DCore.so"
             )
 
     def package_info(self):
