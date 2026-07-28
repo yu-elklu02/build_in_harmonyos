@@ -46,6 +46,16 @@ class QuazipConan(ConanFile):
         deps.generate()
 
         tc = CMakeToolchain(self)
+        moc_path = os.path.join(
+            self.dependencies["qt5-qtbase"].package_folder, "bin", "moc"
+        )
+        if not os.path.isfile(moc_path):
+            raise ConanException(
+                "qt5-qtbase/5.15.2 does not provide the required bin/moc tool"
+            )
+        # CMakeDeps exports Qt5 libraries but not the Qt5::moc executable
+        # target used by QuaZip's AUTOMOC configuration.
+        tc.variables["CMAKE_AUTOMOC_EXECUTABLE"] = moc_path
         tc.variables["QUAZIP_QT_MAJOR_VERSION"] = "5"
         tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
         tc.variables["QUAZIP_ENABLE_TESTS"] = True
