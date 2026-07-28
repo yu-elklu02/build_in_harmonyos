@@ -69,9 +69,11 @@ class Qt3dConan(ConanFile):
         quoted_test_dir = shlex.quote(test_dir)
         quoted_qmake = shlex.quote(qmake)
         test_env = Environment()
-        test_env.prepend_path("QMAKEPATH", self.source_folder)
+        # qmake creates the Qt3D module .pri files in the Conan build folder,
+        # rather than alongside the extracted sources.
+        test_env.prepend_path("QMAKEPATH", self.build_folder)
         test_env.prepend_path(
-            "LD_LIBRARY_PATH", os.path.join(self.source_folder, "lib")
+            "LD_LIBRARY_PATH", os.path.join(self.build_folder, "lib")
         )
 
         with test_env.vars(self).apply():
