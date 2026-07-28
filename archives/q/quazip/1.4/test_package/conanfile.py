@@ -1,7 +1,7 @@
 import os
 from conan import ConanFile
 from conan.tools.build import can_run
-from conan.tools.cmake import CMake, cmake_layout
+from conan.tools.cmake import CMake, CMakeDeps, cmake_layout
 
 
 class QuazipTestConan(ConanFile):
@@ -10,6 +10,13 @@ class QuazipTestConan(ConanFile):
 
     def requirements(self):
         self.requires(self.tested_reference_str)
+        self.requires("qt5-qtbase/5.15.2")
+        self.requires("zlib/1.3.1")
+
+    def generate(self):
+        deps = CMakeDeps(self)
+        deps.set_property("qt5-qtbase", "cmake_file_name", "Qt5")
+        deps.generate()
 
     def layout(self):
         cmake_layout(self)
