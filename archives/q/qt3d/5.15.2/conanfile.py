@@ -62,9 +62,9 @@ class Qt3dConan(ConanFile):
             self._run_upstream_core_test(qmake)
 
     def _run_upstream_core_test(self, qmake):
-        """Build and run a non-graphical Qt3D upstream test suite."""
+        """Build and run a public-API-only Qt3D upstream test suite."""
         test_dir = os.path.join(
-            self.source_folder, "tests", "auto", "core", "qentity"
+            self.source_folder, "tests", "auto", "core", "qaspectjob"
         )
         quoted_test_dir = shlex.quote(test_dir)
         quoted_qmake = shlex.quote(qmake)
@@ -78,11 +78,11 @@ class Qt3dConan(ConanFile):
 
         with test_env.vars(self).apply():
             self.run(
-                f"cd {quoted_test_dir} && {quoted_qmake} qentity.pro QMAKE_STRIP=''"
+                f"cd {quoted_test_dir} && {quoted_qmake} qaspectjob.pro QMAKE_STRIP=''"
             )
             self.run(f"cd {quoted_test_dir} && make -j2 QMAKE_STRIP=''")
             self.run(
-                f"cd {quoted_test_dir} && QT_QPA_PLATFORM=offscreen ./tst_qentity"
+                f"cd {quoted_test_dir} && QT_QPA_PLATFORM=offscreen ./tst_qaspectjob"
             )
 
     def package(self):
