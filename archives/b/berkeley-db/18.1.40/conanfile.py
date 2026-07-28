@@ -49,6 +49,8 @@ class BerkeleyDbConan(ConanFile):
             "--enable-test",
             "--with-tcl={}".format(os.path.join(tcl_root, "lib")),
         ])
+        # Tcl 9 no longer provides the legacy CONST compatibility macro.
+        tc.extra_cflags.append("-DCONST=const")
         if self.settings.os == "OHOS":
             # Berkeley DB's bundled config.guess does not recognize HarmonyOS.
             tc.configure_args.append("--build=aarch64-unknown-linux-gnu")
