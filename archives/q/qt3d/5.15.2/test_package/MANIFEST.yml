@@ -12,7 +12,7 @@ upstream_tests:
 
 test_package_tests:
   - file: test.cpp
-    description: "Create a Qt3D entity hierarchy and attach a QTransform component"
+    description: "Create a Qt3D entity hierarchy, attach a QTransform, and construct Qt3DRender QRenderSettings with a render-policy assertion"
     command: "./test_qt3d"
 
-assertion_count: 2
+assertion_count: 3

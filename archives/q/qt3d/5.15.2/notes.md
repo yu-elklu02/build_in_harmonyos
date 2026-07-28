@@ -29,9 +29,12 @@ The remaining upstream suites are not built in this basic-adaptation path becaus
 many require private Qt modules, graphics services and platform plugins unavailable
 on the worker.
 
-The Conan consumer test compiles and runs a small Qt3D Core application. It checks
-the entity parent relationship and component attachment, proving that headers,
-linkage and runtime loading work through the packaged artifact.
+The Conan consumer test compiles and runs a small Qt3D Core and Render application.
+It checks the entity parent relationship, component attachment and a QRenderSettings
+render-policy round trip, proving that the packaged Core and Render headers, linkage
+and runtime loading work through the packaged artifact. This is not an EGL/OpenGL ES
+rendering test: validating an offscreen frame submission requires an OHOS graphics
+stack and remains outside this basic adaptation path.
 
 ## Result
 

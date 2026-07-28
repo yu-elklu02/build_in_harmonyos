@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
+#include <Qt3DRender/QRenderSettings>
 
 #include <cstdio>
 
@@ -21,6 +22,13 @@ int main(int argc, char *argv[]) {
         return 2;
     }
 
-    std::puts("Qt3D Core consumer test passed");
+    Qt3DRender::QRenderSettings render_settings(&root);
+    render_settings.setRenderPolicy(Qt3DRender::QRenderSettings::Always);
+    if (render_settings.renderPolicy() != Qt3DRender::QRenderSettings::Always) {
+        std::fprintf(stderr, "Qt3D Render settings policy failed\n");
+        return 3;
+    }
+
+    std::puts("Qt3D Core and Render consumer test passed");
     return 0;
 }

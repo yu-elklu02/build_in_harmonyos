@@ -8,7 +8,7 @@ find_package(qt3d CONFIG REQUIRED)
 find_package(qt5-qtbase CONFIG REQUIRED)
 
 add_executable(test_qt3d test.cpp)
-target_link_libraries(test_qt3d PRIVATE qt3d::Core qt5-qtbase::qt5-qtbase)
+target_link_libraries(test_qt3d PRIVATE qt3d::Render qt5-qtbase::qt5-qtbase)
 set_target_properties(test_qt3d PROPERTIES
     LINK_FLAGS "-Wl,--disable-new-dtags"
 )
