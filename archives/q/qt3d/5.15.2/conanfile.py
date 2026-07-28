@@ -62,7 +62,7 @@ class Qt3dConan(ConanFile):
     def package(self):
         # The qmake project does not declare install rules for the addon.
         # Package its completed build artifacts directly.
-        build_root = os.path.join(self.build_folder, "build-release")
+        build_root = self.build_folder
         build_lib = os.path.join(build_root, "lib")
         copy(
             self,
