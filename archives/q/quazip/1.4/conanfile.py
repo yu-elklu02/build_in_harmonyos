@@ -14,7 +14,9 @@ class QuazipConan(ConanFile):
 
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
-    default_options = {"shared": True}
+    # zlib/1.3.1 is provided as a non-PIC static archive on OpenHarmony.
+    # Keep QuaZip static so AArch64 linking does not require -fPIC from zlib.
+    default_options = {"shared": False}
 
     def export_sources(self):
         export_conandata_patches(self)
