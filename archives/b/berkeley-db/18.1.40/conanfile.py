@@ -86,7 +86,7 @@ class BerkeleyDbConan(ConanFile):
             test_env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.build_folder, ".libs"))
             with test_env.vars(self).apply():
                 self.run(
-                    '"{}" "{}"'.format(os.path.join(tcl_root, "bin", "tclsh"), tcl_runner),
+                    '"{}" "{}"'.format(os.path.join(tcl_root, "bin", "tclsh9.0"), tcl_runner),
                     cwd=self.build_folder,
                     env="conanrun",
                 )
