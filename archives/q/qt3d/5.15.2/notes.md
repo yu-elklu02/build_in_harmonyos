@@ -5,7 +5,7 @@
 - Target: OpenHarmony aarch64
 - Build system: qmake + make
 - Qt prefix: `qt5-qtbase/5.15.2` Conan package directory
-- Qt dependency: PR #2919 (not merged at the time of this target PR)
+- Qt dependency: `qt5-qtbase/5.15.2` (merged into the registry)
 
 ## Adaptation
 
@@ -15,14 +15,16 @@ Quick3D submodules only when the Qt installation exposes the Qt Quick module.
 
 The qmake install tree is staged with `INSTALL_ROOT`, then Qt3D libraries, headers,
 module metadata and optional plugins are copied into a normal Conan package layout.
-The dependency PR branch is exported locally while adapting qt3d. After PR #2919 is
-merged and released, the target CI resolves `qt5-qtbase/5.15.2` from the registry.
+The target CI resolves `qt5-qtbase/5.15.2` from the registry.
 
 ## Tests
 
-The upstream archive contains 251 `tst_*.cpp` programs under `tests/auto`. They are
-not built in this basic-adaptation path because many require private Qt modules,
-graphics services and platform plugins that are unavailable on the worker.
+The recipe builds and runs the upstream non-graphical
+`tests/auto/core/qentity` suite. It covers Qt3D entity ownership, component
+attachment and cloning without requiring graphics services or an OpenGL context.
+The remaining upstream suites are not built in this basic-adaptation path because
+many require private Qt modules, graphics services and platform plugins unavailable
+on the worker.
 
 The Conan consumer test compiles and runs a small Qt3D Core application. It checks
 the entity parent relationship and component attachment, proving that headers,

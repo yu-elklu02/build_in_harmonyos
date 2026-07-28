@@ -1,5 +1,6 @@
 import glob
 import os
+import shlex
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -58,6 +59,29 @@ class Qt3dConan(ConanFile):
             self.run(f'"{qmake}" "{project}" QMAKE_STRIP=""')
             # The OHOS worker does not support GNU make's jobserver FIFO reliably.
             self.run('make -j2 QMAKE_STRIP=""')
+            self._run_upstream_core_test(qmake)
+
+    def _run_upstream_core_test(self, qmake):
+        """Build and run a non-graphical Qt3D upstream test suite."""
+        test_dir = os.path.join(
+            self.source_folder, "tests", "auto", "core", "qentity"
+        )
+        quoted_test_dir = shlex.quote(test_dir)
+        quoted_qmake = shlex.quote(qmake)
+        test_env = Environment()
+        test_env.prepend_path("QMAKEPATH", self.source_folder)
+        test_env.prepend_path(
+            "LD_LIBRARY_PATH", os.path.join(self.source_folder, "lib")
+        )
+
+        with test_env.vars(self).apply():
+            self.run(
+                f"cd {quoted_test_dir} && {quoted_qmake} qentity.pro QMAKE_STRIP=''"
+            )
+            self.run(f"cd {quoted_test_dir} && make -j2 QMAKE_STRIP=''")
+            self.run(
+                f"cd {quoted_test_dir} && QT_QPA_PLATFORM=offscreen ./tst_qentity"
+            )
 
     def package(self):
         _, qt_root = self._qt_installation()
