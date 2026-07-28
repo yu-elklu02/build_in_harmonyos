@@ -19,7 +19,7 @@ upstream_tests:
 
 test_package_tests:
   - file: test.cpp
-    description: "Create a ZIP archive, write an entry, reopen it and verify the payload"
+    description: "Create a ZIP archive, verify write/read close status, reopen it and verify the payload"
     command: "./test_package"
 
 assertion_count: 396

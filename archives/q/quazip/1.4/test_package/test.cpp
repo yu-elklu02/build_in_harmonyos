@@ -30,22 +30,38 @@ int main() {
         return 3;
     }
     output.close();
+    if (output.getZipError() != 0) {
+        std::cerr << "failed to close archive entry\n";
+        return 4;
+    }
     archive.close();
+    if (archive.getZipError() != 0) {
+        std::cerr << "failed to finalize archive\n";
+        return 5;
+    }
 
     if (!archive.open(QuaZip::mdUnzip) ||
         !archive.setCurrentFile("payload.txt")) {
         std::cerr << "failed to reopen archive entry\n";
-        return 4;
+        return 6;
     }
 
     QuaZipFile input(&archive);
     if (!input.open(QIODevice::ReadOnly) || input.readAll() != expected) {
         std::cerr << "archive entry content mismatch\n";
-        return 5;
+        return 7;
     }
 
     input.close();
+    if (input.getZipError() != 0) {
+        std::cerr << "failed to close archive input\n";
+        return 8;
+    }
     archive.close();
+    if (archive.getZipError() != 0) {
+        std::cerr << "failed to close archive input\n";
+        return 9;
+    }
     std::cout << "QuaZip round-trip test passed\n";
     return 0;
 }

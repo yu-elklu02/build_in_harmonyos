@@ -7,5 +7,5 @@ sources:
 patches:
   "1.4":
     - patch_file: "patches/0001-qztest-skip-root-write-on-ohos.patch"
-      patch_description: "Skip the root-directory extraction test on OpenHarmony."
+      patch_description: "Skip the root-directory extraction case when the test environment is not writable."
       patch_type: "portability"

@@ -25,6 +25,7 @@ responsible for any configured mirror fallback.
 
 The recipe enables and runs upstream qztest through CTest. The consumer test
 creates a ZIP archive, writes an entry, reopens it and verifies the payload.
-On OpenHarmony, the root-directory extraction case is excluded because the
-platform root filesystem is read-only; the remaining 125 upstream cases and
-the consumer test passed on the target device.
+The root-directory extraction case performs a POSIX runtime check and is skipped
+only when the test environment does not permit writing to `/`; no platform
+conditional-compilation macro is introduced. The remaining 125 upstream cases
+and the consumer test passed on the target device.
