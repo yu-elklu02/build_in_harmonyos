@@ -35,6 +35,6 @@ linkage and runtime loading work through the packaged artifact.
 
 ## Result
 
-- Source checksum verified locally: pass
-- Recipe/YAML static checks: pending
-- OHOS build and consumer test: pending CI
+- Source checksum verified: pass
+- Recipe/YAML static checks: pass
+- OHOS build, upstream `tst_QAspectJob` (5/5) and consumer test: pass

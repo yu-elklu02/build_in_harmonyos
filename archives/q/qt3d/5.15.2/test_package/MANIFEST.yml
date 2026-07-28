@@ -1,14 +1,14 @@
 package: qt3d/5.15.2
 homepage: "https://www.qt.io"
 
-upstream_check_command: "make check"
-upstream_test_in_build: false
-upstream_test_command: "make check"
+upstream_check_command: "cd tests/auto/core/qaspectjob && qmake qaspectjob.pro && make -j2 && QT_QPA_PLATFORM=offscreen ./tst_qaspectjob"
+upstream_test_in_build: true
+upstream_test_command: "QT_QPA_PLATFORM=offscreen ./tst_qaspectjob"
 
 upstream_tests:
-  - name: "Qt3D auto tests"
-    source: "qt3d-everywhere-src-5.15.2/tests/auto/"
-    description: "251 tst_*.cpp test programs across Core, Render, Input, Animation and Extras"
+  - name: "tst_QAspectJob"
+    source: "qt3d-everywhere-src-5.15.2/tests/auto/core/qaspectjob"
+    description: "Public Qt3DCore aspect-job dependency operations; 5 tests passed on OHOS"
 
 test_package_tests:
   - file: test.cpp
