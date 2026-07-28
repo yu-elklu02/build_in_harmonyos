@@ -99,7 +99,7 @@ class QuazipConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["quazip1-qt5"]
-        self.cpp_info.includedirs = ["include/QuaZip-Qt5"]
+        self.cpp_info.includedirs = ["include/QuaZip-Qt5-1.4"]
         self.cpp_info.requires = ["qt5-qtbase::Qt5Core", "zlib::zlib"]
         self.cpp_info.set_property("cmake_file_name", "QuaZip-Qt5")
         self.cpp_info.set_property(
