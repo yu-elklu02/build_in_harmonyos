@@ -1,0 +1,9 @@
+--- a/qztest/testjlcompress.h
++++ b/qztest/testjlcompress.h
+@@ -30,4 +30,6 @@
+ #ifdef Q_OS_UNIX
+ #define QUAZIP_SYMLINK_TEST
++#ifndef Q_OS_OPENHARMONY
+ #define QUAZIP_EXTRACT_TO_ROOT_TEST
++#endif
+ #endif

@@ -2,7 +2,7 @@ import os
 from conan import ConanFile
 from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import get
+from conan.tools.files import apply_conandata_patches, get
 
 
 class QuazipConan(ConanFile):
@@ -32,6 +32,7 @@ class QuazipConan(ConanFile):
         for url in urls:
             try:
                 get(self, url=url, sha256=source["sha256"], strip_root=True)
+                apply_conandata_patches(self)
                 return
             except ConanException as error:
                 self.output.warning(f"Failed to download QuaZip source from {url}: {error}")
