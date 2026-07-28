@@ -5,6 +5,10 @@ suite with `test.tcl`'s `run_all` entry point. This requires the published
 OHOS `tcl/9.0.3.1` package, including its target `tclsh`, shared library, and
 relocated `tclConfig.sh`.
 
+The upstream Tcl module link rule does not normally retain the Tcl runtime as
+an ELF dependency. A portability patch adds Tcl's configured link flags to
+`libdb_tcl`, so the module can be loaded by the target `tclsh` on OHOS.
+
 The recipe builds the C and Tcl APIs from `dist/configure` for OHOS armv8.
 Java and SQL bindings remain disabled because they require runtimes unavailable
 in the target package build.

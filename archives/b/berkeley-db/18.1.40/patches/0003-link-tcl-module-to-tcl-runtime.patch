@@ -1,0 +1,11 @@
+--- a/dist/Makefile.in
++++ b/dist/Makefile.in
+@@ -186,7 +186,7 @@
+ # Tcl support is optional.
+ ##################################################
+ TCL_INCLUDE_SPEC=	@TCL_INCLUDE_SPEC@
+-LIBTSO_LIBS=	@LIBTSO_LIBS@ @LIBSO_LIBS@
++LIBTSO_LIBS=	@LIBTSO_LIBS@ @LIBSO_LIBS@ @TCL_LIB_SPEC@ @TCL_LIB_FLAG@
+ TCL_SRCDIR=	$(langdir)/tcl
+ libtcl_base=	libdb_tcl
+ libtcl=		$(libtcl_base).a

@@ -10,3 +10,6 @@ patches:
     - patch_file: "patches/0002-skip-missing-document-install.patch"
       patch_description: "Do not install documentation absent from the source archive"
       patch_type: "portability"
+    - patch_file: "patches/0003-link-tcl-module-to-tcl-runtime.patch"
+      patch_description: "Link the Tcl extension against the selected Tcl runtime"
+      patch_type: "portability"
