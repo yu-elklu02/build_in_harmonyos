@@ -62,18 +62,19 @@ class Qt3dConan(ConanFile):
     def package(self):
         # The qmake project does not declare install rules for the addon.
         # Package its completed build artifacts directly.
-        build_root = self.build_folder
+        build_root = os.path.join(self.build_folder, "build-release")
+        build_lib = os.path.join(build_root, "lib")
         copy(
             self,
             "libQt53D*.so*",
-            src=build_root,
+            src=build_lib,
             dst=os.path.join(self.package_folder, "lib"),
             keep_path=False,
         )
         copy(
             self,
             "libQt53D*.prl",
-            src=build_root,
+            src=build_lib,
             dst=os.path.join(self.package_folder, "lib"),
             keep_path=False,
         )
@@ -85,7 +86,7 @@ class Qt3dConan(ConanFile):
             keep_path=True,
         )
 
-        for cmake_dir in glob.glob(os.path.join(build_root, "lib", "cmake", "Qt53D*")):
+        for cmake_dir in glob.glob(os.path.join(build_lib, "cmake", "Qt53D*")):
             copy(
                 self,
                 "*",
