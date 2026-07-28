@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Conan test_package template — Conan L1 official test.
-
-This is the L1 test in the five-level test system.
-CI runs this automatically via `conan create` (which invokes test_package).
-
-File location: archives/{letter}/libvo-aacenc/{version}/test_package/conanfile.py
-"""
+"""Consumer test for libvo-aacenc."""
 from conan import ConanFile
 from conan.errors import ConanException
 from conan.tools.build import cross_building

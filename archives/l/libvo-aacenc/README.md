@@ -29,8 +29,8 @@ VisualOn AAC 编码器库 — 开源 AAC 音频编码实现。
 
 ```bash
 # pkg-config 查询
-pkg-config --cflags vo-aacenc    # → -I/storage/Users/currentUser/usr/local/include
-pkg-config --libs vo-aacenc      # → -L/storage/Users/currentUser/usr/local/lib -lvo-aacenc
+pkg-config --cflags vo-aacenc
+pkg-config --libs vo-aacenc
 
 # 链接示例
 clang-wrapper -o myapp myapp.c -lvo-aacenc
