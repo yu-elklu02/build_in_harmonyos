@@ -27,6 +27,7 @@ class VoAacencConan(ConanFile):
     def generate(self):
         tc = AutotoolsToolchain(self)
         tc.configure_args.extend(["--disable-shared", "--enable-static"])
+        # Upstream's 2012 config.sub rejects the newer linux-ohos triplet.
         tc.configure_args.extend(["--build=aarch64-unknown-linux-gnu", "--host=aarch64-unknown-linux-gnu"])
         tc.generate()
 
