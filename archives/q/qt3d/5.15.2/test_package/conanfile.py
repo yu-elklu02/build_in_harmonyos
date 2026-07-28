@@ -12,6 +12,9 @@ class Qt3dTestConan(ConanFile):
 
     def requirements(self):
         self.requires(self.tested_reference_str)
+        # CMakeDeps only emits Qt5CoreConfig.cmake for a direct requirement.
+        # Keep this explicit because the test project links Qt5::Core directly.
+        self.requires("qt5-qtbase/5.15.2")
 
     def layout(self):
         cmake_layout(self)
