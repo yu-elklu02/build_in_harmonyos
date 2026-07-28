@@ -2,7 +2,7 @@ import os
 from conan import ConanFile
 from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import apply_conandata_patches, get
+from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
 
 
 class QuazipConan(ConanFile):
@@ -15,6 +15,9 @@ class QuazipConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = {"shared": True}
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def requirements(self):
         self.requires("zlib/1.3.1")
@@ -44,6 +47,8 @@ class QuazipConan(ConanFile):
         # QuaZip calls find_package(Qt5 COMPONENTS Core). Map the Conan
         # package name to that upstream CMake package.
         deps.set_property("qt5-qtbase", "cmake_file_name", "Qt5")
+        deps.set_property("zlib", "cmake_file_name", "ZLIB")
+        deps.set_property("zlib", "cmake_target_name", "ZLIB::ZLIB")
         deps.generate()
 
         tc = CMakeToolchain(self)
@@ -77,7 +82,7 @@ class QuazipConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-        cmake.test(cli_args=["--output-on-failure"])
+        self.run("ctest --output-on-failure", cwd=self.build_folder)
 
     def package(self):
         cmake = CMake(self)
