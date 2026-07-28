@@ -18,8 +18,9 @@ recipe supplies the Conan-provided tools through CMAKE_AUTOMOC_EXECUTABLE and
 CMAKE_AUTORCC_EXECUTABLE. The Qt5 runtime directory is applied only while
 running CTest.
 
-The recipe declares the canonical checksum-verified GitHub source URL. CI is
-responsible for any configured mirror fallback.
+The recipe declares the canonical checksum-verified GitHub source URL. If that
+download is unavailable, it clones the GitCode mirror and checks out the
+verified upstream v1.4 commit `566fa496649b8cb09018b497575bb3bf2977965f`.
 
 ## Tests
 

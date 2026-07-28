@@ -4,6 +4,7 @@ from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.env import Environment
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
+from conan.tools.scm import Git
 
 
 class QuazipConan(ConanFile):
@@ -43,7 +44,18 @@ class QuazipConan(ConanFile):
             else:
                 break
         else:
-            raise ConanException("Unable to download QuaZip source from all mirrors")
+            self.output.warning(
+                "Falling back to the checksum-pinned GitCode QuaZip mirror"
+            )
+            try:
+                git = Git(self, self.source_folder)
+                git.clone(url=source["git_mirror"], target=".")
+                git.checkout(source["git_commit"])
+            except ConanException as error:
+                raise ConanException(
+                    "Unable to download QuaZip source from GitHub or clone "
+                    f"the GitCode mirror: {error}"
+                ) from error
 
         apply_conandata_patches(self)
 
