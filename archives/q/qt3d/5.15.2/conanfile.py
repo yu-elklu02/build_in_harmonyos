@@ -68,13 +68,19 @@ class Qt3dConan(ConanFile):
         )
         quoted_test_dir = shlex.quote(test_dir)
         quoted_qmake = shlex.quote(qmake)
+        _, qt_root = self._qt_installation()
         test_env = Environment()
-        # qmake creates the Qt3D module .pri files in the Conan build folder,
-        # rather than alongside the extracted sources.
-        test_env.prepend_path("QMAKEPATH", self.build_folder)
+        # qmake creates Qt3D's module .pri files in the Conan build folder.
+        # Preserve the installed Qt5 module root as well, so QMAKEPATH does
+        # not hide Qt5Core and Qt5Test from the qmake executable.
+        test_env.define(
+            "QMAKEPATH",
+            os.pathsep.join((self.build_folder, qt_root)),
+        )
         test_env.prepend_path(
             "LD_LIBRARY_PATH", os.path.join(self.build_folder, "lib")
         )
+        test_env.prepend_path("LD_LIBRARY_PATH", os.path.join(qt_root, "lib"))
 
         with test_env.vars(self).apply():
             self.run(
