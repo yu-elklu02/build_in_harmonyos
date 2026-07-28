@@ -1,11 +1,26 @@
---- a/dist/Makefile.in
-+++ b/dist/Makefile.in
-@@ -186,7 +186,7 @@
- # Tcl support is optional.
- ##################################################
- TCL_INCLUDE_SPEC=	@TCL_INCLUDE_SPEC@
--LIBTSO_LIBS=	@LIBTSO_LIBS@ @LIBSO_LIBS@
-+LIBTSO_LIBS=	@LIBTSO_LIBS@ @LIBSO_LIBS@ @TCL_LIB_SPEC@ @TCL_LIB_FLAG@
- TCL_SRCDIR=	$(langdir)/tcl
- libtcl_base=	libdb_tcl
- libtcl=		$(libtcl_base).a
+--- a/dist/aclocal/tcl.m4
++++ b/dist/aclocal/tcl.m4
+@@ -106,8 +106,10 @@
+ 	# load time. [#4843]  Furthermore, with Tcl 8.3, the link flags
+ 	# given by the Tcl spec are insufficient for our use.  [#5779],[#17109]
+ 	#
+ 	case "$host_os" in
+ 	aix*)
+ 		LIBTSO_LIBS="$LIBTSO_LIBS $TCL_LIB_SPEC $TCL_LIB_FLAG"
+ 		LIBTSO_LIBS="$LIBTSO_LIBS -L$TCL_EXEC_PREFIX/lib -ltcl$TCL_VERSION";;
++	linux*|ohos*)
++		LIBTSO_LIBS="$LIBTSO_LIBS $TCL_LIB_SPEC $TCL_LIB_FLAG";;
+ 	esac
+ 
+ 	TCL_TCLSH="${TCL_PREFIX}/bin/tclsh${TCL_VERSION}"
+--- a/dist/configure
++++ b/dist/configure
+@@ -24286,6 +24286,8 @@
+ 	aix*)
+ 		LIBTSO_LIBS="$LIBTSO_LIBS $TCL_LIB_SPEC $TCL_LIB_FLAG"
+ 		LIBTSO_LIBS="$LIBTSO_LIBS -L$TCL_EXEC_PREFIX/lib -ltcl$TCL_VERSION";;
++	linux*|ohos*)
++		LIBTSO_LIBS="$LIBTSO_LIBS $TCL_LIB_SPEC $TCL_LIB_FLAG";;
+ 	esac
+ 
+ 
