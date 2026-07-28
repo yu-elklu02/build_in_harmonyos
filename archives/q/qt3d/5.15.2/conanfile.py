@@ -78,13 +78,22 @@ class Qt3dConan(ConanFile):
             dst=os.path.join(self.package_folder, "lib"),
             keep_path=False,
         )
-        copy(
-            self,
-            "*.h",
-            src=os.path.join(self.source_folder, "src"),
-            dst=os.path.join(self.package_folder, "include"),
-            keep_path=True,
-        )
+        module_map = {
+            "core": "Qt3DCore",
+            "render": "Qt3DRender",
+            "input": "Qt3DInput",
+            "logic": "Qt3DLogic",
+            "animation": "Qt3DAnimation",
+            "extras": "Qt3DExtras",
+        }
+        for source_module, package_module in module_map.items():
+            copy(
+                self,
+                "*.h",
+                src=os.path.join(self.source_folder, "src", source_module),
+                dst=os.path.join(self.package_folder, "include", package_module),
+                keep_path=False,
+            )
 
         for cmake_dir in glob.glob(os.path.join(build_lib, "cmake", "Qt53D*")):
             copy(
@@ -101,6 +110,10 @@ class Qt3dConan(ConanFile):
             raise ConanException(
                 "Qt3D build completed without producing libQt53DCore.so"
             )
+        if not os.path.isfile(
+            os.path.join(self.package_folder, "include", "Qt3DCore", "qentity.h")
+        ):
+            raise ConanException("Qt3D package is missing the public qentity.h header")
 
     def package_info(self):
         component_data = {

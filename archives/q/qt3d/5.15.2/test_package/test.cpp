@@ -1,7 +1,7 @@
 #include <QCoreApplication>
-#include <Qt3DCore/QEntity>
-#include <Qt3DCore/QTransform>
-#include <Qt3DRender/QRenderSettings>
+#include <Qt3DCore/qentity.h>
+#include <Qt3DCore/qtransform.h>
+#include <Qt3DRender/qrendersettings.h>
 
 #include <cstdio>
 

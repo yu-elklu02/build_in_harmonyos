@@ -32,7 +32,9 @@ on the worker.
 The Conan consumer test compiles and runs a small Qt3D Core and Render application.
 It checks the entity parent relationship, component attachment and a QRenderSettings
 render-policy round trip, proving that the packaged Core and Render headers, linkage
-and runtime loading work through the packaged artifact. This is not an EGL/OpenGL ES
+and runtime loading work through the packaged artifact. Qt3D public headers are
+copied from the source module directories because this qmake project has no header
+install rules. This is not an EGL/OpenGL ES
 rendering test: validating an offscreen frame submission requires an OHOS graphics
 stack and remains outside this basic adaptation path.
 
