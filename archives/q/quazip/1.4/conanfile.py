@@ -1,5 +1,6 @@
 import os
 from conan import ConanFile
+from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import get
 
@@ -25,7 +26,19 @@ class QuazipConan(ConanFile):
         cmake_layout(self)
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        source = self.conan_data["sources"][self.version]
+        urls = source["url"]
+        if isinstance(urls, str):
+            urls = [urls]
+
+        for url in urls:
+            try:
+                get(self, url=url, sha256=source["sha256"], strip_root=True)
+                return
+            except ConanException as error:
+                self.output.warning(f"Failed to download QuaZip source from {url}: {error}")
+
+        raise ConanException("Unable to download QuaZip source from all mirrors")
 
     def generate(self):
         deps = CMakeDeps(self)

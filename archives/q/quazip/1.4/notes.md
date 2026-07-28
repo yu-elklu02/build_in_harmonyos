@@ -13,6 +13,9 @@ the Conan Qt package to the upstream Qt5 CMake package name while preserving
 the generated Qt component targets. Bzip2 support is disabled because it is not
 needed for the upstream ZIP coverage.
 
+The source recipe tries a checksum-verified proxy mirror before the canonical
+GitHub release URL, because GitHub connectivity is intermittent on OHOS workers.
+
 ## Tests
 
 The recipe enables and runs upstream qztest through CTest. The consumer test
