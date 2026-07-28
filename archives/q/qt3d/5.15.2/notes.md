@@ -20,8 +20,9 @@ The target CI resolves `qt5-qtbase/5.15.2` from the registry.
 ## Tests
 
 The recipe builds and runs the upstream non-graphical
-`tests/auto/core/qentity` suite. It covers Qt3D entity ownership, component
-attachment and cloning without requiring graphics services or an OpenGL context.
+`tests/auto/core/qaspectjob` suite. It covers Qt3D aspect-job dependency
+addition, removal and expired-dependency cleanup without requiring graphics
+services, private Qt modules or an OpenGL context.
 The remaining upstream suites are not built in this basic-adaptation path because
 many require private Qt modules, graphics services and platform plugins unavailable
 on the worker.
