@@ -4,7 +4,7 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import can_run
 from conan.tools.env import Environment
-from conan.tools.files import apply_conandata_patches, get, save
+from conan.tools.files import apply_conandata_patches, get, replace_in_file, save
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 
@@ -66,6 +66,13 @@ class BerkeleyDbConan(ConanFile):
         configure_env.define("TCL_ROOT", tcl_root)
         with configure_env.vars(self).apply():
             autotools.configure(build_script_folder="dist")
+        replace_in_file(
+            self,
+            os.path.join(self.build_folder, "include.tcl"),
+            "${TCL_ROOT}",
+            tcl_root,
+            strict=True,
+        )
         autotools.make()
         autotools.make(target="test_mutex")
         if can_run(self):
