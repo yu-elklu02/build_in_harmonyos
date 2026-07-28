@@ -3,7 +3,8 @@ import os
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import can_run
-from conan.tools.files import apply_conandata_patches, get
+from conan.tools.env import Environment
+from conan.tools.files import apply_conandata_patches, get, save
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 
@@ -18,7 +19,10 @@ class BerkeleyDbConan(ConanFile):
     exports_sources = "conandata.yml", "patches/*"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
-    default_options = {"shared": False}
+    default_options = {"shared": True}
+
+    def requirements(self):
+        self.requires("tcl/9.0.3.1")
 
     def layout(self):
         basic_layout(self)
@@ -29,24 +33,37 @@ class BerkeleyDbConan(ConanFile):
     def validate(self):
         if self.settings.os != "OHOS" or self.settings.arch != "armv8":
             raise ConanInvalidConfiguration("berkeley-db is packaged for OHOS armv8 only")
+        if not self.options.shared:
+            raise ConanInvalidConfiguration(
+                "Berkeley DB Tcl regression tests require a shared libdb_tcl module"
+            )
 
     def generate(self):
+        tcl_root = self.dependencies["tcl"].package_folder
         tc = AutotoolsToolchain(self)
         tc.configure_args.append("--prefix=/")
+        tc.configure_args.extend([
+            "--enable-shared",
+            "--disable-static",
+            "--enable-tcl",
+            "--enable-test",
+            "--with-tcl={}".format(os.path.join(tcl_root, "lib")),
+        ])
         if self.settings.os == "OHOS":
             # Berkeley DB's bundled config.guess does not recognize HarmonyOS.
             tc.configure_args.append("--build=aarch64-unknown-linux-gnu")
             tc.configure_args.append("--host=aarch64-unknown-linux-gnu")
-        if self.options.shared:
-            tc.configure_args.extend(["--disable-static", "--enable-shared"])
-        else:
-            tc.configure_args.extend(["--enable-static", "--disable-shared"])
         tc.generate()
 
     def build(self):
         apply_conandata_patches(self)
+        tcl_root = self.dependencies["tcl"].package_folder
+        tcl_lib = os.path.join(tcl_root, "lib")
         autotools = Autotools(self)
-        autotools.configure(build_script_folder="dist")
+        configure_env = Environment()
+        configure_env.define("TCL_ROOT", tcl_root)
+        with configure_env.vars(self).apply():
+            autotools.configure(build_script_folder="dist")
         autotools.make()
         autotools.make(target="test_mutex")
         if can_run(self):
@@ -54,6 +71,25 @@ class BerkeleyDbConan(ConanFile):
                 os.path.join(self.build_folder, "test_mutex") + " -p 2 -n 10 -l 10",
                 env="conanrun",
             )
+            tcl_runner = os.path.join(self.build_folder, "run_tcl_tests.tcl")
+            save(
+                self,
+                tcl_runner,
+                "source {{{}}}\nrun_all\nif {{[info exists ::failed] && $::failed != 0}} {{exit 1}}\n".format(
+                    os.path.join(self.source_folder, "test", "tcl", "test.tcl")
+                ),
+            )
+            test_env = Environment()
+            test_env.define("TCL_ROOT", tcl_root)
+            test_env.define_path("TCL_LIBRARY", os.path.join(tcl_lib, "tcl9.0"))
+            test_env.prepend_path("LD_LIBRARY_PATH", tcl_lib)
+            test_env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.build_folder, ".libs"))
+            with test_env.vars(self).apply():
+                self.run(
+                    '"{}" "{}"'.format(os.path.join(tcl_root, "bin", "tclsh"), tcl_runner),
+                    cwd=self.build_folder,
+                    env="conanrun",
+                )
 
     def package(self):
         autotools = Autotools(self)

@@ -1,9 +1,10 @@
 package: "berkeley-db/18.1.40"
 homepage: "https://www.oracle.com/database/technologies/related/berkeleydb.html"
-upstream_check_command: "./test_mutex -p 2 -n 10 -l 10"
+upstream_check_command: "tclsh run_tcl_tests.tcl"
 upstream_test_in_build: true
-upstream_test_command: "make test_mutex"
+upstream_test_command: "make test_mutex && tclsh run_tcl_tests.tcl"
 upstream_tests:
+  - "Berkeley DB Tcl regression suite: 514 Tcl test scripts run by test.tcl run_all"
   - "test_mutex multi-process mutex test"
 test_package_tests:
   - file: test.c
