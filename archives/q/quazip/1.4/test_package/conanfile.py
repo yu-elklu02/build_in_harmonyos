@@ -16,6 +16,8 @@ class QuazipTestConan(ConanFile):
     def generate(self):
         deps = CMakeDeps(self)
         deps.set_property("qt5-qtbase", "cmake_file_name", "Qt5")
+        deps.set_property("zlib", "cmake_file_name", "ZLIB")
+        deps.set_property("zlib", "cmake_target_name", "ZLIB::ZLIB")
         deps.generate()
 
     def layout(self):

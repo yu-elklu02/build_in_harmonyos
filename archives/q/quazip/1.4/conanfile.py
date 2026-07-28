@@ -13,6 +13,7 @@ class QuazipConan(ConanFile):
     description = "Qt/C++ wrapper over minizip for accessing ZIP archives"
     homepage = "https://github.com/stachenov/quazip"
     license = "LGPL-2.1-or-later"
+    package_type = "static-library"
 
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
