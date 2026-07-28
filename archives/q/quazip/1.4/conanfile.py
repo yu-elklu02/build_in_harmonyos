@@ -38,12 +38,14 @@ class QuazipConan(ConanFile):
         for url in urls:
             try:
                 get(self, url=url, sha256=source["sha256"], strip_root=True)
-                apply_conandata_patches(self)
-                return
             except ConanException as error:
                 self.output.warning(f"Failed to download QuaZip source from {url}: {error}")
+            else:
+                break
+        else:
+            raise ConanException("Unable to download QuaZip source from all mirrors")
 
-        raise ConanException("Unable to download QuaZip source from all mirrors")
+        apply_conandata_patches(self)
 
     def generate(self):
         deps = CMakeDeps(self)

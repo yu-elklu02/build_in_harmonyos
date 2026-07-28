@@ -13,13 +13,18 @@ the Conan Qt package to the upstream Qt5 CMake package name while preserving
 the generated Qt component targets. Bzip2 support is disabled because it is not
 needed for the upstream ZIP coverage.
 
-CMakeDeps does not export the Qt5::moc executable target, so the recipe supplies
-the Conan-provided moc path through CMAKE_AUTOMOC_EXECUTABLE.
+CMakeDeps does not export the Qt5::moc and Qt5::rcc executable targets, so the
+recipe supplies the Conan-provided tools through CMAKE_AUTOMOC_EXECUTABLE and
+CMAKE_AUTORCC_EXECUTABLE. The Qt5 runtime directory is applied only while
+running CTest.
 
-The source recipe tries a checksum-verified proxy mirror before the canonical
-GitHub release URL, because GitHub connectivity is intermittent on OHOS workers.
+The recipe declares the canonical checksum-verified GitHub source URL. CI is
+responsible for any configured mirror fallback.
 
 ## Tests
 
 The recipe enables and runs upstream qztest through CTest. The consumer test
 creates a ZIP archive, writes an entry, reopens it and verifies the payload.
+On OpenHarmony, the root-directory extraction case is excluded because the
+platform root filesystem is read-only; the remaining 125 upstream cases and
+the consumer test passed on the target device.

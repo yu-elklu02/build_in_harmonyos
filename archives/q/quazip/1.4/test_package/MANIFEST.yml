@@ -13,6 +13,9 @@ upstream_tests:
     test_method_count: 51
     data_provider_count: 20
     assertion_count: 391
+    verified_case_count: 125
+    verified_passed: 125
+    verified_failed: 0
 
 test_package_tests:
   - file: test.cpp
