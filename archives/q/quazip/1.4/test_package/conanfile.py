@@ -6,7 +6,7 @@ from conan.tools.cmake import CMake, CMakeDeps, cmake_layout
 
 class QuazipTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeDeps", "CMakeToolchain"
+    generators = "CMakeToolchain"
 
     def requirements(self):
         self.requires(self.tested_reference_str)
