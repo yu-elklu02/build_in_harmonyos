@@ -1,0 +1,17 @@
+package: lua-luv/1.51.0-1
+homepage: "https://github.com/luvit/luv"
+
+upstream_test_in_build: true
+upstream_test_command: "./test tests/manual-test-external-loop.lua"
+upstream_tests:
+  - file: src/test.c
+    source: luv-1.51.0-1/src/test.c
+    description: "Upstream C test driver exercising luv with an external libuv loop."
+    command: "./test tests/manual-test-external-loop.lua"
+
+test_package_tests:
+  - file: test.c
+    description: "Loads luv.so and verifies version and timer APIs through Lua."
+    command: "./test_lua_luv <package>/lib/lua/5.4/luv.so"
+
+assertion_count: 4
