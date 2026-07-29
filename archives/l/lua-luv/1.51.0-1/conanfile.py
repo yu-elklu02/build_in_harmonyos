@@ -17,6 +17,16 @@ class LuaLuvConan(ConanFile):
     package_type = "library"
 
     settings = "os", "arch", "compiler", "build_type"
+    options = {"shared": [True, False], "fPIC": [True, False]}
+    default_options = {"shared": False, "fPIC": True}
+
+    def config_options(self):
+        if self.settings.os == "Windows":
+            self.options.rm_safe("fPIC")
+
+    def configure(self):
+        if self.options.shared:
+            self.options.rm_safe("fPIC")
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -39,8 +49,8 @@ class LuaLuvConan(ConanFile):
         tc.variables["LUA_BUILD_TYPE"] = "System"
         tc.variables["WITH_SHARED_LIBUV"] = "ON"
         tc.variables["BUILD_MODULE"] = "ON"
-        tc.variables["BUILD_STATIC_LIBS"] = "ON"
-        tc.variables["BUILD_SHARED_LIBS"] = "OFF"
+        tc.variables["BUILD_STATIC_LIBS"] = "OFF" if self.options.shared else "ON"
+        tc.variables["BUILD_SHARED_LIBS"] = "ON" if self.options.shared else "OFF"
         tc.generate()
 
     def build(self):
