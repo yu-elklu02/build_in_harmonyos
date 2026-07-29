@@ -91,12 +91,8 @@
  endif
 --- a/src/libxsmm_timer.c
 +++ b/src/libxsmm_timer.c
-@@ -28,7 +28,7 @@
- # include <sys/platform/ppc.h>
- #endif
- 
+@@ -31,3 +31,3 @@
 -#if !defined(LIBXSMM_TIMER_TSC)
 +#if !defined(LIBXSMM_TIMER_TSC) && (defined(LIBXSMM_PLATFORM_X86) || defined(__powerpc64__))
  # define LIBXSMM_TIMER_TSC
  #endif
- #if !defined(LIBXSMM_TIMER_WPC)
