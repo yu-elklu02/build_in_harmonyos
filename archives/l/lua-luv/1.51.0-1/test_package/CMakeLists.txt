@@ -11,6 +11,3 @@ target_link_libraries(test_lua_luv
 
 # Lua is linked statically; make its API symbols visible to the loaded module.
 set_target_properties(test_lua_luv PROPERTIES ENABLE_EXPORTS TRUE)
-
-enable_testing()
-add_test(NAME test_lua_luv COMMAND test_lua_luv)

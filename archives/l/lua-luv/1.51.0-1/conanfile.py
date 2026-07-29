@@ -4,6 +4,7 @@
 import os
 
 from conan import ConanFile
+from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get
 
@@ -47,6 +48,10 @@ class LuaLuvConan(ConanFile):
         tc = CMakeToolchain(self)
         lua = self.dependencies["lua"].cpp_info
         libuv = self.dependencies["libuv"].cpp_info
+        if not lua.includedirs:
+            raise ConanException("lua/5.4.8 does not expose an include directory")
+        if not libuv.includedirs:
+            raise ConanException("libuv/1.52.1 does not expose an include directory")
         lua_include = lua.includedirs[0]
         # Use already adapted Conan packages instead of luv's bundled submodules.
         tc.variables["WITH_LUA_ENGINE"] = "Lua"

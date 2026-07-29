@@ -1,6 +1,6 @@
 software: lua-luv
 version: "1.51.0-1"
-status: published
+status: built
 build_date: "2026-07-29"
 build_system: cmake
 

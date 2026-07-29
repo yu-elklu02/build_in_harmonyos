@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
         "uv.run()\n"
         "assert(fired)\n";
     if (luaL_dostring(state, script) != LUA_OK) {
-        fprintf(stderr, "Lua test failed: %s\n", lua_tostring(state, -1));
+        const char *error_message = lua_tostring(state, -1);
+        fprintf(stderr, "Lua test failed: %s\n", error_message ? error_message : "unknown Lua error");
         lua_close(state);
         dlclose(module);
         return 1;
