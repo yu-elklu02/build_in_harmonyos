@@ -19,7 +19,7 @@
  		-e "s/#ifndef NDEBUG/$(SUPPRESS_UNUSED_PREFETCH_WARNINGS)#ifdef LIBXSMM_NEVER_DEFINED/" \
 --- a/Makefile.inc
 +++ b/Makefile.inc
-@@ -301,18 +301,18 @@ uniqadd = $(if $($2),$(filter-out $($2),$($1)) $(if $3,$3,$($2)),$(filter-out $
+@@ -302,18 +302,18 @@ uniqadd = $(if $($2),$(filter-out $($2),$($1)) $(if $3,$3,$($2)),$(filter-out $
  uniqmov = $(if $(filter $($2),$($1)),$(call uniqadd,$1,$2,$3),$($1))
  
 -ctest = $(if $1,$(if $(shell INFILE=$$($(MKTEMP) /tmp/.libxsmm_XXXXXX.c) && \
@@ -42,7 +42,7 @@
  
  ldclib = $(if $1,$(call ctest,$1 $2,-l$(strip $3)))
  ldflib = $(if $1,$(call ftest,$1 $2,-l$(strip $3)))
-@@ -947,6 +947,6 @@ abslibpath ?= $(call absliblpath,$1)
+@@ -948,6 +948,6 @@ abslibpath ?= $(call absliblpath,$1)
  libpath = $(call qapath,$(if $1,$(shell $(FLUSH) $1 $2 -l$(strip $3) $(call linkopt,$(XLNKVERBOSE)) 2>&1 \
    | grep "lib$3" | tr " " "\n" | sed -n "/\//p" | sed "s/[$(CHAR_OPEN)]\(..*\)[$(CHAR_CLOSE)]/\1/" \
 -  | xargs -I {} sh -c "ls -pd {} 2>/dev/null || ls -pd {}.* 2>/dev/null" | grep -v /$$ | tail -n1)))
