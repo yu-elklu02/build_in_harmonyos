@@ -45,6 +45,28 @@
 @@ -11,1 +11,2 @@
 +#include <stdlib.h>
  #include <libxsmm_source.h>
+--- a/tests/headeronly.c
++++ b/tests/headeronly.c
+@@ -8,7 +8,8 @@
+ ******************************************************************************/
+ /* Hans Pabst (Intel Corp.)
+ ******************************************************************************/
+ #include <libxsmm_source.h>
++#include <libxsmm.h>
+ 
+ /* must match definitions in headeronly_aux.c */
+ #if !defined(ITYPE)
+--- a/tests/headeronly_aux.c
++++ b/tests/headeronly_aux.c
+@@ -8,7 +8,8 @@
+ ******************************************************************************/
+ /* Hans Pabst (Intel Corp.)
+ ******************************************************************************/
+ #include <libxsmm_source.h>
++#include <libxsmm.h>
+ 
+ /* must match definitions in headeronly.c */
+ #if !defined(ITYPE)
 --- a/Makefile
 +++ b/Makefile
 @@ -735,7 +735,7 @@ $(BLDDIR)/%.c: $(BLDDIR)/.make $(INCDIR)/libxsmm.h $(BINDIR)/libxsmm_gemm_gene
