@@ -6,6 +6,17 @@
  ###############################################################################
  # Copyright (c) Intel Corporation - All rights reserved.                      #
  # This file is part of the LIBXSMM library.                                   #
+--- a/.flock.sh
++++ b/.flock.sh
+@@ -22,7 +22,7 @@ else
+ shift
+ cd "${ABSDIR}" || true
+-if [ "${FLOCK}" ]; then
++if [ "${FLOCK}" ] && ${FLOCK} --help 2>&1 | grep -q -e ' -c'; then
+   ${FLOCK} "${ABSDIR}" -c "$@"
+ else
+   eval "$@"
+ fi
 --- a/Makefile
 +++ b/Makefile
 @@ -735,7 +735,7 @@ $(BLDDIR)/%.c: $(BLDDIR)/.make $(INCDIR)/libxsmm.h $(BINDIR)/libxsmm_gemm_gene
