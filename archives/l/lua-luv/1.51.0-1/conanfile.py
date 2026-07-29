@@ -70,10 +70,12 @@ class LuaLuvConan(ConanFile):
         cmake.build()
         cmake.build(target="test")
 
-        # This is luv's upstream C test driver executing its external-loop case.
+        # Run the upstream Lua test suite and its external-loop integration case.
         test_binary = os.path.join(self.build_folder, "test")
+        test_suite = os.path.join(self.source_folder, "tests", "run.lua")
         test_script = os.path.join(self.source_folder, "tests", "manual-test-external-loop.lua")
-        self.run(f'"{test_binary}" "{test_script}"', env="conanrun")
+        self.run(f'"{test_binary}" "{test_suite}"', cwd=self.source_folder, env="conanrun")
+        self.run(f'"{test_binary}" "{test_script}"', cwd=self.source_folder, env="conanrun")
 
     def package(self):
         cmake = CMake(self)

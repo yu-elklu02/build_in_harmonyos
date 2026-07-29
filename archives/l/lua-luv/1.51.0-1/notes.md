@@ -12,6 +12,7 @@ POSIX-like targets and links the configured Lua library plus `rt`.
 
 ## Test coverage
 
-The upstream C test driver (`src/test.c`) is built and run with
+The upstream C test driver (`src/test.c`) runs `tests/run.lua`, which discovers
+22 upstream `test-*.lua` scripts, and then runs
 `tests/manual-test-external-loop.lua`. The consumer test loads the packaged
 `luv.so`, calls `uv.version_string()`, and drives a libuv timer through Lua.
