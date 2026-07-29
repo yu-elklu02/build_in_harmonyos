@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Run the complete upstream test set and make legacy runners propagate failure.
-set -eu
+set -euo pipefail
 
 command -v node >/dev/null 2>&1 || {
     echo "uglifycss requires a Node.js runtime in PATH" >&2

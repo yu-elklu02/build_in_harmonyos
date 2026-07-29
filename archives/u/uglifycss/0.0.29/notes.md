@@ -26,7 +26,9 @@ The tag includes 70 YUI CSS regression cases in `tests-yui/` and three URL
 conversion scenarios in `tests-url.sh`. The original runners report failures
 but return success, so `run_upstream_tests.sh` preserves their full coverage
 and converts generated `*.FAILED` files or `KO` results into a failing exit
-status for Conan. Both upstream runners execute Node through `--jitless`, so
+status for Conan. The wrapper runs with Bash and `set -euo pipefail`, so a
+failed URL-test transformation cannot be silently ignored. Both upstream
+runners execute Node through `--jitless`, so
 the complete test set uses the same supported runtime path as the installed
 command. The URL runner's fixed temporary path is redirected to `TMPDIR` at
 execution time because `/tmp` is read-only on the validated HarmonyOS device.

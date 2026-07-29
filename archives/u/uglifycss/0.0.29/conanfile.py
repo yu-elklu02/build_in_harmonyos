@@ -41,7 +41,7 @@ class UglifycssConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         runner = os.path.join(self.export_sources_folder, "run_upstream_tests.sh")
-        self.run(f'sh "{runner}"', cwd=self.source_folder)
+        self.run(f'bash "{runner}"', cwd=self.source_folder)
 
     def package(self):
         app_dir = os.path.join(self.package_folder, "res", "uglifycss")
