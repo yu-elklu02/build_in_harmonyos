@@ -45,15 +45,18 @@ class LuaLuvConan(ConanFile):
         CMakeDeps(self).generate()
         tc = CMakeToolchain(self)
         lua = self.dependencies["lua"].cpp_info
+        libuv = self.dependencies["libuv"].cpp_info
         lua_include = lua.includedirs[0]
-        lua_library = os.path.join(lua.libdirs[0], "liblua.a")
         # Use already adapted Conan packages instead of luv's bundled submodules.
         tc.variables["WITH_LUA_ENGINE"] = "Lua"
         tc.variables["LUA_BUILD_TYPE"] = "System"
         # Upstream's FindLua module does not consume the lua::lua CMake target.
         tc.variables["LUA_INCLUDE_DIR"] = lua_include
-        tc.variables["LUA_LIBRARY"] = lua_library
-        tc.variables["LUA_LIBRARIES"] = lua_library
+        tc.variables["LUA_LIBRARY"] = "lua::lua"
+        tc.variables["LUA_LIBRARIES"] = "lua::lua"
+        # FindLibuv has the same limitation. Preserve the Conan imported target.
+        tc.variables["LIBUV_INCLUDE_DIR"] = libuv.includedirs[0]
+        tc.variables["LIBUV_LIBRARIES"] = "libuv::libuv"
         tc.variables["WITH_SHARED_LIBUV"] = "ON"
         tc.variables["BUILD_MODULE"] = "ON"
         tc.variables["BUILD_STATIC_LIBS"] = "OFF" if self.options.shared else "ON"
