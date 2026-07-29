@@ -18,3 +18,6 @@ bytes by the kernel.
 Upstream provides no formal automated test suite. `test_package` loads the
 installed module using Lua 5.4, calls the documented `proctitle("...")` API,
 and verifies the kernel process name through `PR_GET_NAME`.
+
+The test package explicitly requires `lua/5.4.8` so CMakeDeps generates the
+`lua` package configuration consumed by its C test.

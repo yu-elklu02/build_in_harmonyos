@@ -11,6 +11,9 @@ class LuaProctitleTestConan(ConanFile):
 
     def requirements(self):
         self.requires(self.tested_reference_str)
+        # CMakeDeps only guarantees config files for direct test requirements.
+        # The module's Lua dependency must therefore be declared here too.
+        self.requires("lua/5.4.8")
 
     def layout(self):
         cmake_layout(self)
