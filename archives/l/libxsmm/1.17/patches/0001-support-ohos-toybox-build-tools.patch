@@ -40,6 +40,11 @@
  
  
  int main(void)
+--- a/tests/hash.c
++++ b/tests/hash.c
+@@ -11,1 +11,2 @@
++#include <stdlib.h>
+ #include <libxsmm_source.h>
 --- a/Makefile
 +++ b/Makefile
 @@ -735,7 +735,7 @@ $(BLDDIR)/%.c: $(BLDDIR)/.make $(INCDIR)/libxsmm.h $(BINDIR)/libxsmm_gemm_gene
