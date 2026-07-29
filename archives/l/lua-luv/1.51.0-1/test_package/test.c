@@ -28,8 +28,8 @@ int main(int argc, char **argv) {
     luaopen_fn open_luv = (luaopen_fn)dlsym(module, "luaopen_luv");
     if (!open_luv) {
         fprintf(stderr, "luaopen_luv is missing: %s\n", dlerror());
-        dlclose(module);
         lua_close(state);
+        dlclose(module);
         return 1;
     }
 
@@ -45,13 +45,14 @@ int main(int argc, char **argv) {
         "assert(fired)\n";
     if (luaL_dostring(state, script) != LUA_OK) {
         fprintf(stderr, "Lua test failed: %s\n", lua_tostring(state, -1));
-        dlclose(module);
         lua_close(state);
+        dlclose(module);
         return 1;
     }
 
     puts("lua-luv consumer test passed");
-    dlclose(module);
+    /* Lua finalizers can still reference functions implemented by luv.so. */
     lua_close(state);
+    dlclose(module);
     return 0;
 }
