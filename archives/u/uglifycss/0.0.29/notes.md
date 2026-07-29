@@ -28,7 +28,8 @@ but return success, so `run_upstream_tests.sh` preserves their full coverage
 and converts generated `*.FAILED` files or `KO` results into a failing exit
 status for Conan. Both upstream runners execute Node through `--jitless`, so
 the complete test set uses the same supported runtime path as the installed
-command.
+command. The URL runner's fixed temporary path is redirected to `TMPDIR` at
+execution time because `/tmp` is read-only on the validated HarmonyOS device.
 
 The 0.0.29 source tag has three internally inconsistent snapshots.
 `0001-fix-upstream-css-regressions.patch` corrects the corresponding

@@ -20,6 +20,7 @@ fi
 url_output=$(sed \
     -e 's#^\([[:space:]]*\)\./uglifycss #\1node --jitless ./uglifycss #' \
     -e 's#^\([[:space:]]*\)\.\./\.\./\.\./uglifycss #\1node --jitless ../../../uglifycss #' \
+    -e 's#/tmp/uglifycss-tests-url\.tmp#${TMPDIR:-.}/uglifycss-tests-url.tmp#g' \
     tests-url.sh | sh)
 printf '%s\n' "$url_output"
 if printf '%s\n' "$url_output" | grep -q 'KO'; then
