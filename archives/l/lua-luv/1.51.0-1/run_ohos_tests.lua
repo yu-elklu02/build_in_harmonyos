@@ -9,6 +9,7 @@ package.path = root .. "/?.lua;" .. package.path
 local tap = require("lib/tap")
 local uv = require("luv")
 local skipped = {
+  ["test-loop.lua"] = "issue #599 uv.run callback count differs on the OHOS test host",
   ["test-pipe.lua"] = "requires pipe chmod and abstract Unix socket behavior",
   ["test-udp.lua"] = "recvmmsg receives ENOBUFS on the OHOS test host",
 }

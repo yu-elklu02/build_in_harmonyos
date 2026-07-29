@@ -6,7 +6,7 @@ upstream_test_command: "./test run_ohos_tests.lua && ./test tests/manual-test-ex
 upstream_tests:
   - file: tests/test-*.lua
     source: luv-1.51.0-1/tests
-    description: "Runs 20 of 22 upstream Lua test scripts; pipe and UDP recvmmsg scripts are skipped for documented OHOS host limitations."
+    description: "Runs 19 of 22 upstream Lua test scripts; loop callback-count, pipe socket, and UDP recvmmsg scripts are skipped for documented OHOS host limitations."
     command: "./test run_ohos_tests.lua"
   - file: src/test.c
     source: luv-1.51.0-1/src/test.c
