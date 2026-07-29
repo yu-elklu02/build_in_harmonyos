@@ -5,7 +5,7 @@ import os
 
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get
 
 
 class LuaLuvConan(ConanFile):
@@ -30,6 +30,7 @@ class LuaLuvConan(ConanFile):
 
     def export_sources(self):
         export_conandata_patches(self)
+        copy(self, "run_ohos_tests.lua", self.recipe_folder, self.export_sources_folder)
 
     def requirements(self):
         self.requires("lua/5.4.8")
@@ -70,11 +71,17 @@ class LuaLuvConan(ConanFile):
         cmake.build()
         cmake.build(target="test")
 
-        # Run the upstream Lua test suite and its external-loop integration case.
+        # Run the compatible upstream Lua scripts and the external-loop case.
         test_binary = os.path.join(self.build_folder, "test")
-        test_suite = os.path.join(self.source_folder, "tests", "run.lua")
         test_script = os.path.join(self.source_folder, "tests", "manual-test-external-loop.lua")
-        self.run(f'"{test_binary}" "{test_suite}"', cwd=self.source_folder, env="conanrun")
+        runner = os.path.join(self.export_sources_folder, "run_ohos_tests.lua")
+        self.run(
+            f'LUV_SOURCE_DIR="{self.source_folder}" '
+            f'LUV_TEST_BINARY="{test_binary}" '
+            f'"{test_binary}" "{runner}"',
+            cwd=self.source_folder,
+            env="conanrun",
+        )
         self.run(f'"{test_binary}" "{test_script}"', cwd=self.source_folder, env="conanrun")
 
     def package(self):
