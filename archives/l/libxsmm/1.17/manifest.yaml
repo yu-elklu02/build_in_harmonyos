@@ -20,7 +20,8 @@ build:
   dependencies: []
   cc: clang
   cxx: clang++
-patches_applied: []
+patches_applied:
+  - "0001-support-ohos-toybox-build-tools.patch"
 knowledge_gained:
   - "LIBXSMM 1.17 requires Intel-compatible CPUs by default; PLATFORM=1 enables its documented generic fallback path."
   - "The generic OpenHarmony armv8 package disables LIBXSMM JIT and BLAS-dependent functionality."

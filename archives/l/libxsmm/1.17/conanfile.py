@@ -2,7 +2,7 @@ import os
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.files import copy, get
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get
 from conan.tools.layout import basic_layout
 
 
@@ -14,6 +14,9 @@ class LibxsmmConan(ConanFile):
     homepage = "https://github.com/libxsmm/libxsmm"
     package_type = "static-library"
     settings = "os", "arch", "compiler", "build_type"
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def validate(self):
         if str(self.settings.os) != "OHOS" or str(self.settings.arch) != "armv8":
@@ -39,9 +42,17 @@ class LibxsmmConan(ConanFile):
         )
 
     def build(self):
+        apply_conandata_patches(self)
         make_args = self._make_args()
-        self.run(f"make -j1 {make_args}", cwd=self.source_folder)
-        self.run(f"make -j1 {make_args} tests", cwd=self.source_folder)
+        bash = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+        tmpdir = os.path.join(self.build_folder, "tmp")
+        self.run(f'mkdir -p "{tmpdir}"', cwd=self.build_folder)
+        make_env = (
+            f'PATH="{os.path.dirname(bash)}:$PATH" TMPDIR="{tmpdir}" '
+            f'SHELL="{bash}"'
+        )
+        self.run(f"{make_env} make -j1 {make_args}", cwd=self.source_folder)
+        self.run(f"{make_env} make -j1 {make_args} tests", cwd=self.source_folder)
 
     def package(self):
         copy(

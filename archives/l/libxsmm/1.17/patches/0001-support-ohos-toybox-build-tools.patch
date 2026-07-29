@@ -1,0 +1,91 @@
+--- a/.state.sh
++++ b/.state.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env sh
++#!/usr/bin/env bash
+ ###############################################################################
+ # Copyright (c) Intel Corporation - All rights reserved.                      #
+ # This file is part of the LIBXSMM library.                                   #
+--- a/Makefile
++++ b/Makefile
+@@ -735,7 +735,7 @@ $(BLDDIR)/%.c: $(BLDDIR)/.make $(INCDIR)/libxsmm.h $(BINDIR)/libxsmm_gemm_gene
+ 	$(GENGEMM) dense $@ libxsmm_d$(basename $(notdir $@))_$(GENTARGET) $(MNVALUE) $(NMVALUE) $(KVALUE) $(MNVALUE) $(KVALUE) $(MNVALUE) $(ALPHA) $(BETA) 0 0 $(GENTARGET) $(PREFETCH_SCHEME) DP
+ endif
+ endif # noarch
+-	$(eval TMPFILE = $(shell $(MKTEMP) /tmp/.libxsmm_XXXXXX.mak))
++	$(eval TMPFILE = $(shell $(MKTEMP) $${TMPDIR:-.}/.libxsmm_XXXXXX.mak))
+ 	@cat $@ | sed \
+ 		-e "s/void libxsmm_/LIBXSMM_INLINE LIBXSMM_RETARGETABLE void libxsmm_/" \
+ 		-e "s/#ifndef NDEBUG/$(SUPPRESS_UNUSED_PREFETCH_WARNINGS)#ifdef LIBXSMM_NEVER_DEFINED/" \
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -301,18 +301,18 @@ uniqadd = $(if $($2),$(filter-out $($2),$($1)) $(if $3,$3,$($2)),$(filter-out $
+ uniqmov = $(if $(filter $($2),$($1)),$(call uniqadd,$1,$2,$3),$($1))
+ 
+-ctest = $(if $1,$(if $(shell INFILE=$$($(MKTEMP) /tmp/.libxsmm_XXXXXX.c) && \
++ctest = $(if $1,$(if $(shell INFILE=$$($(MKTEMP) $${TMPDIR:-.}/.libxsmm_XXXXXX.c) && \
+   echo "int main(void) { return 0; }" > $${INFILE} && if [ "$3" ]; \
+   then $(firstword $1) -c $${INFILE} -o $${INFILE}.o >/dev/null && \
+        $1 $2 $${INFILE}.o -o $${INFILE}.x >/dev/null; \
+   else $(firstword $1) $2 $${INFILE} -o $${INFILE}.x >/dev/null; fi 2>&1 || echo "FAILED"; \
+-  rm -f /tmp/$$(basename $${INFILE} .c).* .libxsmm_??????.c.* 2>/dev/null),$(NULL),$2))
++  rm -f $${TMPDIR:-.}/$$(basename $${INFILE} .c).* .libxsmm_??????.c.* 2>/dev/null),$(NULL),$2))
+ # INFILE cannot use leading dot when used with certain F-compiler
+-ftest = $(if $1,$(if $(shell INFILE=$$($(MKTEMP) /tmp/_libxsmm_XXXXXX.f) && \
++ftest = $(if $1,$(if $(shell INFILE=$$($(MKTEMP) $${TMPDIR:-.}/_libxsmm_XXXXXX.f) && \
+   printf "      PROGRAM test\n      END PROGRAM\n" > $${INFILE} && if [ "$3" ]; \
+   then $(firstword $1) -c $${INFILE} -o $${INFILE}.o >/dev/null && \
+        $1 $2 $${INFILE}.o -o $${INFILE}.x >/dev/null; \
+   else $(firstword $1) $2 $${INFILE} -o $${INFILE}.x >/dev/null; fi 2>&1 || echo "FAILED"; \
+-  rm -f /tmp/$$(basename $${INFILE} .f).* _libxsmm_??????.f.* 2>/dev/null),$(NULL),$2))
++  rm -f $${TMPDIR:-.}/$$(basename $${INFILE} .f).* _libxsmm_??????.f.* 2>/dev/null),$(NULL),$2))
+ 
+ ldclib = $(if $1,$(call ctest,$1 $2,-l$(strip $3)))
+ ldflib = $(if $1,$(call ftest,$1 $2,-l$(strip $3)))
+@@ -947,6 +947,6 @@ abslibpath ?= $(call absliblpath,$1)
+ libpath = $(call qapath,$(if $1,$(shell $(FLUSH) $1 $2 -l$(strip $3) $(call linkopt,$(XLNKVERBOSE)) 2>&1 \
+   | grep "lib$3" | tr " " "\n" | sed -n "/\//p" | sed "s/[$(CHAR_OPEN)]\(..*\)[$(CHAR_CLOSE)]/\1/" \
+-  | xargs -I {} sh -c "ls -pd {} 2>/dev/null || ls -pd {}.* 2>/dev/null" | grep -v /$$ | tail -n1)))
++  | xargs -n 1 sh -c 'ls -pd "$$1" 2>/dev/null || ls -pd "$$1".* 2>/dev/null' _ | grep -v /$$ | tail -n1)))
+ 
+ ifneq (Windows_NT1,$(UNAME)$(DEPSTATIC))
+   abslibfile = $(strip $(if $(findstring .$(ILIBEXT),$1), \
+@@ -1582,10 +1582,10 @@ ifneq (,$(OMPFLAG_FORCE))
+   OMPLIBFILE := $(call libpath,$(LD),$(SLDFLAGS) $(OMPFLAG_FORCE) $(foreach LIB,$(LIBFIND),$(call abslibpath,$(LIB))),$(OMPRT))
+   ifeq (0,$(CRAY))
+   ifeq (,$(OMPLIBFILE))
+-  ifneq (,$(shell INFILE=$$($(MKTEMP) /tmp/.libxsmm_XXXXXX.c) && \
++  ifneq (,$(shell INFILE=$$($(MKTEMP) $${TMPDIR:-.}/.libxsmm_XXXXXX.c) && \
+       printf "$(CHAR_HASH)include <omp.h>\nint main(void) { return omp_get_max_threads(); }\n" > $${INFILE} && \
+       $(LD) $(SLDFLAGS) $(OMPFLAG_FORCE) $(foreach LIB,$(LIBFIND),$(call abslibpath,$(LIB))) -l$(OMPRT) $${INFILE} -o $${INFILE}.x 2>/dev/null >/dev/null && echo "OK"; \
+-      rm -f /tmp/$$(basename $${INFILE} .c).* .libxsmm_??????.* 2>/dev/null))
++      rm -f $${TMPDIR:-.}/$$(basename $${INFILE} .c).* .libxsmm_??????.* 2>/dev/null))
+     CLDFLAGS += $(foreach LIB,$(LIBFIND),$(call abslibpath,$(LIB)))
+     OMPLIBFILE := -l$(OMPRT)
+   endif
+@@ -2023,10 +2023,10 @@ ifeq (,$(LIBATOMIC))
+   LIBATOMIC ?= 1
+ endif
+ 
+-ifeq (0,$(shell INFILE=$$($(MKTEMP) /tmp/.libxsmm_XXXXXX.c) && \
++ifeq (0,$(shell INFILE=$$($(MKTEMP) $${TMPDIR:-.}/.libxsmm_XXXXXX.c) && \
+     printf "$(CHAR_HASH)include <features.h>\n$(CHAR_HASH)if !defined(__GNU_LIBRARY__) && !defined(__GLIBC__)\n0\n$(CHAR_HASH)endif\n" > $${INFILE} && \
+     if [ "$$($(CC) -c $${INFILE} -o $${INFILE}.o 2>&1 || echo 'x')" ]; then echo "1"; else echo "0"; fi; \
+-    rm -f /tmp/$$(basename $${INFILE} .c).* .libxsmm_??????.* 2>/dev/null))
++    rm -f $${TMPDIR:-.}/$$(basename $${INFILE} .c).* .libxsmm_??????.* 2>/dev/null))
+   GLIBC := 1
+ endif
+ GLIBC ?= 0
+@@ -2039,10 +2039,10 @@ ifneq (,$(OMPFLAG_FORCE))
+ endif
+ 
+ ifneq (,$(OMPFLAG_FORCE))
+-ifeq (0,$(shell INFILE=$$($(MKTEMP) /tmp/.libxsmm_XXXXXX.c) && \
++ifeq (0,$(shell INFILE=$$($(MKTEMP) $${TMPDIR:-.}/.libxsmm_XXXXXX.c) && \
+     printf "$(CHAR_HASH)if defined(_OPENMP)\n$(CHAR_HASH) include <omp.h>\nint main() { return 0; }\n$(CHAR_HASH)endif\n" > $${INFILE} && \
+     if [ "$$($(CC) $(OMPFLAG_FORCE) $${INFILE} -o $${INFILE}.x 2>&1 || echo 'x')" ]; then echo "1"; else echo "0"; fi; \
+-    rm -f /tmp/$$(basename $${INFILE} .c).* .libxsmm_??????.* 2>/dev/null))
++    rm -f $${TMPDIR:-.}/$$(basename $${INFILE} .c).* .libxsmm_??????.* 2>/dev/null))
+   OMPFLAG := $(OMPFLAG_FORCE)
+ endif
+ endif
