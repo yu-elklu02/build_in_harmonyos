@@ -54,7 +54,7 @@ class UglifycssConan(ConanFile):
             "#!/bin/sh\n"
             "set -eu\n"
             "script_dir=$(CDPATH= cd -- \"$(dirname -- \"$0\")\" && pwd)\n"
-            "exec node \"$script_dir/../res/uglifycss/uglifycss\" \"$@\"\n",
+            "exec node --jitless \"$script_dir/../res/uglifycss/uglifycss\" \"$@\"\n",
         )
         os.chmod(launcher, os.stat(launcher).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 

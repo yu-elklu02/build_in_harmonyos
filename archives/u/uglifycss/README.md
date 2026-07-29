@@ -14,7 +14,9 @@ preserving CSS semantics.
 
 The package contains portable JavaScript and does not build native code. The
 installed command is a shell wrapper that invokes the Node.js runtime supplied
-by the OpenHarmony build environment.
+by the OpenHarmony build environment with `--jitless`. This is required on the
+validated HarmonyOS aarch64 runtime, where default V8 JIT initialization
+terminates before JavaScript can run.
 
 ## Dependencies
 

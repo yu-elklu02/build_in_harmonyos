@@ -12,7 +12,8 @@ source:
 
 build:
   system: custom
-  configure_options: []
+  configure_options:
+    - "node --jitless"
   dependencies: []
   cc: clang
   cxx: clang++
@@ -24,3 +25,4 @@ knowledge_gained:
   - "The 0.0.29 tag contains 70 YUI CSS regression cases and three URL conversion scenarios."
   - "The upstream runners do not propagate failed snapshots or URL diffs, so the recipe wrapper converts those conditions to a nonzero exit status."
   - "A small bugfix patch aligns three inconsistent 0.0.29 snapshot cases with the minifier output."
+  - "On the validated HarmonyOS aarch64 Node.js v24.13.0 runtime, Node must run with --jitless because default V8 JIT initialization exits with signal 5."

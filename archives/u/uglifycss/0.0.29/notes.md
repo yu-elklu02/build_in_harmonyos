@@ -10,8 +10,11 @@
 ## Packaging
 
 The official `0.0.29` source tag is copied into `res/uglifycss`. The packaged
-`bin/uglifycss` launcher invokes the source CLI through `node`, keeping the
-package independent of a host-specific Node.js path.
+`bin/uglifycss` launcher invokes the source CLI through `node --jitless`,
+keeping the package independent of a host-specific Node.js path. This is
+required by the validated HarmonyOS aarch64 Node.js v24.13.0 runtime: default
+V8 JIT initialization exits with signal 5 before JavaScript executes, while
+the JIT-disabled invocation runs the CLI successfully.
 
 The codeload endpoint does not end in an archive extension, so `conandata.yml`
 sets the download filename explicitly. This ensures Conan extracts the verified
@@ -23,7 +26,9 @@ The tag includes 70 YUI CSS regression cases in `tests-yui/` and three URL
 conversion scenarios in `tests-url.sh`. The original runners report failures
 but return success, so `run_upstream_tests.sh` preserves their full coverage
 and converts generated `*.FAILED` files or `KO` results into a failing exit
-status for Conan.
+status for Conan. Both upstream runners execute Node through `--jitless`, so
+the complete test set uses the same supported runtime path as the installed
+command.
 
 The 0.0.29 source tag has three internally inconsistent snapshots.
 `0001-fix-upstream-css-regressions.patch` corrects the corresponding
