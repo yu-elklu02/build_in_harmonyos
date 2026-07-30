@@ -2,7 +2,7 @@ import os
 import stat
 
 from conan import ConanFile
-from conan.tools.files import copy, get, save
+from conan.tools.files import apply_conandata_patches, copy, get, save
 from conan.tools.layout import basic_layout
 
 
@@ -19,6 +19,7 @@ class MesonConan(ConanFile):
         basic_layout(self, src_folder=".")
 
     def build(self):
+        apply_conandata_patches(self)
         self.run("python3 run_tests.py", cwd=self.source_folder)
 
     def package(self):

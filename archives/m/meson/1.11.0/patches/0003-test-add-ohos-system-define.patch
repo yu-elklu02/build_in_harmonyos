@@ -1,0 +1,4 @@
+--- a/test cases/common/132 get define/meson.build
++++ b/test cases/common/132 get define/meson.build
+@@ -16,0 +17,1 @@
++  'ohos'      : ['__OHOS__',      '1'],
