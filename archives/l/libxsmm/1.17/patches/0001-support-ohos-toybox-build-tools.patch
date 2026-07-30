@@ -120,7 +120,19 @@
  # define ELEM_TYPE short
 --- a/tests/Makefile
 +++ b/tests/Makefile
-@@ -119,14 +119,22 @@ $(foreach SRC, $(FXXSRCX) $(F77SRCX) $(F90SRCX), \
+@@ -73,7 +73,11 @@ test: $(OUTDIR)/.make $(OUTDIR)/test.sh $(XFILES)
+ 	@$(OUTDIR)/test.sh $(TEST)
+ 
+ # determine header-only tests (to avoid linking against LIBXSMM libraries; see below)
+ HEADER_ONLY = $(basename $(notdir $(shell grep -H libxsmm_source *.c | cut -d: -f1)))
++ifeq (1,$(PLATFORM))
++# Header-only source tests require library implementations on this static platform.
++HEADER_ONLY :=
++endif
+ 
+ define DEFINE_LINK_LD_RULE
+ ifneq (,$(wildcard $(LIBDEP)))
+@@ -119,14 +123,22 @@ $(foreach SRC, $(FXXSRCX) $(F77SRCX) $(F90SRCX), \
    $(eval $(call DEFINE_LINK_FC_RULE, $(basename $(notdir $(SRC))), $(call objname,$(SRC)))))
  
 +ifeq (1,$(PLATFORM))
