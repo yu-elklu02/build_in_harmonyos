@@ -1,3 +1,2 @@
 project('meson-conan-probe', 'c')
-executable('meson-probe', 'probe.c')
-
+executable('conan-probe', 'probe.c')

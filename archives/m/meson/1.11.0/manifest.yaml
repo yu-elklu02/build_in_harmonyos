@@ -14,5 +14,5 @@ build:
     - "Python 3.12 interpreter supplied by the build environment"
 
 test:
-  package_test: "meson setup build && meson compile -C build && ./build/meson-probe"
+  package_test: "meson setup build && meson compile -C build && ./build/conan-probe"
   assertions: 2

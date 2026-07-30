@@ -17,5 +17,4 @@ class MesonTestConan(ConanFile):
         if cross_building(self):
             self.output.info("Cross-building: package execution is skipped.")
             return
-        self.run("./build/meson-probe")
-
+        self.run("./build/conan-probe")
