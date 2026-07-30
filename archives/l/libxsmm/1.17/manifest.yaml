@@ -1,7 +1,7 @@
 software: libxsmm
 version: "1.17"
 build_system: makefile
-status: published
+status: built
 build_date: "2026-07-29"
 source:
   url: "https://codeload.github.com/libxsmm/libxsmm/tar.gz/refs/tags/1.17"
