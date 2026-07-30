@@ -45,18 +45,6 @@ class MozjpegConan(ConanFile):
     def generate(self):
         CMakeDeps(self).generate()
         toolchain = CMakeToolchain(self)
-        libpng = self.dependencies["libpng"]
-        libpng_libdir = os.path.join(
-            libpng.package_folder, libpng.cpp_info.libdirs[0]
-        )
-        libpng_library = os.path.join(
-            libpng_libdir, "lib{}.a".format(libpng.cpp_info.libs[0])
-        )
-        toolchain.variables["PNG_ROOT"] = libpng.package_folder
-        toolchain.variables["PNG_PNG_INCLUDE_DIR"] = os.path.join(
-            libpng.package_folder, "include"
-        )
-        toolchain.variables["PNG_LIBRARY"] = libpng_library
         toolchain.variables["CMAKE_INSTALL_LIBDIR"] = "lib"
         toolchain.variables["ENABLE_SHARED"] = self.options.shared
         toolchain.variables["ENABLE_STATIC"] = True
@@ -66,9 +54,29 @@ class MozjpegConan(ConanFile):
         toolchain.variables["WITH_FUZZ"] = False
         toolchain.generate()
 
+    def _findpng_variables(self):
+        libpng = self.dependencies["libpng"]
+        libpng_libdir = os.path.join(
+            libpng.package_folder, libpng.cpp_info.libdirs[0]
+        )
+        return {
+            "PNG_ROOT": libpng.package_folder,
+            "PNG_PNG_INCLUDE_DIR": os.path.join(
+                libpng.package_folder, "include"
+            ),
+            "PNG_LIBRARY": os.path.join(
+                libpng_libdir, "lib{}.a".format(libpng.cpp_info.libs[0])
+            ),
+        }
+
     def build(self):
         cmake = CMake(self)
-        cmake.configure(variables={"CMAKE_POLICY_VERSION_MINIMUM": "3.5"})
+        cmake.configure(
+            variables={
+                "CMAKE_POLICY_VERSION_MINIMUM": "3.12",
+                **self._findpng_variables(),
+            }
+        )
         cmake.build()
         cmake.test(output_on_failure=True)
 
