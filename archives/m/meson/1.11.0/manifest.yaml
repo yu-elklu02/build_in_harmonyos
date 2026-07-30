@@ -1,10 +1,18 @@
 version: "1.11.0"
-status: published
-build_date: "2026-04-17"
+status: adapting
+build_system: python
 
 source:
   url: "https://pypi.org/packages/source/m/meson/meson-1.11.0.tar.gz"
+  sha256: "dffdd0915ceb028541fe3bed77d63ba35e78514591c043736b450d62634eeb31"
   tar_format: tar.gz
 
 build:
-  system: custom
+  system: python
+  configure_options: []
+  dependencies:
+    - "Python 3.12 interpreter supplied by the build environment"
+
+test:
+  package_test: "meson setup build && meson compile -C build && ./build/meson-probe"
+  assertions: 2

@@ -4,13 +4,11 @@ description: "Build system"
 category: build-tool
 homepage: "https://mesonbuild.com/"
 license: Apache-2.0
-build_system: custom
-
+build_system: python
 
 versions:
   "1.11.0":
-    status: published
-    build_date: "2026-04-17"
+    status: adapting
   "1.5.1":
     status: built
     build_date: "2026-04-25"
