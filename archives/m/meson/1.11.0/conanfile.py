@@ -20,7 +20,7 @@ class MesonConan(ConanFile):
 
     def build(self):
         self.run(
-            "python3 run_project_tests.py --only common/1 trivial -j 1",
+            "python3 run_project_tests.py --only 'common/1 trivial' -j 1",
             cwd=self.source_folder,
         )
 

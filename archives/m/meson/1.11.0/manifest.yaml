@@ -15,7 +15,7 @@ build:
 
 test:
   upstream_test_in_build: true
-  upstream_test_command: "python3 run_project_tests.py --only common/1 trivial -j 1"
+  upstream_test_command: "python3 run_project_tests.py --only 'common/1 trivial' -j 1"
   upstream_test_cases: 1
   package_test: "meson setup build && meson compile -C build && ./build/conan-probe"
   assertions: 2
