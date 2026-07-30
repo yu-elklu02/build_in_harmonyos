@@ -1,91 +1,132 @@
 --- a/test cases/cmake/21 shared module/meson.build
 +++ b/test cases/cmake/21 shared module/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('cmakeSharedModule', ['c', 'cpp'])
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS musl rejects dlopen modules with unresolved runtime symbols.')
 +endif
 +
+ cm = import('cmake')
 --- a/test cases/common/117 shared module/meson.build
 +++ b/test cases/common/117 shared module/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('shared module', 'c')
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS musl rejects dlopen modules with unresolved runtime symbols.')
 +endif
 +
+ c = meson.get_compiler('c')
 --- a/test cases/linuxlike/6 subdir include order/meson.build
 +++ b/test cases/linuxlike/6 subdir include order/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('subdir include order', 'c')
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS test environment does not provide GLib development metadata.')
 +endif
 +
+ # Ensure that headers in subdirs override external dependencies
 --- a/test cases/linuxlike/9 compiler checks with dependencies/meson.build
 +++ b/test cases/linuxlike/9 compiler checks with dependencies/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('compiler checks with dependencies', 'c')
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS test environment does not provide GLib development metadata.')
 +endif
 +
+ cc = meson.get_compiler('c')
 --- a/test cases/linuxlike/14 static dynamic linkage/meson.build
 +++ b/test cases/linuxlike/14 static dynamic linkage/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('static dynamic', 'c')
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS zlib package is static-only.')
 +endif
 +
+ # Solaris does not ship static libraries
 --- a/test cases/python3/2 extmodule/meson.build
 +++ b/test cases/python3/2 extmodule/meson.build
-@@ -3,0 +4,4 @@
+@@ -1,3 +1,7 @@
+ project('Python extension module', 'c',
+   default_options : ['buildtype=release'])
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS Python does not expose a usable extension-module ABI.')
 +endif
 +
+ # Because Windows Python ships only with optimized libs,
 --- a/test cases/python3/4 custom target depends extmodule/meson.build
 +++ b/test cases/python3/4 custom target depends extmodule/meson.build
-@@ -3,0 +4,4 @@
+@@ -1,3 +1,7 @@
+ project('Python extension module', 'c',
+   default_options : ['buildtype=release'])
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS Python does not expose a usable extension-module ABI.')
 +endif
 +
+ # Because Windows Python ships only with optimized libs,
 --- a/test cases/python/2 extmodule/meson.build
 +++ b/test cases/python/2 extmodule/meson.build
-@@ -3,0 +4,4 @@
+@@ -1,3 +1,7 @@
+ project('Python extension module', 'c',
+   default_options : ['buildtype=release', 'werror=true', 'python.bytecompile=-1'])
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS Python does not expose a usable extension-module ABI.')
 +endif
 +
+ # Because Windows Python ships only with optimized libs,
 --- a/test cases/python/4 custom target depends extmodule/meson.build
 +++ b/test cases/python/4 custom target depends extmodule/meson.build
-@@ -3,0 +4,4 @@
+@@ -1,3 +1,7 @@
+ project('Python extension module', 'c',
+   default_options : ['buildtype=release'])
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS Python does not expose a usable extension-module ABI.')
 +endif
 +
+ # Because Windows Python ships only with optimized libs,
 --- a/test cases/python/8 different python versions/meson.build
 +++ b/test cases/python/8 different python versions/meson.build
-@@ -3,0 +4,4 @@
+@@ -1,4 +1,7 @@
+ project('Python extension module', 'c',
+   default_options : ['buildtype=release'])
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS Python does not expose a usable extension-module ABI.')
 +endif
 +
+ py_mod = import('python')
 --- a/test cases/python/9 extmodule limited api/meson.build
 +++ b/test cases/python/9 extmodule limited api/meson.build
-@@ -3,0 +4,4 @@
+@@ -1,4 +1,7 @@
+ project('Python limited api', 'c',
+   default_options : ['buildtype=release', 'werror=true'])
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS Python does not expose a usable extension-module ABI.')
 +endif
 +
+ py_mod = import('python')
 --- a/test cases/frameworks/15 llvm/meson.build
 +++ b/test cases/frameworks/15 llvm/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('llvmtest', ['c', 'cpp'], default_options : ['c_std=c99'])
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS SDK lacks a complete LLVM config-tool and CMake development installation.')
 +endif
 +
+ method = get_option('method')
 --- a/test cases/frameworks/29 blocks/meson.build
 +++ b/test cases/frameworks/29 blocks/meson.build
-@@ -2,0 +3,4 @@
+@@ -1,3 +1,6 @@
+ project('blocks-dependency', 'c')
+-
 +if host_machine.system() == 'harmonyos'
 +  error('MESON_SKIP_TEST: HarmonyOS SDK does not provide BlocksRuntime.')
 +endif
 +
+ id = meson.get_compiler('c').get_id()
