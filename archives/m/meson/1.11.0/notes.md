@@ -7,7 +7,5 @@ environment's Python 3.12 interpreter.
 The consumer test configures and compiles a minimal C project with the packaged
 Meson command, then runs the generated executable.
 
-The full upstream suite exceeds the Conan build timeout on the target. `build()`
-therefore runs the upstream `common/1 trivial` project test with one worker. It
-performs configure, compile, test, and install steps and completes within CI
-limits.
+The complete upstream suite runs through `python3 run_tests.py` in `build()`.
+Its pass/skip/fail total is recorded from the completed device validation log.

@@ -19,10 +19,7 @@ class MesonConan(ConanFile):
         basic_layout(self, src_folder=".")
 
     def build(self):
-        self.run(
-            "python3 run_project_tests.py --only 'common/1 trivial' -j 1",
-            cwd=self.source_folder,
-        )
+        self.run("python3 run_tests.py", cwd=self.source_folder)
 
     def package(self):
         site_packages = os.path.join(
