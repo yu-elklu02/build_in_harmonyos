@@ -45,7 +45,6 @@ class MozjpegConan(ConanFile):
     def generate(self):
         CMakeDeps(self).generate()
         toolchain = CMakeToolchain(self)
-        toolchain.variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5"
         toolchain.variables["CMAKE_INSTALL_LIBDIR"] = "lib"
         toolchain.variables["ENABLE_SHARED"] = self.options.shared
         toolchain.variables["ENABLE_STATIC"] = True
@@ -57,7 +56,7 @@ class MozjpegConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        cmake.configure()
+        cmake.configure(variables={"CMAKE_POLICY_VERSION_MINIMUM": "3.5"})
         cmake.build()
         cmake.test(output_on_failure=True)
 
