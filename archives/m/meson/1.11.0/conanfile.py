@@ -2,7 +2,13 @@ import os
 import stat
 
 from conan import ConanFile
-from conan.tools.files import apply_conandata_patches, copy, get, save
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+    save,
+)
 from conan.tools.layout import basic_layout
 
 
@@ -11,6 +17,9 @@ class MesonConan(ConanFile):
     version = "1.11.0"
     package_type = "application"
     settings = "os", "arch", "compiler", "build_type"
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)

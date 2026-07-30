@@ -11,5 +11,5 @@ The complete upstream suite runs through `python3 run_tests.py` in `build()`.
 Its pass/skip/fail total is recorded from the completed device validation log.
 
 The adaptation adds the upstream test's missing OHOS system-definition mapping:
-Meson reports `host_machine.system()` as `ohos`, and the OHOS Clang toolchain
-defines `__OHOS__` as `1`.
+Meson reports `host_machine.system()` as `harmonyos`, and the OHOS Clang
+toolchain defines `__OHOS__` as `1`.
