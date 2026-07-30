@@ -71,7 +71,7 @@ class MozjpegConan(ConanFile):
             }
         )
         cmake.build()
-        cmake.test(output_on_failure=True)
+        cmake.test()
 
     def package(self):
         copy(self, "LICENSE.md", src=self.source_folder,
