@@ -1,0 +1,23 @@
+software: typobuster
+display: "typobuster"
+description: "Lightweight GTK text editor with transformations and typo correction"
+category: utility
+homepage: "https://github.com/nwg-piotr/typobuster"
+license: GPL-3.0-or-later
+build_system: custom
+
+ohos_adaptation:
+  key_points:
+    - "Python GTK3 application packaged with its Python modules, assets, desktop entry, and launcher"
+    - "Runtime requires the OpenHarmony Python 3, PyGObject, GTK3, and GtkSourceView4 environments"
+  common_dependencies:
+    - python
+    - pygobject
+    - gtk+
+    - gtksourceview
+
+versions:
+  "1.0.0":
+    status: built
+    build_date: "2026-07-30"
+    conan_ref: "typobuster/1.0.0"

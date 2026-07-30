@@ -1,0 +1,38 @@
+software: typobuster
+version: "1.0.0"
+status: built
+build_date: "2026-07-30"
+build_system: custom
+conan_ref: "typobuster/1.0.0"
+
+source:
+  url: "https://github.com/nwg-piotr/typobuster/archive/refs/tags/v1.0.0.tar.gz"
+  sha256: "0c098645c0db6836c3c5021782c991b2ee1cd1bef3da09534db582d6b46a67c0"
+  tar_format: tar.gz
+
+build:
+  system: custom
+  configure_options: []
+  dependencies: []
+  cc: N/A
+  cxx: N/A
+
+dependencies:
+  required: []
+  runtime:
+    - python/3.12.9
+    - pygobject
+    - gtk+/3.24.38
+    - gtksourceview4
+
+patches_applied: []
+knowledge_gained:
+  - "typobuster 1.0.0 is a Python GTK3 application rather than a C++ project"
+  - "The upstream tag has no automated test suite; the package validates Python bytecode and a consumer exercises text transformations"
+test_passed: 0
+test_failed: 0
+test_results:
+  type: upstream-none
+  total: 0
+  passed: 0
+  failed: 0

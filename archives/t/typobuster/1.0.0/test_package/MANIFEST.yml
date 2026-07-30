@@ -1,0 +1,14 @@
+package: typobuster/1.0.0
+homepage: "https://github.com/nwg-piotr/typobuster"
+
+upstream_check_command: "No automated upstream test suite is provided by the v1.0.0 tag"
+upstream_test_in_build: false
+upstream_test_command: ""
+upstream_tests: []
+
+test_package_tests:
+  - file: test_typobuster.py
+    description: "Load the packaged tools module and assert five text transformations"
+    command: "python3 test_typobuster.py <package-folder>"
+
+assertion_count: 5

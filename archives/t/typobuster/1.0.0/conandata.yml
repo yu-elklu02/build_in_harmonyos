@@ -1,0 +1,5 @@
+sources:
+  - url: "https://github.com/nwg-piotr/typobuster/archive/refs/tags/v1.0.0.tar.gz"
+    sha256: "0c098645c0db6836c3c5021782c991b2ee1cd1bef3da09534db582d6b46a67c0"
+
+patches: []
