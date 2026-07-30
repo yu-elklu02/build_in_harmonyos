@@ -59,14 +59,24 @@ class MozjpegConan(ConanFile):
         libpng_libdir = os.path.join(
             libpng.package_folder, libpng.cpp_info.libdirs[0]
         )
+        libpng_library = None
+        for extension in (".so", ".a"):
+            candidate = os.path.join(
+                libpng_libdir, "lib{}{}".format(libpng.cpp_info.libs[0], extension)
+            )
+            if os.path.isfile(candidate):
+                libpng_library = candidate
+                break
+        if libpng_library is None:
+            raise ConanInvalidConfiguration(
+                "Unable to locate the libpng library supplied by Conan."
+            )
         return {
             "PNG_ROOT": libpng.package_folder,
             "PNG_PNG_INCLUDE_DIR": os.path.join(
                 libpng.package_folder, "include"
             ),
-            "PNG_LIBRARY": os.path.join(
-                libpng_libdir, "lib{}.a".format(libpng.cpp_info.libs[0])
-            ),
+            "PNG_LIBRARY": libpng_library,
         }
 
     def build(self):
