@@ -82,16 +82,18 @@ diff --git a/include/libxsmm_sync.h b/include/libxsmm_sync.h
 index 6961cb867537c3e467ebf39bfce6d293b0bccefe..67d8cf674079b010d107072ed5167dd84ac11302 100644
 --- a/include/libxsmm_sync.h
 +++ b/include/libxsmm_sync.h
-@@ -14,2 +14,5 @@
+@@ -14,2 +14,7 @@
  #include "libxsmm_intrinsics_x86.h"
-+#if defined(__OHOS__)
-+# include <sched.h>
++#if defined(__has_include)
++# if __has_include(<sched.h>)
++#   include <sched.h>
++# endif
 +#endif
  
 @@ -462,3 +465,5 @@ typedef enum libxsmm_atomic_kind {
  #   define LIBXSMM_TLS_GETVALUE(KEY) pthread_getspecific(KEY)
 -#   if defined(__APPLE__) && defined(__MACH__)
-+#   if defined(__OHOS__)
++#   if defined(__has_include) && __has_include(<sched.h>)
 +#     define LIBXSMM_SYNC_YIELD sched_yield()
 +#   elif defined(__APPLE__) && defined(__MACH__)
  #     define LIBXSMM_SYNC_YIELD pthread_yield_np()
