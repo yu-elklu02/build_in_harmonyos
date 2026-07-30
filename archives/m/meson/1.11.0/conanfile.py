@@ -51,7 +51,7 @@ class MesonConan(ConanFile):
             "includedir=${{prefix}}/include\n\n"
             "Name: zlib\n"
             "Description: zlib supplied for Meson upstream tests\n"
-            "Version: 1.3.1.1\n"
+            "Version: 1.3.1\n"
             "Libs: -L${{libdir}} -lz\n"
             "Cflags: -I${{includedir}}\n".format(zlib_prefix),
         )
@@ -63,7 +63,7 @@ class MesonConan(ConanFile):
             "  IMPORTED_LOCATION \"{0}/lib/libz.a\"\n"
             "  INTERFACE_INCLUDE_DIRECTORIES \"{0}/include\")\n"
             "set(ZLIB_FOUND TRUE)\n"
-            "set(ZLIB_VERSION_STRING \"1.3.1.1\")\n"
+            "set(ZLIB_VERSION_STRING \"1.3.1\")\n"
             "set(ZLIB_LIBRARIES ZLIB::ZLIB)\n"
             "set(ZLIB_INCLUDE_DIRS \"{0}/include\")\n".format(zlib_prefix),
         )

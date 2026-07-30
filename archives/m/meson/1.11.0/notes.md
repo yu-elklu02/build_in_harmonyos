@@ -17,3 +17,5 @@ toolchain defines `__OHOS__` as `1`.
 The complete upstream suite receives `zlib/1.3.1.1` as a test-only build
 requirement. The recipe generates local pkg-config and CMake metadata so that
 the suite's dependency-discovery tests exercise a real OHOS zlib package.
+The metadata reports zlib's header/API version (`1.3.1`), not the package
+recipe revision (`1.3.1.1`).
