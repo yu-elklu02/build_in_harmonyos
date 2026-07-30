@@ -1,7 +1,12 @@
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy, get
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+)
 import os
 
 
@@ -17,6 +22,9 @@ class MozjpegConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def validate(self):
         if self.settings.os != "OHOS" or self.settings.arch != "armv8":
@@ -41,6 +49,7 @@ class MozjpegConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def generate(self):
         CMakeDeps(self).generate()
@@ -54,37 +63,11 @@ class MozjpegConan(ConanFile):
         toolchain.variables["WITH_FUZZ"] = False
         toolchain.generate()
 
-    def _findpng_variables(self):
-        libpng = self.dependencies["libpng"]
-        libpng_libdir = os.path.join(
-            libpng.package_folder, libpng.cpp_info.libdirs[0]
-        )
-        libpng_library = None
-        for extension in (".so", ".a"):
-            candidate = os.path.join(
-                libpng_libdir, "lib{}{}".format(libpng.cpp_info.libs[0], extension)
-            )
-            if os.path.isfile(candidate):
-                libpng_library = candidate
-                break
-        if libpng_library is None:
-            raise ConanInvalidConfiguration(
-                "Unable to locate the libpng library supplied by Conan."
-            )
-        return {
-            "PNG_ROOT": libpng.package_folder,
-            "PNG_PNG_INCLUDE_DIR": os.path.join(
-                libpng.package_folder, "include"
-            ),
-            "PNG_LIBRARY": libpng_library,
-        }
-
     def build(self):
         cmake = CMake(self)
         cmake.configure(
             variables={
                 "CMAKE_POLICY_VERSION_MINIMUM": "3.12",
-                **self._findpng_variables(),
             }
         )
         cmake.build()
