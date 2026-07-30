@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/mozilla/mozjpeg",
+  "version": "4.1.1",
+  "build": "conan create archives/m/mozjpeg/4.1.1 --user=ohpcd --channel=stable",
+  "upstream_test": "ctest --output-on-failure",
+  "package_test": "encode and decode a one-pixel in-memory JPEG"
+}
