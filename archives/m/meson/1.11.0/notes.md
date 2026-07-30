@@ -19,3 +19,8 @@ requirement. The recipe generates local pkg-config and CMake metadata so that
 the suite's dependency-discovery tests exercise a real OHOS zlib package.
 The metadata reports zlib's header/API version (`1.3.1`), not the package
 recipe revision (`1.3.1.1`).
+
+The full suite retains tests that can run on OHOS. It explicitly skips only
+features unavailable in the device environment: unresolved-symbol dlopen
+modules, Python extension ABI tests, GLib development tests, static/dynamic
+zlib linkage comparison, incomplete LLVM development files, and BlocksRuntime.
