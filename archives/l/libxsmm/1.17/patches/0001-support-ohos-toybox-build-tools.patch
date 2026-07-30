@@ -194,6 +194,30 @@
    OMPFLAG := $(OMPFLAG_FORCE)
  endif
  endif
+--- a/include/libxsmm_sync.h
++++ b/include/libxsmm_sync.h
+@@ -11,7 +11,10 @@
+ #ifndef LIBXSMM_SYNC_H
+ #define LIBXSMM_SYNC_H
+ 
+ #include "libxsmm_intrinsics_x86.h"
++#if defined(__OHOS__)
++# include <sched.h>
++#endif
+ 
+ #if !defined(LIBXSMM_TLS)
+ # if (0 != LIBXSMM_SYNC) && !defined(LIBXSMM_NO_TLS)
+@@ -460,7 +463,9 @@
+ #   define LIBXSMM_TLS_DESTROY(KEY) pthread_key_delete(KEY)
+ #   define LIBXSMM_TLS_SETVALUE(KEY, PTR) pthread_setspecific(KEY, PTR)
+ #   define LIBXSMM_TLS_GETVALUE(KEY) pthread_getspecific(KEY)
+-#   if defined(__APPLE__) && defined(__MACH__)
++#   if defined(__OHOS__)
++#     define LIBXSMM_SYNC_YIELD sched_yield()
++#   elif defined(__APPLE__) && defined(__MACH__)
+ #     define LIBXSMM_SYNC_YIELD pthread_yield_np()
+ #   else
+ #     if defined(__USE_GNU) || !defined(__BSD_VISIBLE)
 --- a/src/libxsmm_timer.c
 +++ b/src/libxsmm_timer.c
 @@ -31,3 +31,3 @@
