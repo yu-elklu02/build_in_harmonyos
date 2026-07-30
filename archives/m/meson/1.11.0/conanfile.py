@@ -29,12 +29,12 @@ class MesonConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def layout(self):
         basic_layout(self, src_folder=".")
 
     def build(self):
-        apply_conandata_patches(self)
         test_deps = os.path.join(self.build_folder, "upstream-test-deps")
         pkgconfig_dir = os.path.join(test_deps, "pkgconfig")
         cmake_dir = os.path.join(test_deps, "lib", "cmake", "ZLIB")
