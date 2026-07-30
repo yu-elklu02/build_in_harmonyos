@@ -17,7 +17,7 @@ class LibxsmmTestPackage(ConanFile):
         includes = " ".join(f'-I"{path}"' for path in dep.includedirs)
         libdirs = " ".join(f'-L"{path}"' for path in dep.libdirs)
         self.run(
-            f'{cc} test.c -o test_libxsmm {includes} {libdirs} '
+            f'{cc} -DLIBXSMM_PLATFORM_FORCE test.c -o test_libxsmm {includes} {libdirs} '
             "-lxsmm -lxsmmnoblas -ldl -lm -lpthread"
         )
 
