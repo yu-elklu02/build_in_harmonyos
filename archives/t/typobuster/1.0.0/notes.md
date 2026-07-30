@@ -6,7 +6,7 @@ The upstream v1.0.0 tag is a Python GTK3 application. It has no CMake, Makefile,
 
 ## Package layout
 
-The recipe installs the Python module and bundled language/icon assets under `lib/typobuster`, desktop metadata under `share`, and a launcher under `bin/typobuster`. The launcher adds the packaged module directory to `PYTHONPATH` before running `typobuster.main`.
+The recipe installs the Python module, distribution metadata, and bundled language/icon assets under `lib`, desktop metadata under `share`, and a launcher under `bin/typobuster`. The launcher adds the packaged module directory to `PYTHONPATH` before running `typobuster.main`.
 
 ## Runtime requirements
 
@@ -14,4 +14,4 @@ The GUI requires Python 3, PyGObject, GTK3, and GtkSourceView4 in the OpenHarmon
 
 ## Tests
 
-Upstream v1.0.0 contains no automated test target. The consumer test loads the packaged `typobuster.tools` module and verifies five real text transformations without opening a GUI.
+Upstream v1.0.0 contains no automated test target. The consumer test executes the packaged `typobuster --version` launcher and loads the packaged `typobuster.tools` module to verify five real text transformations without opening a GUI.

@@ -1,5 +1,6 @@
 import importlib.util
 import os
+import subprocess
 import sys
 
 
@@ -12,7 +13,20 @@ def load_tools(package_folder):
 
 
 def main():
-    tools = load_tools(sys.argv[1])
+    package_folder = sys.argv[1]
+    check_launcher = "--check-launcher" in sys.argv[2:]
+    if check_launcher:
+        launcher = os.path.join(package_folder, "bin", "typobuster")
+        version = subprocess.run(
+            [launcher, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if version.returncode != 0 or "version 1.0.0" not in version.stdout:
+            raise RuntimeError(f"packaged launcher version check failed: {version.stdout}{version.stderr}")
+
+    tools = load_tools(package_folder)
     checks = {
         "snake case": tools.to_snake_case("Hello Harmony OS") == "hello_harmony_os",
         "camel case": tools.to_camel_case("hello harmony os") == "helloHarmonyOs",
@@ -23,7 +37,8 @@ def main():
     failed = [name for name, passed in checks.items() if not passed]
     if failed:
         raise RuntimeError(f"typobuster transformation checks failed: {', '.join(failed)}")
-    print(f"typobuster functional checks passed: {len(checks)}")
+    total = len(checks) + int(check_launcher)
+    print(f"typobuster launcher and functional checks passed: {total}")
 
 
 if __name__ == "__main__":

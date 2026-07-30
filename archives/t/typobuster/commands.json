@@ -1,0 +1,12 @@
+{
+  "name": "typobuster",
+  "description": "GTK text editor with transformations and typo correction",
+  "homepage": "https://github.com/nwg-piotr/typobuster",
+  "type": "tool",
+  "versions": {
+    "1.0.0": {
+      "ref": "typobuster/1.0.0",
+      "binary": false
+    }
+  }
+}

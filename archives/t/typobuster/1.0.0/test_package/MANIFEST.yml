@@ -8,7 +8,7 @@ upstream_tests: []
 
 test_package_tests:
   - file: test_typobuster.py
-    description: "Load the packaged tools module and assert five text transformations"
+    description: "Execute the packaged launcher version command and assert five text transformations"
     command: "python3 test_typobuster.py <package-folder>"
 
-assertion_count: 5
+assertion_count: 6

@@ -45,6 +45,11 @@ class TypobusterConan(ConanFile):
         copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
         save(
             self,
+            os.path.join(self.package_folder, "lib", "typobuster-1.0.0.dist-info", "METADATA"),
+            "Metadata-Version: 2.1\nName: typobuster\nVersion: 1.0.0\n",
+        )
+        save(
+            self,
             os.path.join(self.package_folder, "bin", "typobuster"),
             "#!/data/service/hnp/bin/bash\n"
             "set -eu\n"

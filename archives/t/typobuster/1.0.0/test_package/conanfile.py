@@ -17,4 +17,7 @@ class TypobusterTestConan(ConanFile):
         package_folder = self.dependencies["typobuster"].package_folder
         test_script = os.path.join(self.source_folder, "test_typobuster.py")
         python = "python3" if str(self.settings.os) == "OHOS" else "python"
-        self.run(f'{python} "{test_script}" "{package_folder}"', env="conanrun")
+        arguments = f'{python} "{test_script}" "{package_folder}"'
+        if str(self.settings.os) == "OHOS":
+            arguments += " --check-launcher"
+        self.run(arguments, env="conanrun")
