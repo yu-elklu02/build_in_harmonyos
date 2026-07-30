@@ -1,5 +1,5 @@
 version: "4.1.1"
-status: adapting
+status: built
 build_system: cmake
 
 source:
@@ -10,7 +10,7 @@ source:
 build:
   system: cmake
   configure_options:
-    - "ENABLE_SHARED=<shared option>"
+    - "ENABLE_SHARED=ON/OFF (Conan shared option; default OFF)"
     - "ENABLE_STATIC=ON"
     - "PNG_SUPPORTED=ON"
     - "WITH_SIMD=OFF"
@@ -22,6 +22,7 @@ build:
 test:
   upstream_test_in_build: true
   upstream_test_command: "ctest --output-on-failure"
-  upstream_test_cases: "Recorded from the completed device validation log."
+  upstream_test_cases: 108
+  upstream_test_passed: 108
   package_test: "encode and decode a one-pixel in-memory JPEG"
   assertions: 5

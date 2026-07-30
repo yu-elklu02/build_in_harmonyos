@@ -6,7 +6,7 @@ MozJPEG is adapted as a static-first CMake library for OHOS/armv8.
 - `WITH_SIMD=OFF` avoids the unavailable NASM tool while retaining all codec
   functionality.
 - PNG input support is enabled through `libpng/1.6.58`, with `zlib/1.3.1.1`.
-- The upstream CTest suite runs during `build()`; its final case count is
-  recorded from the device validation log.
+- The upstream CTest suite runs during `build()`; device validation passed all
+  108 of 108 cases.
 - The consumer test encodes and decodes a one-pixel JPEG in memory, asserting
   JPEG framing, dimensions, and successful scanline decoding.
