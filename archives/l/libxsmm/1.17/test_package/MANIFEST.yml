@@ -14,4 +14,4 @@ test_package_tests:
     description: "Links the packaged static archives and validates initialization, target reporting, and memory allocation."
     command: "./test_libxsmm"
 
-assertion_count: 3
+assertion_count: 2

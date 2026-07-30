@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -44,11 +45,12 @@ class LibxsmmConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         make_args = self._make_args()
-        bash = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+        bash = os.environ.get("CONFIG_SHELL") or shutil.which("bash") or "bash"
+        bash_dir = os.path.dirname(bash)
         tmpdir = os.path.join(self.build_folder, "tmp")
         self.run(f'mkdir -p "{tmpdir}"', cwd=self.build_folder)
         make_env = (
-            f'PATH="{os.path.dirname(bash)}:$PATH" TMPDIR="{tmpdir}" '
+            f'PATH="{bash_dir + ":" if bash_dir else ""}$PATH" TMPDIR="{tmpdir}" '
             f'SHELL="{bash}"'
         )
         self.run(f"{make_env} make -j1 {make_args}", cwd=self.source_folder)
