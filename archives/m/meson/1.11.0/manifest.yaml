@@ -14,5 +14,8 @@ build:
     - "Python 3.12 interpreter supplied by the build environment"
 
 test:
+  upstream_test_in_build: true
+  upstream_test_command: "python3 run_tests.py"
+  upstream_test_cases: "Reported by the upstream runner during conan create."
   package_test: "meson setup build && meson compile -C build && ./build/conan-probe"
   assertions: 2

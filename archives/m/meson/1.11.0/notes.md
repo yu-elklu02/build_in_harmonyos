@@ -6,3 +6,6 @@ environment's Python 3.12 interpreter.
 
 The consumer test configures and compiles a minimal C project with the packaged
 Meson command, then runs the generated executable.
+
+The complete upstream suite runs through `python3 run_tests.py` in `build()`.
+Its pass/skip/fail total must be taken from the device validation log.
