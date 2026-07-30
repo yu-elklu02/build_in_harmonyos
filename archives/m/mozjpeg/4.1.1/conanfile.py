@@ -45,6 +45,18 @@ class MozjpegConan(ConanFile):
     def generate(self):
         CMakeDeps(self).generate()
         toolchain = CMakeToolchain(self)
+        libpng = self.dependencies["libpng"]
+        libpng_libdir = os.path.join(
+            libpng.package_folder, libpng.cpp_info.libdirs[0]
+        )
+        libpng_library = os.path.join(
+            libpng_libdir, "lib{}.a".format(libpng.cpp_info.libs[0])
+        )
+        toolchain.variables["PNG_ROOT"] = libpng.package_folder
+        toolchain.variables["PNG_PNG_INCLUDE_DIR"] = os.path.join(
+            libpng.package_folder, "include"
+        )
+        toolchain.variables["PNG_LIBRARY"] = libpng_library
         toolchain.variables["CMAKE_INSTALL_LIBDIR"] = "lib"
         toolchain.variables["ENABLE_SHARED"] = self.options.shared
         toolchain.variables["ENABLE_STATIC"] = True
