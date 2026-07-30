@@ -27,4 +27,4 @@ class MozjpegTestConan(ConanFile):
             self.output.info("Cross-building: execution is skipped.")
             return
         cmake = CMake(self)
-        cmake.test(output_on_failure=True)
+        cmake.test()
