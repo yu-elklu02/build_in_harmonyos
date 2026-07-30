@@ -1,6 +1,8 @@
-#include <jpeglib.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <jpeglib.h>
 
 static int encode_one_pixel(unsigned char **jpeg_data, unsigned long *jpeg_size)
 {
