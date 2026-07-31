@@ -15,3 +15,6 @@ patches:
   - patch_file: "patches/0004-configure-ffs-ohos.patch"
     patch_description: "Expose ffs declaration on OHOS libc during configure"
     patch_type: "portability"
+  - patch_file: "patches/0005-configure-status-umask.patch"
+    patch_description: "Avoid unwritable config.status temporary directories on OHOS"
+    patch_type: "portability"
