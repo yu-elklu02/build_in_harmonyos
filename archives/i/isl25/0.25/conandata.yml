@@ -12,3 +12,6 @@ patches:
   - patch_file: "patches/0003-configure-tmpdir.patch"
     patch_description: "Honor TMPDIR when creating configure scratch files"
     patch_type: "portability"
+  - patch_file: "patches/0004-configure-ffs-ohos.patch"
+    patch_description: "Expose ffs declaration on OHOS libc during configure"
+    patch_type: "portability"
