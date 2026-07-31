@@ -16,7 +16,7 @@ class XomConan(ConanFile):
     license = "LGPL-2.1-or-later"
     homepage = "https://xom.nu/"
     url = "https://gitcode.com/OpenHarmonyPCDeveloper/build_in_harmonyos"
-    package_type = "library"
+    package_type = "application"
     settings = "os", "arch"
 
     def validate(self):
@@ -27,7 +27,12 @@ class XomConan(ConanFile):
         basic_layout(self, src_folder="src")
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        get(
+            self,
+            **self.conan_data["sources"][self.version],
+            filename=f"xom-{self.version}.tar.gz",
+            strip_root=True,
+        )
 
     def build(self):
         self.run("ant jar")

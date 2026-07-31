@@ -5,6 +5,9 @@ build_system: ant
 homepage: "https://xom.nu/"
 license: "LGPL-2.1-or-later"
 dependencies: []
+language: Java
+adaptation_path: "B"
+knowledge_extension: "Java/Ant source package adaptation requires a Java toolchain (java, javac) and Ant on OHOS CI; otherwise the recipe can only progress through source export and dependency graph, not build/test."
 test:
   upstream_test_in_build: true
   upstream_test_command: "ant test"

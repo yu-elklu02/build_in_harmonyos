@@ -1,0 +1,47 @@
+id: E254
+trigger_tool: conan
+phase: build
+error_signature: ant: inaccessible or not found|java: not found|javac: not found
+severity: 2
+category: java-ant-toolchain
+match_keywords: Java, Ant, jar, xom, java not found, javac not found, ant not found
+title: Java/Ant source packages require JDK and Ant in the OHOS build environment
+root_cause: Java source packages that build upstream JARs with Ant are not native C/C++ packages. The Conan recipe can download sources and export metadata, but build() cannot execute if the OHOS builder lacks java, javac, and ant. This is an environment/toolchain prerequisite, not a missing C/C++ dependency.
+affected_scope: Java libraries or tools whose upstream build requires Ant, javac, or java at package build time
+verification_cmd: command -v java; command -v javac; command -v ant
+rec_priority: 1
+rec_approach: require-java-toolchain-before-path-a-submit
+rec_description: Before submitting a Java/Ant source package as a normal Path A adaptation, verify that the target CI/device has JDK and Ant available. If the tools are absent, document the result as a Path B knowledge extension or first provide the Java build toolchain.
+rec_command: conan create archives/x/xom/1.4.4 --name=xom --version=1.4.4 --user=ohpcd --channel=stable -pr:h=ci/conan/profiles/ohos-aarch64 -pr:b=default
+rec_auto_fix: false
+rec_impl: manual-environment-or-recipe-design-decision
+fallback_priority: 2
+fallback_approach: package-prebuilt-jar-with-verified-source
+fallback_description: If upstream publishes a trustworthy prebuilt JAR, a separate recipe design may download that JAR directly, verify SHA256, package it under libexec/bin, and run a real Java functional test. This must not be mixed with a source-build recipe that claims Ant tests passed.
+fallback_command:
+fallback_auto_fix: false
+fallback_impl:
+forbid_1_pattern: mark Java Ant build as passed when ant/java/javac are missing
+forbid_1_reason: This would fake the upstream build and test result.
+forbid_1_consequence: CI/test evidence becomes invalid and the package may fail for consumers.
+forbid_2_pattern: silently skip ant test without recording zero or blocked upstream tests
+forbid_2_reason: Upstream tests must either run for real or be accurately documented as blocked/skipped with reason.
+forbid_2_consequence: PR test statistics become misleading.
+principles:
+causes: []
+caused_by: []
+similar_to: []
+conflicts_with: []
+prerequisite_of: []
+doc_file: knowledge/drafts/E254-draft-xom-java-ant-toolchain.md
+last_updated: 2026-07-31
+source_event: xom/1.4.4 OHOS device validation
+authors: codex
+source_pr:
+source_commit: 0d81962a45929f45e304527746e9d030ffe8d9d7
+metrics_success_count: 1
+metrics_fail_count: 1
+metrics_confidence: 1.0
+metrics_last_used: 2026-07-31
+draft: true
+contributor_id: codex
