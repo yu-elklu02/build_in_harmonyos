@@ -1,11 +1,6 @@
-diff --git a/configure b/configure
-index 1ed74be..88b760a 100755
 --- a/configure
 +++ b/configure
-@@ -24826,12 +24826,12 @@ ac_cs_config='$ac_cs_config_escaped'
- # Create a (secure) tmp directory for tmp files.
- 
- {
+@@ -24829,7 +24829,7 @@ ac_cs_config='$ac_cs_config_escaped'
 -  tmp=`(umask 077 && mktemp -d "${TMPDIR:-.}/confXXXXXX") 2>/dev/null` &&
 +  tmp=`(umask 022 && mktemp -d "${TMPDIR:-.}/confXXXXXX") 2>/dev/null` &&
    test -d "$tmp"
@@ -15,5 +10,3 @@ index 1ed74be..88b760a 100755
 -  (umask 077 && mkdir "$tmp")
 +  (umask 022 && mkdir "$tmp")
  } || as_fn_error $? "cannot create a temporary directory in ${TMPDIR:-.}" "$LINENO" 5
- ac_tmp=$tmp
- 
