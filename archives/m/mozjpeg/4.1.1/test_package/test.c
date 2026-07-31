@@ -56,7 +56,7 @@ static int decode_one_pixel(const unsigned char *jpeg_data, unsigned long jpeg_s
         (j_common_ptr)&decompressor, JPOOL_IMAGE,
         decompressor.output_width * decompressor.output_components, 1);
     ok = jpeg_read_scanlines(&decompressor, row, 1) == 1;
-    jpeg_finish_decompress(&decompressor);
+    ok = ok && jpeg_finish_decompress(&decompressor);
     jpeg_destroy_decompress(&decompressor);
     return ok;
 }
