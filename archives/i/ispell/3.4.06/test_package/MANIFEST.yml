@@ -1,0 +1,15 @@
+# MANIFEST.yml — ispell/3.4.06 test_package
+# R34: tests must actually exercise the package binary
+
+test_sources:
+  - test_ispell.sh
+
+binaries_under_test:
+  - ispell
+  - buildhash
+
+test_assertions:
+  - ispell binary is present and executable
+  - ispell -v prints version string containing "ispell"
+  - ispell -a pipe mode emits "@(#)" version header line
+  - ispell -a pipeline executes without crash

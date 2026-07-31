@@ -1,0 +1,11 @@
+# conandata.yml — ispell 3.4.06
+# Official source: https://www.cs.hmc.edu/~geoff/ispell.html
+#
+# ⚠️  SHA256 PLACEHOLDER: compute on real device before first conan create:
+#   curl -L https://www.cs.hmc.edu/~geoff/ispell/ispell-3.4.06.tar.gz \
+#        -o ~/tmp/ispell.tar.gz && sha256sum ~/tmp/ispell.tar.gz
+
+sources:
+  "3.4.06":
+    url: "https://www.cs.hmc.edu/~geoff/ispell/ispell-3.4.06.tar.gz"
+    sha256: "FILL_IN_SHA256"

@@ -1,0 +1,20 @@
+version: "3.4.06"
+software: ispell
+status: adapting
+build_date: "2026-07-31"
+build_system: makefile
+
+source:
+  url: "https://www.cs.hmc.edu/~geoff/ispell/ispell-3.4.06.tar.gz"
+  sha256: "FILL_IN_AFTER_FIRST_DOWNLOAD"
+  tar_format: tar.gz
+
+build:
+  system: makefile
+  configure_options:
+    - "CC=clang (from Conan toolchain conf)"
+    - "TERMLIB=-lncursesw"
+    - "TERMINCLUDE=-I<ncurses_pkg>/include/ncursesw"
+    - "LANGUAGES= (skip English dictionary build)"
+  dependencies:
+    - "ncurses/6.5"
