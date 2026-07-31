@@ -2,7 +2,7 @@ diff --git a/configure b/configure
 index 1ed74be..88b760a 100755
 --- a/configure
 +++ b/configure
-@@ -24825,12 +24825,12 @@ ac_cs_config='$ac_cs_config_escaped'
+@@ -24826,12 +24826,12 @@ ac_cs_config='$ac_cs_config_escaped'
  # Create a (secure) tmp directory for tmp files.
  
  {
