@@ -13,7 +13,7 @@ upstream_tests:
 test_package_tests:
   - file: test.c
     description: "Encode and decode a one-pixel JPEG through the packaged libjpeg API."
-    command: "./test_package"
+    command: "./mozjpeg_functional_test"
     assertions:
       - "JPEG output is larger than the SOI marker"
       - "JPEG output starts with the SOI marker"
