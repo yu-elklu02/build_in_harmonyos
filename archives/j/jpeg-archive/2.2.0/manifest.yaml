@@ -1,0 +1,23 @@
+version: "2.2.0"
+software: jpeg-archive
+status: adapting
+build_date: "2026-07-31"
+build_system: cmake
+
+source:
+  url: "https://github.com/danielgtaylor/jpeg-archive/archive/refs/tags/v2.2.0.tar.gz"
+  sha256: "FILL_IN_AFTER_DOWNLOAD"
+  tar_format: tar.gz
+
+build:
+  system: cmake
+  configure_options:
+    - "JPEG_LIBRARY=<mozjpeg_pkg_dir>/lib/libjpeg.a (set via CMakeToolchain)"
+    - "JPEG_INCLUDE_DIR=<mozjpeg_pkg_dir>/include"
+    - "PNG_LIBRARY=<libpng_pkg_dir>/lib/libpng.a"
+    - "PNG_PNG_INCLUDE_PATH=<libpng_pkg_dir>/include"
+    - "ZLIB_LIBRARY=<zlib_pkg_dir>/lib/libz.a"
+    - "CMAKE_POLICY_VERSION_MINIMUM=3.5"
+  dependencies:
+    - "mozjpeg/4.1.1"
+    - "libpng/1.6.58"
