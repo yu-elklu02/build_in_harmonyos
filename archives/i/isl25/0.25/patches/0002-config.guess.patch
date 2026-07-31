@@ -10,7 +10,7 @@
 +          i?86) MACHINE=i686 ;;
 +          *) MACHINE="$UNAME_MACHINE" ;;
 +        esac
-+        GUESS=${MACHINE}-unknown-linux-ohos
-+        ;;
++        echo ${MACHINE}-unknown-linux-ohos
++        exit ;;
 +
      *:NetBSD:*:*)
