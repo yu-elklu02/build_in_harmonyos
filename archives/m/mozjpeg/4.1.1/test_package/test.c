@@ -48,7 +48,10 @@ static int decode_one_pixel(const unsigned char *jpeg_data, unsigned long jpeg_s
         jpeg_destroy_decompress(&decompressor);
         return 0;
     }
-    jpeg_start_decompress(&decompressor);
+    if (!jpeg_start_decompress(&decompressor)) {
+        jpeg_destroy_decompress(&decompressor);
+        return 0;
+    }
     row = (*decompressor.mem->alloc_sarray)(
         (j_common_ptr)&decompressor, JPOOL_IMAGE,
         decompressor.output_width * decompressor.output_components, 1);
