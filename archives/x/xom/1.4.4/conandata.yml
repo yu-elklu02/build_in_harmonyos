@@ -1,0 +1,4 @@
+sources:
+  "1.4.4":
+    url: "https://github.com/elharo/xom/archive/refs/tags/v1.4.4.tar.gz"
+    sha256: "8f42a1a5a73b00fdf67b1e51154a8dddd005784cdd29d44a19ed1c570a60def1"

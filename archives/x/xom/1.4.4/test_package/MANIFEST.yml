@@ -1,0 +1,21 @@
+package: xom/1.4.4
+homepage: "https://xom.nu/"
+
+upstream_test_in_build: true
+upstream_test_command: "ant test"
+upstream_tests:
+  - source: "XOM Ant test target"
+    description: "Upstream Java test suite executed by Ant."
+    command: "ant test"
+    count: 1
+
+test_package_tests:
+  - file: test_xom.java
+    description: "Creates an XML document with XOM and checks serialized output."
+    command: "javac/java test_xom"
+    assertions:
+      - "XOM_JAR is exported by the package"
+      - "Java source compiles against the packaged JAR"
+      - "Runtime output contains the expected XML element"
+
+assertion_count: 3

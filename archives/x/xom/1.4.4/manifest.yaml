@@ -1,0 +1,12 @@
+software: xom
+version: "1.4.4"
+status: adapting
+build_system: ant
+homepage: "https://xom.nu/"
+license: "LGPL-2.1-or-later"
+dependencies: []
+test:
+  upstream_test_in_build: true
+  upstream_test_command: "ant test"
+  upstream_test_cases: 1
+  test_package_assertions: 3

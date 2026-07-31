@@ -1,0 +1,8 @@
+package: xom
+homepage: "https://xom.nu/"
+license: "LGPL-2.1-or-later"
+status: adapting
+versions:
+  - version: "1.4.4"
+    status: adapting
+    dependencies: []
