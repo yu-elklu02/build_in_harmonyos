@@ -10,3 +10,7 @@ MozJPEG is adapted as a static-first CMake library for OHOS/armv8.
   108 of 108 cases.
 - The consumer test encodes and decodes a one-pixel JPEG in memory, asserting
   JPEG framing, dimensions, and successful scanline decoding.
+
+**编译结束**: 2026-07-30
+
+**最终状态**: built

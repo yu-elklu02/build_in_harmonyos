@@ -5,4 +5,4 @@ sources:
 
 patches:
   "4.1.1":
-    - patch_file: "patches/0003-use-conan-libpng-config.patch"
+    - patch_file: "patches/0001-use-conan-libpng-config.patch"

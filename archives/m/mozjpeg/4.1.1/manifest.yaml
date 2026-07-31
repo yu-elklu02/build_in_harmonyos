@@ -1,6 +1,10 @@
 version: "4.1.1"
+software: mozjpeg
 status: built
+build_date: "2026-07-30"
 build_system: cmake
+test_passed: 113
+test_failed: 0
 
 source:
   url: "https://github.com/mozilla/mozjpeg/archive/refs/tags/v4.1.1.tar.gz"

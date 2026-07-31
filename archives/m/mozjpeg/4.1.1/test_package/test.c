@@ -23,6 +23,8 @@ static int encode_one_pixel(unsigned char **jpeg_data, unsigned long *jpeg_size)
     row = pixel;
     if (jpeg_write_scanlines(&compressor, &row, 1) != 1) {
         jpeg_destroy_compress(&compressor);
+        *jpeg_data = NULL;
+        *jpeg_size = 0;
         return 0;
     }
     jpeg_finish_compress(&compressor);

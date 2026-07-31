@@ -32,10 +32,6 @@ class MozjpegConan(ConanFile):
                 "mozjpeg/4.1.1 is adapted and validated for OHOS/armv8 only."
             )
 
-    def config_options(self):
-        if self.settings.os == "Windows":
-            self.options.rm_safe("fPIC")
-
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
