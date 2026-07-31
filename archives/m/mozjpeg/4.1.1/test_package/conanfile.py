@@ -1,3 +1,5 @@
+import os
+
 from conan import ConanFile
 from conan.tools.build import cross_building
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
@@ -26,5 +28,6 @@ class MozjpegTestConan(ConanFile):
         if cross_building(self):
             self.output.info("Cross-building: execution is skipped.")
             return
-        cmake = CMake(self)
-        cmake.test()
+        test_binary = os.path.join(
+            self.cpp.build.bindirs[0], "mozjpeg_functional_test")
+        self.run(test_binary, env="conanrun")
