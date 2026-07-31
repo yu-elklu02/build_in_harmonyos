@@ -88,9 +88,14 @@ class BerkeleyDbConan(ConanFile):
                     os.path.join(self.source_folder, "test", "tcl", "test.tcl")
                 ),
             )
+            tmp_dir = os.path.join(self.build_folder, "tmp")
+            os.makedirs(tmp_dir, exist_ok=True)
             test_env = Environment()
             test_env.define("TCL_ROOT", tcl_root)
             test_env.define_path("TCL_LIBRARY", os.path.join(tcl_lib, "tcl9.0"))
+            test_env.define("TMPDIR", tmp_dir)
+            test_env.define("TMP", tmp_dir)
+            test_env.define("TEMP", tmp_dir)
             test_env.prepend_path("LD_LIBRARY_PATH", tcl_lib)
             test_env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.build_folder, ".libs"))
             with test_env.vars(self).apply():
