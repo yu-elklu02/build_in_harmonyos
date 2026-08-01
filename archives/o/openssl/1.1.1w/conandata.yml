@@ -1,0 +1,11 @@
+sources:
+  url: "https://www.openssl.org/source/openssl-1.1.1w.tar.gz"
+  sha256: "cf3098950cb4d853ad95e69a1a3f9d50d6d97f1eb47cf7e57b3f4f8c01675a0e"
+
+patches:
+  - patch_file: "patches/0001-Configurations-openharmony-conf.patch"
+    patch_description: "Add OpenHarmony targets to OpenSSL 1.1.1w Configure"
+    patch_type: "portability"
+  - patch_file: "patches/0002-Configure.patch"
+    patch_description: "Use OHOS-accessible perl shebang"
+    patch_type: "portability"

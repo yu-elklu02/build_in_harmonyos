@@ -1,0 +1,7 @@
+test_type: conan
+cases: 3
+features:
+  - version
+  - sha256
+  - ssl-context
+
