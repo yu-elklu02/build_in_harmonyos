@@ -1,9 +1,11 @@
 sources:
-  url: "https://codeload.github.com/rakshasa/libtorrent/tar.gz/refs/tags/v0.16.17"
-  sha256: "14b502a00f0eeebee9293f7c6cf0d3ec356a5a3792c0d320290edd19c7a65d0b"
+  url: "https://github.com/rakshasa/rtorrent/releases/download/v0.16.17/libtorrent-0.16.17.tar.gz"
+  sha256: "9efd7f3176a03f7935b5616ff57695524e99a3184e43ec01110d13d960d2abf6"
 
 patches:
-  - patch_file: "patches/0001-scripts-pkg.m4.patch"
-    patch_description: "Bundle pkg.m4 for autoreconf on the source archive"
-    patch_type: "build"
-
+  - patch_file: "patches/0001-config-sub-ohos.patch"
+    patch_description: "Allow config.sub to accept linux-ohos triplets"
+    patch_type: "portability"
+  - patch_file: "patches/0002-configure-umask.patch"
+    patch_description: "Avoid umask 077 temporary directories on OHOS HMDFS"
+    patch_type: "portability"

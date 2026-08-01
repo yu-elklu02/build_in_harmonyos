@@ -5,8 +5,8 @@ compile_date: "2026-08-01"
 build_system: autotools
 
 source:
-  url: "https://codeload.github.com/rakshasa/libtorrent/tar.gz/refs/tags/v0.16.17"
-  sha256: "14b502a00f0eeebee9293f7c6cf0d3ec356a5a3792c0d320290edd19c7a65d0b"
+  url: "https://github.com/rakshasa/rtorrent/releases/download/v0.16.17/libtorrent-0.16.17.tar.gz"
+  sha256: "9efd7f3176a03f7935b5616ff57695524e99a3184e43ec01110d13d960d2abf6"
   tar_format: tar.gz
 
 build:
@@ -29,10 +29,11 @@ test:
     cases: 3
 
 patches_applied:
-  - "0001-scripts-pkg.m4.patch"
+  - "0001-config-sub-ohos.patch"
+  - "0002-configure-umask.patch"
 
 knowledge_gained:
-  - "The GitHub source archive omits generated configure files; run autoreconf -ivf."
-  - "libtorrent's Autoconf macros require pkg.m4 in scripts/."
+  - "Use rakshasa rtorrent release assets instead of GitHub codeload for generated configure/Makefile.in files."
+  - "config.sub needs linux-ohos triplet support for OHOS cross builds."
+  - "OHOS HMDFS can make umask 077 temporary directories unusable; configure temp creation must avoid the strict umask."
   - "OpenSSL 3 APIs are supported by libtorrent 0.16.17 through accessor-based calls."
-

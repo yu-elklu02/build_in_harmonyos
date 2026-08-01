@@ -71,7 +71,6 @@ class LibtorrentConan(ConanFile):
         previous_pkg_config_path = os.environ.get("PKG_CONFIG_PATH")
         os.environ["PKG_CONFIG_PATH"] = self.generators_folder
         try:
-            self.run("autoreconf -ivf", cwd=self.source_folder, env="conanbuild")
             autotools = Autotools(self)
             autotools.configure()
             autotools.make()

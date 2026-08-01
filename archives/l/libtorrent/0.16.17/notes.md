@@ -9,8 +9,11 @@
 
 ## Build and tests
 
-The upstream GitHub source archive requires `autoreconf -ivf` before
-configuration. The recipe runs the upstream CppUnit suite with `make check`.
-The consumer test creates a value, string, and map `torrent::Object` to verify
-that headers, library linkage, and runtime behavior work together.
+The recipe uses the rakshasa `rtorrent` release asset for libtorrent, not the
+GitHub codeload tag archive, because the release asset includes generated
+`configure` and `Makefile.in` files. This avoids requiring `automake`/`aclocal`
+on OHOS CI workers.
 
+The recipe runs the upstream CppUnit suite with `make check`. The consumer test
+creates a value, string, and map `torrent::Object` to verify that headers,
+library linkage, and runtime behavior work together.

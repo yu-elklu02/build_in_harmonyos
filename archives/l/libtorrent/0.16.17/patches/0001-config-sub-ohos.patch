@@ -1,0 +1,11 @@
+--- a/config.sub
++++ b/config.sub
+@@ -1828,7 +1828,7 @@ esac
+ # (given a valid OS), if there is a kernel.
+ case $kernel-$os-$obj in
+ 	linux-gnu*- | linux-android*- | linux-dietlibc*- | linux-llvm*- \
+-		    | linux-mlibc*- | linux-musl*- | linux-newlib*- \
++		    | linux-mlibc*- | linux-musl*- | linux-newlib*- | linux-ohos*- \
+ 		    | linux-relibc*- | linux-uclibc*- )
+ 		;;
+ 	uclinux-uclibc*- )
