@@ -28,7 +28,7 @@ class OpenSshSsh1Conan(ConanFile):
 
     def requirements(self):
         self.requires("zlib/1.3.1.1")
-        self.requires("openssl/3.5.6")
+        self.requires("openssl/1.1.1w")
 
     def validate(self):
         if self.settings.os not in ("Linux", "OHOS"):
@@ -69,6 +69,7 @@ class OpenSshSsh1Conan(ConanFile):
         ])
 
         if self.settings.os == "OHOS":
+            tc.configure_args.append("ac_cv_header_linux_if_tun_h=no")
             tc.extra_cflags.append("-D_GNU_SOURCE")
             tc.extra_cflags.append("-D__USE_GNU")
 
@@ -98,4 +99,3 @@ class OpenSshSsh1Conan(ConanFile):
         self.runenv_info.prepend_path(
             "PATH", os.path.join(self.package_folder, "sbin")
         )
-
