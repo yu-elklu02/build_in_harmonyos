@@ -1,0 +1,20 @@
+diff --git a/src/torrent/runtime/proxy_manager.cc b/src/torrent/runtime/proxy_manager.cc
+--- a/src/torrent/runtime/proxy_manager.cc
++++ b/src/torrent/runtime/proxy_manager.cc
+@@ -24,10 +24,14 @@ ProxyManager::set_proxy_url(const std::string& url) {
+     return clear_proxy();
+ 
+   auto schema           = net::parse_uri_scheme(url);
+-  auto [host, port]     = net::parse_uri_host_port(url);
+-  auto [user, password] = net::parse_uri_user_password(url);
++  auto host_port        = net::parse_uri_host_port(url);
++  auto user_password    = net::parse_uri_user_password(url);
++  auto host             = host_port.first;
++  auto port             = host_port.second;
++  auto user             = user_password.first;
++  auto password         = user_password.second;
+ 
+   // TODO: Verify there's no junk after the port number?
+ 
+   if (schema.empty())
+     throw input_error("Proxy address must include a scheme.");

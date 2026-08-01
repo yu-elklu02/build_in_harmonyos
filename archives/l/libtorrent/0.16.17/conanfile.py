@@ -8,6 +8,8 @@ from conan.tools.files import (
     copy,
     export_conandata_patches,
     get,
+    load,
+    save,
 )
 from conan.tools.gnu import Autotools, AutotoolsToolchain, PkgConfigDeps
 from conan.tools.layout import basic_layout
@@ -60,7 +62,18 @@ class LibtorrentConan(ConanFile):
 
     def generate(self):
         PkgConfigDeps(self).generate()
+        openssl_pc = os.path.join(self.generators_folder, "openssl.pc")
+        if os.path.exists(openssl_pc):
+            openssl_pc_content = load(self, openssl_pc)
+            for alias in ("libcrypto.pc", "libssl.pc"):
+                alias_pc = os.path.join(self.generators_folder, alias)
+                if not os.path.exists(alias_pc):
+                    save(self, alias_pc, openssl_pc_content)
+
         tc = AutotoolsToolchain(self)
+        if self.settings.os == "OHOS":
+            tc.configure_args.append("--build=aarch64-ohos-linux")
+            tc.cppstd = "-std=c++20"
         tc.configure_args.extend([
             "--enable-shared" if self.options.shared else "--disable-shared",
             "--disable-static" if self.options.shared else "--enable-static",
