@@ -41,4 +41,3 @@ class OpensslTestConan(ConanFile):
             self.run(f"{bash} -c './test_openssl'", env="conanrun")
         else:
             self.run("./test_openssl", env="conanrun")
-

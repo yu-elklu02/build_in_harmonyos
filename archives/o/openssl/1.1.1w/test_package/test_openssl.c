@@ -47,4 +47,3 @@ int main(void) {
     printf("openssl functional checks passed: %d/%d\n", passed, total);
     return passed == total ? 0 : 1;
 }
-
