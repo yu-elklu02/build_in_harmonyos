@@ -1,0 +1,38 @@
+software: libtorrent
+version: "0.16.17"
+status: built
+compile_date: "2026-08-01"
+build_system: autotools
+
+source:
+  url: "https://codeload.github.com/rakshasa/libtorrent/tar.gz/refs/tags/v0.16.17"
+  sha256: "14b502a00f0eeebee9293f7c6cf0d3ec356a5a3792c0d320290edd19c7a65d0b"
+  tar_format: tar.gz
+
+build:
+  system: autotools
+  configure_options:
+    - "--enable-static"
+    - "--disable-shared"
+  dependencies:
+    - libcurl/8.5.0
+    - zlib/1.3.1.1
+    - openssl/3.5.6
+    - cppunit/1.15.1 (test)
+
+test:
+  upstream:
+    command: "make check"
+    source: "test/ CppUnit suite"
+  test_package:
+    command: "creates and verifies torrent::Object values"
+    cases: 3
+
+patches_applied:
+  - "0001-scripts-pkg.m4.patch"
+
+knowledge_gained:
+  - "The GitHub source archive omits generated configure files; run autoreconf -ivf."
+  - "libtorrent's Autoconf macros require pkg.m4 in scripts/."
+  - "OpenSSL 3 APIs are supported by libtorrent 0.16.17 through accessor-based calls."
+

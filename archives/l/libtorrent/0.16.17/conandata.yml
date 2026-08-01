@@ -1,0 +1,9 @@
+sources:
+  url: "https://codeload.github.com/rakshasa/libtorrent/tar.gz/refs/tags/v0.16.17"
+  sha256: "14b502a00f0eeebee9293f7c6cf0d3ec356a5a3792c0d320290edd19c7a65d0b"
+
+patches:
+  - patch_file: "patches/0001-scripts-pkg.m4.patch"
+    patch_description: "Bundle pkg.m4 for autoreconf on the source archive"
+    patch_type: "build"
+
