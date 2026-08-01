@@ -47,6 +47,7 @@ class OpensslConan(ConanFile):
     def build(self):
         prefix = self.package_folder
         openssldir = os.path.join(prefix, "ssl")
+        cc = os.environ.get("CC", "clang")
 
         args = [
             "perl",
@@ -54,6 +55,7 @@ class OpensslConan(ConanFile):
             f"--prefix={prefix}",
             f"--openssldir={openssldir}",
             "no-asm",
+            f"CC={cc}",
             self._target(),
         ]
         if not self.options.shared:
