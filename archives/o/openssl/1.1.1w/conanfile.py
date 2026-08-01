@@ -32,7 +32,12 @@ class OpensslConan(ConanFile):
             raise ConanInvalidConfiguration("openssl/1.1.1w supports OHOS armv8 only")
 
     def source(self):
-        get(self, **self.conan_data["sources"], strip_root=True)
+        get(
+            self,
+            **self.conan_data["sources"],
+            filename=f"openssl-{self.version}.tar.gz",
+            strip_root=True,
+        )
         apply_conandata_patches(self)
 
     def _target(self):
