@@ -1,0 +1,22 @@
+--- a/src/os/os_tmpdir.c
++++ b/src/os/os_tmpdir.c
+@@ -35,6 +35,19 @@ __os_tmpdir(env, flags)
+ 
+ 	dbenv = env->dbenv;
+ 
++#ifdef __OHOS__
++	/*
++	 * OHOS mounts /tmp read-only.  Permit an explicit temporary directory
++	 * without enabling DB_USE_ENVIRON for every test environment.
++	 */
++	tdir = tdir_buf;
++	if ((ret = __os_getenv(
++	    env, "BDB_TMPDIR", &tdir, sizeof(tdir_buf))) != 0)
++		return (ret);
++	if (tdir != NULL && tdir[0] != '\0')
++		return (__os_strdup(env, tdir, &dbenv->db_tmp_dir));
++#endif
++
+ 	/* Use the environment if it's permitted and initialized. */
+ 	if (LF_ISSET(DB_USE_ENVIRON) ||
+ 	    (LF_ISSET(DB_USE_ENVIRON_ROOT) && __os_isroot())) {

@@ -84,7 +84,7 @@ class BerkeleyDbConan(ConanFile):
             save(
                 self,
                 tcl_runner,
-                "source {{{}}}\nrun_all\nif {{[info exists ::failed] && $::failed != 0}} {{exit 1}}\n".format(
+                "puts \"BDB_TMPDIR=$::env(BDB_TMPDIR)\"\nsource {{{}}}\nrun_all\nif {{[info exists ::failed] && $::failed != 0}} {{exit 1}}\n".format(
                     os.path.join(self.source_folder, "test", "tcl", "test.tcl")
                 ),
             )
@@ -96,6 +96,7 @@ class BerkeleyDbConan(ConanFile):
             test_env.define("TMPDIR", tmp_dir)
             test_env.define("TMP", tmp_dir)
             test_env.define("TEMP", tmp_dir)
+            test_env.define("BDB_TMPDIR", tmp_dir)
             test_env.prepend_path("LD_LIBRARY_PATH", tcl_lib)
             test_env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.build_folder, ".libs"))
             with test_env.vars(self).apply():
@@ -107,7 +108,7 @@ class BerkeleyDbConan(ConanFile):
 
     def package(self):
         autotools = Autotools(self)
-        autotools.install()
+        autotools.install(args=["-j1"])
 
     def package_info(self):
         self.cpp_info.libs = ["db"]

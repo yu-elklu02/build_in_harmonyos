@@ -13,3 +13,6 @@ patches:
     - patch_file: "patches/0003-link-tcl-module-to-tcl-runtime.patch"
       patch_description: "Link the Tcl extension against the selected Tcl runtime"
       patch_type: "portability"
+    - patch_file: "patches/0004-add-ohos-tmpdir-override.patch"
+      patch_description: "Allow OHOS tests to use an explicit writable Berkeley DB temp directory"
+      patch_type: "portability"
