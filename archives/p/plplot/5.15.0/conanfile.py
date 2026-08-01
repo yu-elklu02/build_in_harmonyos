@@ -7,7 +7,7 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import can_run
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
-from conan.tools.files import copy, get
+from conan.tools.files import copy, get, replace_in_file
 
 
 class PlplotConan(ConanFile):
@@ -61,14 +61,23 @@ class PlplotConan(ConanFile):
         tc.variables["WITH_CSA"] = False
         tc.variables["PL_HAVE_FREETYPE"] = False
         tc.variables["USE_RPATH"] = False
+        if str(self.settings.os) == "OHOS":
+            tc.cache_variables["MATH_LIB"] = "m"
         tc.generate()
 
     def build(self):
+        if str(self.settings.os) == "OHOS":
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "plplot_test", "CMakeLists.txt"),
+                'message(FATAL_ERROR "Internal build-system error; unable to determine platform.")',
+                "set(PLATFORM UNIX)",
+            )
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
         if can_run(self):
-            cmake.test(cli_args=["-R", "examples_c|examples_cxx", "--output-on-failure"])
+            cmake.test()
 
     def package(self):
         cmake = CMake(self)
@@ -82,7 +91,8 @@ class PlplotConan(ConanFile):
         )
 
     def package_info(self):
-        self.cpp_info.libs = ["plplotcxx", "plplot"]
+        self.cpp_info.includedirs = ["include", os.path.join("include", "plplot")]
+        self.cpp_info.libs = ["plplotcxx", "plplot", "qsastime"]
         if str(self.settings.os) in ("Linux", "OHOS"):
             self.cpp_info.system_libs = ["m"]
         self.cpp_info.set_property("cmake_file_name", "plplot")
