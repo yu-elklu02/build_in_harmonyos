@@ -62,7 +62,7 @@ class PlplotConan(ConanFile):
         tc.variables["PL_HAVE_FREETYPE"] = False
         tc.variables["USE_RPATH"] = False
         if str(self.settings.os) == "OHOS":
-            tc.cache_variables["MATH_LIB"] = "m"
+            tc.cache_variables["MATH_LIB"] = ""
         tc.generate()
 
     def build(self):
@@ -72,6 +72,17 @@ class PlplotConan(ConanFile):
                 os.path.join(self.source_folder, "plplot_test", "CMakeLists.txt"),
                 'message(FATAL_ERROR "Internal build-system error; unable to determine platform.")',
                 "set(PLATFORM UNIX)",
+            )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "cmake", "modules", "plplot.cmake"),
+                """if(NOT WIN32_OR_CYGWIN)
+  find_library(MATH_LIB NAMES m PATHS /usr/local/lib /usr/lib)
+  if(NOT MATH_LIB)
+    message(FATAL_ERROR "Cannot find required math library")
+  endif(NOT MATH_LIB)
+endif(NOT WIN32_OR_CYGWIN)""",
+                "# OHOS: math lives in libc; MATH_LIB pre-seeded empty in conanfile.",
             )
         cmake = CMake(self)
         cmake.configure()
