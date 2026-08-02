@@ -1,0 +1,8 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -91 +91,4 @@ set(SrcPath "${CMAKE_CURRENT_SOURCE_DIR}/src")
+ include_directories(${IncludePath})
++if(BOOST_COMPAT_INCLUDE_DIR)
++  include_directories(BEFORE ${BOOST_COMPAT_INCLUDE_DIR})
++endif()

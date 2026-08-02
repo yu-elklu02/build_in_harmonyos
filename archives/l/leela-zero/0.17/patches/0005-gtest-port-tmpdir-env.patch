@@ -1,0 +1,14 @@
+diff --git a/gtest/googletest/src/gtest-port.cc b/gtest/googletest/src/gtest-port.cc
+--- a/gtest/googletest/src/gtest-port.cc
++++ b/gtest/googletest/src/gtest-port.cc
+@@ -1130,5 +1130,9 @@
+       name_template.push_back(GTEST_PATH_SEP_[0]);
+ #else
+-    name_template = "/tmp/";
++    if (const char* tmpdir = getenv("TMPDIR")) {
++      name_template = tmpdir;
++    } else {
++      name_template = "/tmp/";
++    }
+ #endif
+     name_template.append("gtest_captured_stream.XXXXXX");
