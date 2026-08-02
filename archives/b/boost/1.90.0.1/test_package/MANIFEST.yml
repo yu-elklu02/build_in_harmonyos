@@ -3,9 +3,10 @@ homepage: "https://www.boost.org/"
 
 upstream_tests:
   source: "Boost upstream test tree"
-  scope: "Not run in the local dependency simulation; OHOS validation must record the upstream/component test policy before PR submission."
-  total: 0
-  reason: "Morpheus needs a small compiled component subset; local simulation only verifies package build and consumer linkage."
+  scope: "Official component quick tests for the packaged Boost components."
+  total: 3
+  passed: 3
+  command: "system quick.cpp, filesystem quick.cpp, program_options quick.cpp"
 
 test_package_tests:
   - file: "test.cpp"

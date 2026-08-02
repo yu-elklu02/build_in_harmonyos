@@ -6,3 +6,6 @@ patches:
   - patch_file: "patches/0001-cmake-avoid-versioned-soname-links-on-ohos.patch"
     patch_description: "Avoid HMDFS-incompatible versioned shared-library symlinks on OHOS"
     patch_type: "portability"
+  - patch_file: "patches/0002-spirit-expectation-no-boost-optional.patch"
+    patch_description: "Avoid duplicate Boost.Spirit expectation overloads with boost::optional"
+    patch_type: "portability"

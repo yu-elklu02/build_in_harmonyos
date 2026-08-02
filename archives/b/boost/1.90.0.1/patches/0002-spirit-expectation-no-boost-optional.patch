@@ -1,0 +1,31 @@
+diff --git a/boost/spirit/home/x3/nonterminal/detail/expectation.hpp b/boost/spirit/home/x3/nonterminal/detail/expectation.hpp
+--- a/boost/spirit/home/x3/nonterminal/detail/expectation.hpp
++++ b/boost/spirit/home/x3/nonterminal/detail/expectation.hpp
+@@ -126,14 +126,6 @@
+         return subject.parse(first, last, context, rcontext, attr);
+     }
+ 
+-    template <typename Iterator, typename Context, typename RContext, typename Attribute>
+-    bool parse(Iterator& first, Iterator const& last
+-      , Context const& context, RContext& rcontext, boost::optional<Attribute>& attr) const
+-    {
+-        return subject.parse(first, last, context, rcontext, attr);
+-    }
+-
+     template <typename Iterator, typename Context, typename RContext, typename Attribute>
+     bool parse(Iterator& first, Iterator const& last
+       , Context const& context, RContext& rcontext, Attribute& attr) const
+@@ -144,14 +136,6 @@
+         return subject.parse(first, last, context, rcontext, attr);
+     }
+ 
+-    template <typename Iterator, typename Context, typename RContext, typename Attribute>
+-    bool parse(Iterator& first, Iterator const& last
+-      , Context const& context, RContext& rcontext, boost::optional<Attribute>& attr) const
+-    {
+-        return subject.parse(first, last, context, rcontext, attr);
+-    }
+-
+     template <typename Iterator, typename Context, typename RContext, typename Attribute>
+     bool parse(Iterator& first, Iterator const& last
+       , Context const& context, RContext& rcontext, Attribute& attr) const
