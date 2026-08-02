@@ -8,6 +8,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -26,6 +27,7 @@ int main() {
     po::store(po::parse_command_line(3, arguments, options), values);
     po::notify(values);
     failures += steps != 190;
+    failures += boost::str(boost::format("steps=%1%") % steps) != "steps=190";
 
     namespace fs = boost::filesystem;
     const fs::path root("boost-morpheus-component-test");

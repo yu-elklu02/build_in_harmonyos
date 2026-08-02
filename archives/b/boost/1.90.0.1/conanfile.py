@@ -51,7 +51,7 @@ class BoostConan(ConanFile):
         tc.variables["BUILD_SHARED_LIBS"] = bool(self.options.shared)
         tc.variables["BUILD_TESTING"] = False
         tc.variables["BOOST_INCLUDE_LIBRARIES"] = (
-            "algorithm;atomic;container;circular_buffer;filesystem;math;"
+            "algorithm;atomic;container;circular_buffer;filesystem;format;math;"
             "program_options;property_tree;system;tokenizer"
         )
         tc.variables["CMAKE_DISABLE_FIND_PACKAGE_ICU"] = True
@@ -168,7 +168,7 @@ class BoostConan(ConanFile):
             component.includedirs = ["include"]
             component.set_property("cmake_target_name", f"Boost::{name}")
 
-        for name in ("atomic", "container", "filesystem", "program_options", "system"):
+        for name in ("atomic", "container", "filesystem", "format", "program_options", "system"):
             component = self.cpp_info.components[name]
             component.includedirs = ["include"]
             library = self._component_library(available_libraries, name)

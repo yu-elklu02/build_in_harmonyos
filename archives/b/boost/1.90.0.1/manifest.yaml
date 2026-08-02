@@ -16,6 +16,7 @@ build:
     - container
     - filesystem
     - program_options
+    - format
     - system
   dependencies: []
 
