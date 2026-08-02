@@ -1,31 +1,30 @@
-diff --git a/boost/spirit/home/x3/nonterminal/detail/expectation.hpp b/boost/spirit/home/x3/nonterminal/detail/expectation.hpp
---- a/boost/spirit/home/x3/nonterminal/detail/expectation.hpp
-+++ b/boost/spirit/home/x3/nonterminal/detail/expectation.hpp
-@@ -126,14 +126,6 @@
-         return subject.parse(first, last, context, rcontext, attr);
-     }
+diff --git a/libs/spirit/include/boost/spirit/home/x3/support/expectation.hpp b/libs/spirit/include/boost/spirit/home/x3/support/expectation.hpp
+--- a/libs/spirit/include/boost/spirit/home/x3/support/expectation.hpp
++++ b/libs/spirit/include/boost/spirit/home/x3/support/expectation.hpp
+@@ -124,13 +124,5 @@
+             constexpr decltype(auto) which(std::optional<expectation_failure<Iterator>> const& failure) noexcept { return failure->which(); }
  
--    template <typename Iterator, typename Context, typename RContext, typename Attribute>
--    bool parse(Iterator& first, Iterator const& last
--      , Context const& context, RContext& rcontext, boost::optional<Attribute>& attr) const
--    {
--        return subject.parse(first, last, context, rcontext, attr);
--    }
+-            // boost::optional
+-            template <typename Iterator>
+-            BOOST_ATTRIBUTE_NODISCARD
+-            constexpr decltype(auto) where(boost::optional<expectation_failure<Iterator>> const& failure) noexcept { return failure->where(); }
 -
-     template <typename Iterator, typename Context, typename RContext, typename Attribute>
-     bool parse(Iterator& first, Iterator const& last
-       , Context const& context, RContext& rcontext, Attribute& attr) const
-@@ -144,14 +136,6 @@
-         return subject.parse(first, last, context, rcontext, attr);
-     }
+-            template <typename Iterator>
+-            BOOST_ATTRIBUTE_NODISCARD
+-            constexpr decltype(auto) which(boost::optional<expectation_failure<Iterator>> const& failure) noexcept { return failure->which(); }
+-
+             // std::optional + std::reference_wrapper
+             template <typename Iterator>
+@@ -142,12 +134,4 @@
+             constexpr decltype(auto) which(std::reference_wrapper<std::optional<expectation_failure<Iterator>>> const& failure) noexcept { return failure.get()->which(); }
  
--    template <typename Iterator, typename Context, typename RContext, typename Attribute>
--    bool parse(Iterator& first, Iterator const& last
--      , Context const& context, RContext& rcontext, boost::optional<Attribute>& attr) const
--    {
--        return subject.parse(first, last, context, rcontext, attr);
--    }
+-            // boost::optional + std::reference_wrapper
+-            template <typename Iterator>
+-            BOOST_ATTRIBUTE_NODISCARD
+-            constexpr decltype(auto) where(std::reference_wrapper<boost::optional<expectation_failure<Iterator>>> const& failure) noexcept { return failure.get()->where(); }
 -
-     template <typename Iterator, typename Context, typename RContext, typename Attribute>
-     bool parse(Iterator& first, Iterator const& last
-       , Context const& context, RContext& rcontext, Attribute& attr) const
+-            template <typename Iterator>
+-            BOOST_ATTRIBUTE_NODISCARD
+-            constexpr decltype(auto) which(std::reference_wrapper<boost::optional<expectation_failure<Iterator>>> const& failure) noexcept { return failure.get()->which(); }
+         } // expectation_failure_helpers
+ 
