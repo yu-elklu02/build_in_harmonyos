@@ -15,6 +15,11 @@ only the minimal dependency closure: `atomic`, `container`, `filesystem`,
 `program_options`, and `system`. It intentionally does not copy the larger Redex/FastNetMon
 component set from other open PRs.
 
+The source URL list prefers the SourceForge mirror for the same
+`boost-1.90.0-cmake.tar.xz` release asset because direct GitHub release downloads
+can time out on OHOS devices. The SHA256 remains the upstream Boost CMake asset
+hash.
+
 ## Issue/PR split
 
 - Morpheus task: Issue #1298
