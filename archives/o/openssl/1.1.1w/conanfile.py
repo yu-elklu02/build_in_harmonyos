@@ -71,11 +71,7 @@ class OpensslConan(ConanFile):
         self.run(" ".join(args), cwd=self.source_folder)
         self.run("make -j1", cwd=self.source_folder)
 
-        # Real upstream smoke tests that do not require external data files.
-        self.run(
-            "make test TESTS='test_sanity test_bntest test_sha test_evp test_pkey'",
-            cwd=self.source_folder,
-        )
+        self.run("make test", cwd=self.source_folder)
 
     def package(self):
         self.run("make install_sw", cwd=self.source_folder)
