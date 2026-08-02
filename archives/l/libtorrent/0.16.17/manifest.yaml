@@ -32,10 +32,12 @@ patches_applied:
   - "0001-config-sub-ohos.patch"
   - "0002-configure-umask.patch"
   - "0003-proxy-manager-clang15-structured-binding.patch"
+  - "0004-scheduler-clang15-ranges-heap.patch"
 
 knowledge_gained:
   - "Use rakshasa rtorrent release assets instead of GitHub codeload for generated configure/Makefile.in files."
   - "config.sub needs linux-ohos triplet support for OHOS cross builds."
   - "OHOS HMDFS can make umask 077 temporary directories unusable; configure temp creation must avoid the strict umask."
   - "OHOS clang 15 cannot capture structured binding variables in lambdas; rewrite affected bindings to named variables."
+  - "OHOS clang 15 libc++ lacks std::ranges heap algorithms; use iterator heap algorithms for narrow compatibility patches."
   - "OpenSSL 3 APIs are supported by libtorrent 0.16.17 through accessor-based calls."

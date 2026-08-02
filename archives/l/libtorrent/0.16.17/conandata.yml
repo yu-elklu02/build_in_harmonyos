@@ -12,3 +12,6 @@ patches:
   - patch_file: "patches/0003-proxy-manager-clang15-structured-binding.patch"
     patch_description: "Avoid lambda capture of structured bindings for clang 15"
     patch_type: "portability"
+  - patch_file: "patches/0004-scheduler-clang15-ranges-heap.patch"
+    patch_description: "Use iterator heap algorithms missing from clang 15 libc++ ranges"
+    patch_type: "portability"
