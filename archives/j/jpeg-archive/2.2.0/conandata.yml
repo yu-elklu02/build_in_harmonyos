@@ -1,11 +1,3 @@
-# conandata.yml — jpeg-archive 2.2.0
-# Source: https://github.com/danielgtaylor/jpeg-archive/releases/tag/v2.2.0
-#
-# ⚠️  SHA256 PLACEHOLDER: compute on real device before first conan create:
-#   curl -L https://github.com/danielgtaylor/jpeg-archive/archive/refs/tags/v2.2.0.tar.gz \
-#        -o /tmp/ja.tar.gz && sha256sum /tmp/ja.tar.gz
-#   Then replace the sha256 value below with the result.
-
 sources:
   "2.2.0":
     url: "https://github.com/danielgtaylor/jpeg-archive/archive/refs/tags/v2.2.0.tar.gz"

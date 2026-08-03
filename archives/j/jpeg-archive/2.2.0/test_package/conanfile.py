@@ -25,6 +25,6 @@ class JpegArchiveTestConan(ConanFile):
         test_dir = os.path.dirname(os.path.abspath(__file__))
 
         self.run(
-            f'zsh "{test_dir}/test_jpeg_archive.sh" "{bin_dir}"',
+            f'sh "{test_dir}/test_jpeg_archive.sh" "{bin_dir}"',
             env="conanrun",
         )
