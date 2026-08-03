@@ -6,10 +6,8 @@ build_date: "2026-07-26"
 build_system: cmake
 
 source:
-  url: "https://downloads.sourceforge.net/project/boost/boost/1.90.0/boost-1.90.0-cmake.tar.xz"
-  fallback_urls:
-    - "https://gh-proxy.com/https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-cmake.tar.xz"
-    - "https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-cmake.tar.xz"
+  url: "https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-cmake.tar.xz"
+  fallback_urls: []
   sha256: "aca59f889f0f32028ad88ba6764582b63c916ce5f77b31289ad19421a96c555f"
 
 build:
