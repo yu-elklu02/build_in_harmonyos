@@ -143,7 +143,7 @@ class BoostConan(ConanFile):
         ]
         return next((path for path in candidates if os.path.isfile(path)), "")
 
-    def _component_library(self, available_libraries, component):
+    def _component_library(self, available_libraries, component, header_only=False):
         exact = f"boost_{component}"
         if exact in available_libraries:
             return exact
@@ -152,7 +152,7 @@ class BoostConan(ConanFile):
             for library in available_libraries
             if library.startswith(f"boost_{component}")
         )
-        if not matches:
+        if not matches and not header_only:
             self.output.warning(
                 f"Component '{component}': no library matching 'boost_{component}' found"
             )
@@ -171,7 +171,9 @@ class BoostConan(ConanFile):
         for name in ("atomic", "container", "filesystem", "format", "program_options", "system"):
             component = self.cpp_info.components[name]
             component.includedirs = ["include"]
-            library = self._component_library(available_libraries, name)
+            library = self._component_library(
+                available_libraries, name, header_only=name in ("format", "system")
+            )
             if library:
                 component.libs = [library]
             component.set_property("cmake_target_name", f"Boost::{name}")

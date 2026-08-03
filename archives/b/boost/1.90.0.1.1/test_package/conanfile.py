@@ -31,8 +31,9 @@ class BoostMorpheusComponentsTestConan(ConanFile):
             return
 
         suffix = ".exe" if str(self.settings.os) == "Windows" else ""
+        bindir = self.cpp.build.bindirs[0] if self.cpp.build.bindirs else self.build_folder
         executable = os.path.join(
-            self.cpp.build.bindirs[0], "test_boost_morpheus_components" + suffix
+            bindir, "test_boost_morpheus_components" + suffix
         )
         if self.settings.os == "OHOS":
             self._sign_executable(executable)
