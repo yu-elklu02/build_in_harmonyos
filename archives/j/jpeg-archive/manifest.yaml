@@ -1,10 +1,10 @@
-# Software-level manifest for jpeg-archive
-# Location: archives/j/jpeg-archive/manifest.yaml
-
-software_name: jpeg-archive
-description: "JPEG optimization utilities: recompress, compare, hash, archive"
-homepage: "https://github.com/danielgtaylor/jpeg-archive"
+name: jpeg-archive
+software: jpeg-archive
+category: image-tools
 license: MIT
+homepage: "https://github.com/danielgtaylor/jpeg-archive"
+type: tool
+description: "JPEG optimization utilities: recompress, compare, hash, archive"
 
 versions:
   - "2.2.0"

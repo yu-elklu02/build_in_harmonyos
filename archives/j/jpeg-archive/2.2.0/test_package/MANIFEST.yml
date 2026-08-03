@@ -8,7 +8,7 @@ binaries_under_test:
   - jpeg-archive
 
 test_assertions:
-  - jpeg-recompress --help exits successfully
-  - jpeg-compare --help exits successfully
-  - jpeg-hash --help exits successfully
+  - jpeg-recompress converts a generated PPM image into JPEG output
+  - jpeg-compare successfully compares the generated JPEG with itself
+  - jpeg-hash returns the same hash for repeated runs on the generated JPEG
   - all four installed commands are present and executable
