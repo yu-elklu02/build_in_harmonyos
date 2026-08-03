@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+Date: Tue, 4 Aug 2026 00:00:00 +0000
+Subject: [PATCH] util.h: make VERSION and progname extern declarations
+
+Upstream util.h defines two non-static global variables:
+
+    const char *VERSION;
+    const char *progname;
+
+Every translation unit that #includes "util.h" emits a definition
+of these symbols. GNU ld silently deduplicates them, but lld
+(used by the OHOS toolchain) rejects the duplicates at link time:
+
+    ld.lld: error: duplicate symbol: VERSION
+    ld.lld: error: duplicate symbol: progname
+
+Promote the header definitions to `extern` declarations and add a
+single tentative definition of progname in util.c (VERSION already
+has its definition there).
+---
+ src/util.c | 1 +
+ src/util.h | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/util.c b/src/util.c
+index 1111111..2222222 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -12,6 +12,7 @@
+ 
+ #define INPUT_BUFFER_SIZE 102400
+ 
++const char *progname = "";
+ const char *VERSION = "2.2.0";
+ 
+ /* Print program version to stdout. */
+diff --git a/src/util.h b/src/util.h
+index 3333333..4444444 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -11,8 +11,8 @@
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
+ #define MAX(a, b) ((a) > (b) ? (a) : (b))
+ 
+-const char *VERSION;
+-const char *progname;
++extern const char *VERSION;
++extern const char *progname;
+ 
+ // Subsampling method, which defines how much of the data from
+ // each color channel is included in the image per 2x2 block.
+-- 
+2.39.1
