@@ -30,18 +30,22 @@ int main() {
     failures += boost::str(boost::format("steps=%1%") % steps) != "steps=190";
 
     namespace fs = boost::filesystem;
-    const fs::path root("boost-morpheus-component-test");
+    const fs::path root = fs::current_path() / fs::unique_path("boost-morpheus-component-test-%%%%-%%%%");
     const fs::path file = root / "input.txt";
-    boost::system::error_code ec;
-    fs::remove_all(root, ec);
-    failures += !fs::create_directories(root, ec) || ec;
+    boost::system::error_code create_ec;
+    failures += !fs::create_directories(root, create_ec) || create_ec;
     {
         std::ofstream output(file.string(), std::ios::binary);
         output << "boost-morpheus";
+        failures += !output.good();
     }
-    failures += !fs::exists(file, ec) || ec;
-    failures += fs::file_size(file, ec) != 14 || ec;
-    fs::remove_all(root, ec);
+    boost::system::error_code exists_ec;
+    failures += !fs::exists(file, exists_ec) || exists_ec;
+    boost::system::error_code size_ec;
+    failures += fs::file_size(file, size_ec) != 14 || size_ec;
+    boost::system::error_code remove_ec;
+    fs::remove_all(root, remove_ec);
+    failures += static_cast<bool>(remove_ec);
 
     std::string csv = " alpha, beta, gamma ";
     boost::algorithm::trim(csv);
