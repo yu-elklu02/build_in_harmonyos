@@ -55,9 +55,9 @@ class BoostConan(ConanFile):
             "program_options;property_tree;system;tokenizer"
         )
         tc.variables["CMAKE_DISABLE_FIND_PACKAGE_ICU"] = True
-        tc.variables["CMAKE_TRY_COMPILE_TARGET_TYPE"] = "STATIC_LIBRARY"
 
         if str(self.settings.os) == "OHOS":
+            tc.variables["CMAKE_TRY_COMPILE_TARGET_TYPE"] = "STATIC_LIBRARY"
             tc.variables["BOOST_INSTALL_NO_VERSIONED_LIBS"] = True
             tc.variables["BOOST_FILESYSTEM_DISABLE_STATX"] = True
             tc.variables["BOOST_FILESYSTEM_DISABLE_COPY_FILE_RANGE"] = True

@@ -33,7 +33,8 @@ int main() {
     const fs::path root = fs::current_path() / fs::unique_path("boost-morpheus-component-test-%%%%-%%%%");
     const fs::path file = root / "input.txt";
     boost::system::error_code create_ec;
-    failures += !fs::create_directories(root, create_ec) || create_ec;
+    fs::create_directories(root, create_ec);
+    failures += static_cast<bool>(create_ec);
     {
         std::ofstream output(file.string(), std::ios::binary);
         output << "boost-morpheus";
