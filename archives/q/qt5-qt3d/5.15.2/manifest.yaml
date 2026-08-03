@@ -1,43 +1,23 @@
 software: qt5-qt3d
-version: 5.15.2
+version: "5.15.2"
+homepage: "https://wiki.qt.io/Qt3D"
+license: "LGPL-3.0-only OR GPL-2.0-only"
 category: qt-addon
-status: built
+status: recipe-ready
 
-build_system: qmake
-configure_options:
-  - qt3d.pro
+source:
+  url: "https://github.com/qt/qt3d/archive/refs/tags/v5.15.2.tar.gz"
+  sha256: "4752c8ea92070e742e5de4eae07b562e65f3e9ffe0e844f0f3830fe18162d5be"
 
-dependencies:
-  - qt5-qtbase 5.15.2
-  - qt5-qtdeclarative 5.15.2
+build:
+  system: qmake
+  configure_options:
+    - "-spec harmonyos-clang"
+    - "-prefix <package_folder>"
+  dependencies:
+    - "qt5-qtbase/5.15.2"
+    - "qt5-qtdeclarative/5.15.2"
 
-products:
-  libraries:
-    - libQt53DCore.so.5.15.2
-    - libQt53DRender.so.5.15.2
-    - libQt53DInput.so.5.15.2
-    - libQt53DLogic.so.5.15.2
-    - libQt53DAnimation.so.5.15.2
-    - libQt53DExtras.so.5.15.2
-    - libQt53DQuick.so.5.15.2
-    - libQt53DQuickRender.so.5.15.2
-    - libQt53DQuickInput.so.5.15.2
-    - libQt53DQuickAnimation.so.5.15.2
-    - libQt53DQuickExtras.so.5.15.2
-    - libQt53DQuickScene2D.so.5.15.2
-  executables:
-    - qgltf
-  qml_plugins:
-    - Qt3D/Core/libquick3dcoreplugin.so
-    - Qt3D/Input/libquick3dinputplugin.so
-    - Qt3D/Render/libquick3drenderplugin.so
-    - Qt3D/Animation/libquick3danimationplugin.so
-    - Qt3D/Extras/libquick3dextrasplugin.so
-    - Qt3D/Scene2D/libquick3dscene2dplugin.so
-  render_plugins:
-    - plugins/renderplugins/libscene2d.so
-
-install_prefix: /storage/Users/currentUser/usr/local/Qt5
-
-knowledge_gained: []
-patches: []
+tests:
+  upstream: "Qt3D upstream test targets are built by qmake; device execution is pending."
+  consumer: "test_package/test.cpp creates a QEntity hierarchy and verifies a QTransform component."

@@ -1,0 +1,6 @@
+sources:
+  "5.15.2":
+    url: "https://github.com/qt/qt3d/archive/refs/tags/v5.15.2.tar.gz"
+    sha256: "4752c8ea92070e742e5de4eae07b562e65f3e9ffe0e844f0f3830fe18162d5be"
+
+patches: {}
