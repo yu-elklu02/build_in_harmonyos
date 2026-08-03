@@ -1,0 +1,6 @@
+sources:
+  "5.15.2":
+    url: "https://github.com/qt/qtdeclarative/archive/refs/tags/v5.15.2.tar.gz"
+    sha256: "a6a827298c92cb852d2b2de67f88bb14c18b052605ffc3984756fa1fd896efe9"
+
+patches: {}

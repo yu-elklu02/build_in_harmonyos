@@ -1,0 +1,22 @@
+software: qt5-qtdeclarative
+version: "5.15.2"
+homepage: "https://wiki.qt.io/Qt_Declarative"
+license: "LGPL-3.0-only OR GPL-2.0-only"
+category: qt-addon
+status: recipe-ready
+
+source:
+  url: "https://github.com/qt/qtdeclarative/archive/refs/tags/v5.15.2.tar.gz"
+  sha256: "a6a827298c92cb852d2b2de67f88bb14c18b052605ffc3984756fa1fd896efe9"
+
+build:
+  system: qmake
+  configure_options:
+    - "-spec harmonyos-clang"
+    - "-prefix <package_folder>"
+  dependencies:
+    - "qt5-qtbase/5.15.2"
+
+tests:
+  upstream: "Qt Declarative upstream test targets are built by qmake; device execution is pending."
+  consumer: "test_package/test.cpp creates a QQmlEngine and verifies its root context."
