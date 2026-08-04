@@ -56,6 +56,7 @@ class OpenSshSsh1Conan(ConanFile):
             "--prefix=/",
             "--sysconfdir=/etc/ssh",
             "--libexecdir=/libexec",
+            "--with-ssh1",
             f"--with-zlib={zlib_root}",
             f"--with-ssl-dir={openssl_root}",
             "--with-sandbox=no",

@@ -20,5 +20,5 @@
 
 - Upstream: `make tests`, covering the 14 default OpenSSH regression targets
   declared by `REGRESS_TARGETS` in `regress/Makefile`.
-- Consumer: `test_package` runs `ssh-keygen` to create an Ed25519 key pair and
-  checks both private and public key files are non-empty.
+- Consumer: `test_package` checks the 7.5p1 version, runs `ssh -1 -G`, and
+  creates an SSH1 RSA key pair with `ssh-keygen -t rsa1`.

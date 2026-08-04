@@ -34,8 +34,8 @@ test:
     cases: 14
     source: "regress/Makefile REGRESS_TARGETS"
   test_package:
-    command: "ssh-keygen creates an Ed25519 key pair and asserts both files are non-empty"
-    cases: 1
+    command: "ssh -1 accepts SSH protocol 1 mode and ssh-keygen creates an RSA1 key pair"
+    cases: 3
 
 patches_applied:
   - "0001-config.sub-ohos.patch"
