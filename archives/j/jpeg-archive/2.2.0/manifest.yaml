@@ -4,7 +4,7 @@ version: "2.2.0"
 homepage: "https://github.com/danielgtaylor/jpeg-archive"
 license: MIT
 type: tool
-status: adapting
+status: built
 build_date: "2026-08-04"
 build_system: makefile
 
@@ -20,7 +20,8 @@ build:
   dependencies:
     - "mozjpeg/4.1.1"
 
-patches_applied: []
+patches_applied:
+  - "0001-util.h-make-VERSION-and-progname-extern.patch"
 
 artifacts:
   - bin/jpeg-archive
@@ -30,9 +31,9 @@ artifacts:
 
 upstream_tests:
   command: "make test"
-  case_count: 1
-  status: "not_run_during_cross_build"
-  reason: "upstream Makefile test builds and executes a target test binary, which is not runnable on the cross-build host"
+  case_count: 6
+  status: "passed_on_device_after_patch"
+  reason: "upstream make test passed on OHOS device after applying the lld duplicate-symbol portability patch"
 
 test_package:
   command: "sh test_jpeg_archive.sh <package_bin_dir>"

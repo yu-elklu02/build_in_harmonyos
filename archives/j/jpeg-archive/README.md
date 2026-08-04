@@ -16,7 +16,6 @@ JPEG 优化与归档工具集，使用 mozjpeg 提供高质量压缩。
 - **视觉质量保持**：使用 SSIM/MS-SSIM 算法评估，确保压缩后视觉无损
 - **mozjpeg 驱动**：利用 Mozilla mozjpeg 编码器，比标准 libjpeg 节省 30-70% 空间
 - **批量并行处理**：jpeg-archive 脚本自动调用 Ladon/GNU Parallel 多核并行压缩
-- **PNG 输入支持**：可直接将 PNG 转换为优化的 JPEG
 
 ## 上游仓库
 
@@ -30,4 +29,4 @@ MIT License
 
 | 版本 | 状态 | 平台 | 备注 |
 |------|------|------|------|
-| 2.2.0 | adapting | OHOS aarch64 | 依赖 mozjpeg/4.1.1 + libpng/1.6.58 |
+| 2.2.0 | built | OHOS aarch64 | 依赖 mozjpeg/4.1.1 |

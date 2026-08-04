@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+set -o pipefail
 
 BIN_DIR="$1"
 WORK_DIR="${TMPDIR:-/data/local/tmp}/jpeg-archive-test-$$"

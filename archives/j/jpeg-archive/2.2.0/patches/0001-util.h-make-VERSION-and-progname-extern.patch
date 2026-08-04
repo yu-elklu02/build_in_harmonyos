@@ -1,25 +1,10 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-Date: Tue, 4 Aug 2026 00:00:00 +0000
-Subject: [PATCH] util.h: make VERSION and progname extern declarations
-
-Upstream util.h defines two non-static global variables. GNU ld silently
-deduplicates them, but the OHOS lld toolchain rejects the duplicate symbols.
-Promote the header definitions to extern declarations and define progname in
-util.c.
----
- src/util.c | 1 +
- src/util.h | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
 diff --git a/src/util.c b/src/util.c
-index 1111111..2222222 100644
 --- a/src/util.c
 +++ b/src/util.c
 @@ -15,1 +15,2 @@
 +const char *progname = "";
  const char *VERSION = "2.2.0";
 diff --git a/src/util.h b/src/util.h
-index 3333333..4444444 100644
 --- a/src/util.h
 +++ b/src/util.h
 @@ -14,2 +14,2 @@
@@ -27,5 +12,3 @@ index 3333333..4444444 100644
 -const char *progname;
 +extern const char *VERSION;
 +extern const char *progname;
---
-2.39.1
