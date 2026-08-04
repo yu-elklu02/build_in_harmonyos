@@ -11,10 +11,14 @@
   - avoid `umask 077` temporary directories that fail on OHOS HMDFS.
 - Disables platform integrations not available in the OpenHarmony environment:
   sandbox, utmp/utmpx, wtmp/wtmpx, and lastlog.
-- Uses OpenSSL 1.1.1w because OpenSSH 7.5p1 directly accesses OpenSSL RSA,
-  DSA, and EVP internals. OpenSSL 3.x makes those structures opaque and is not
-  source-compatible with this SSH1-capable release without a large migration
-  backport.
+- OpenSSL 1.1.0 introduced opaque RSA and DSA structures; OpenSSL 1.1.1w has
+  the same API requirement. The upstream 7.5p1 SSH1 code directly dereferences
+  RSA, DSA, and DH members, so the recipe backports accessor-based replacements
+  (`RSA_get0_*`, `RSA_set0_*`, `DSA_get0_*`, `DSA_set0_*`, and `DH_get0_*`) in
+  `0003-openssl-1.1-accessors.patch`.
+- OpenSSL 3.x is not the point at which these structures became opaque; the
+  existing `openssl/1.1.1w` package is retained and no separate OpenSSL change
+  is required.
 
 ## Tests
 

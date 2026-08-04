@@ -9,4 +9,7 @@ patches:
   - patch_file: "patches/0002-configure-umask.patch"
     patch_description: "Avoid umask 077 temporary directories on OHOS HMDFS"
     patch_type: "portability"
+  - patch_file: "patches/0003-openssl-1.1-accessors.patch"
+    patch_description: "Use OpenSSL 1.1 RSA, DSA, and DH accessor APIs"
+    patch_type: "portability"
 
