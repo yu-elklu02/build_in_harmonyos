@@ -52,7 +52,13 @@ class OpenSshSsh1Conan(ConanFile):
         zlib_root = self.dependencies["zlib"].package_folder
         openssl_root = self.dependencies["openssl"].package_folder
 
+        # AutotoolsToolchain 在 OHOS 上不自动注入 --build/--host triplet，
+        # 上游 config.sub 又不认 HarmonyOS，导致 "cannot guess build type"。
+        # 这里显式传 aarch64-linux-ohos（profile 注释确认 get_gnu_triplet
+        # 自动将 OHOS 映射为 linux-ohos），并配合 0001-config.sub-ohos.patch。
         tc.configure_args.extend([
+            "--build=aarch64-linux-ohos",
+            "--host=aarch64-linux-ohos",
             "--prefix=/",
             "--sysconfdir=/etc/ssh",
             "--libexecdir=/libexec",
