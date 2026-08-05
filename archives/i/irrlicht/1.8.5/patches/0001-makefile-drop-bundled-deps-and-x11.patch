@@ -25,8 +25,8 @@ LD_LIBRARY_PATH (conan's VirtualRunEnv does not inject the just-built
 package's own lib dir into the run env).
 
 ---
- source/Irrlicht/Makefile | 6 ++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ source/Irrlicht/Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 --- a/source/Irrlicht/Makefile	2026-08-05 22:14:40.616085625 +0800
 +++ b/source/Irrlicht/Makefile	2026-08-05 22:14:40.880085312 +0800

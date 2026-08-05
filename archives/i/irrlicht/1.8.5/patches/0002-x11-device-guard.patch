@@ -13,21 +13,21 @@ in even when the recipe passes NO_IRR_COMPILE_WITH_X11_:
   COSOperator.cpp:89:23: error: member access into incomplete type
         'irr::CIrrDeviceLinux'
 
-Re-point all 21 `_IRR_COMPILE_WITH_X11_DEVICE_` references across 9
+Re-point all 23 `_IRR_COMPILE_WITH_X11_DEVICE_` references across 9
 files to `_IRR_COMPILE_WITH_X11_`, which the recipe-side NO_ macro
 actually controls.
 
 ---
- source/Irrlicht/COSOperator.cpp              | 4 +--
+ source/Irrlicht/COSOperator.cpp              | 8 ++++----
  source/Irrlicht/COSOperator.h                | 2 +-
- source/Irrlicht/COpenGLDriver.cpp            | 6 +--
+ source/Irrlicht/COpenGLDriver.cpp            | 12 ++++++------
  source/Irrlicht/COpenGLDriver.h              | 2 +-
  source/Irrlicht/COpenGLExtensionHandler.cpp  | 1 +-
  source/Irrlicht/COpenGLExtensionHandler.h    | 2 +-
  source/Irrlicht/CIrrDeviceLinux.cpp          | 2 +-
  source/Irrlicht/CIrrDeviceLinux.h            | 2 +-
  source/Irrlicht/Irrlicht.cpp                 | 2 +-
- 9 files changed, 11 insertions(+), 11 deletions(-)
+ 9 files changed, 23 insertions(+), 23 deletions(-)
 
 --- a/source/Irrlicht/COSOperator.cpp	2026-08-05 21:45:57.244087187 +0800
 +++ b/source/Irrlicht/COSOperator.cpp	2026-08-05 21:45:57.740085156 +0800
