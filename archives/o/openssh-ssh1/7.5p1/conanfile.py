@@ -65,8 +65,6 @@ class OpenSshSsh1Conan(ConanFile):
         # 这里显式传 aarch64-linux-ohos（profile 注释确认 get_gnu_triplet
         # 自动将 OHOS 映射为 linux-ohos），并配合 0001-config.sub-ohos.patch。
         tc.configure_args.extend([
-            "--build=aarch64-linux-ohos",
-            "--host=aarch64-linux-ohos",
             "--prefix=/",
             "--sysconfdir=/etc/ssh",
             "--libexecdir=/libexec",
@@ -84,6 +82,10 @@ class OpenSshSsh1Conan(ConanFile):
         ])
 
         if self.settings.os == "OHOS":
+            tc.configure_args.extend([
+                "--build=aarch64-linux-ohos",
+                "--host=aarch64-linux-ohos",
+            ])
             tc.configure_args.append("ac_cv_header_linux_if_tun_h=no")
             # OHOS sysroot ships <shadow.h> with struct spwd but no getspnam
             # declaration or symbol. configure sets HAVE_SHADOW_H=1 from the
