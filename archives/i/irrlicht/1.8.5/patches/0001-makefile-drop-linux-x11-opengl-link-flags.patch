@@ -1,0 +1,10 @@
+diff --git a/source/Irrlicht/Makefile b/source/Irrlicht/Makefile
+--- a/source/Irrlicht/Makefile
++++ b/source/Irrlicht/Makefile
+@@ -91,6 +91,4 @@
+ INSTALL_DIR = /usr/local/lib
+ sharedlib install: SHARED_LIB = libIrrlicht.so
+-sharedlib: LDFLAGS += -L/usr/X11R6/lib$(LIBSELECT) -lGL -lXxf86vm
+-staticlib sharedlib: CXXINCS += -I/usr/X11R6/include
+ 
+ #OSX specific options
