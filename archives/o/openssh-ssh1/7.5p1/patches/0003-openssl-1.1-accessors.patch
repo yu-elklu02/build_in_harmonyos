@@ -3331,13 +3331,14 @@ index 53a7674b5..b434daa08 100644
 +			}
 +			if (RSA_set0_factors(k->rsa, p, q) == 0) {
 +			        r = SSH_ERR_LIBCRYPTO_ERROR;
++				BN_free(iqmp);
 +				BN_free(p);
 +				BN_free(q);
 +				goto out;
 +			}
 +			if (rsa_generate_additional_parameters(k->rsa, iqmp) != 0) {
 +			        r = SSH_ERR_LIBCRYPTO_ERROR;
-+				free(iqmp);
++				BN_free(iqmp);
 +				goto out;
 +			}
 +		}
