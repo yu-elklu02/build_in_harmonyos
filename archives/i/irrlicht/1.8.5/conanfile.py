@@ -70,7 +70,6 @@ class IrrlichtConan(ConanFile):
 
         disabled_platforms = [
             "NO_IRR_COMPILE_WITH_X11_",
-            "NO_IRR_COMPILE_WITH_X11_DEVICE_",
             "NO_IRR_COMPILE_WITH_SDL_DEVICE_",
             "NO_IRR_COMPILE_WITH_FB_DEVICE_",
             "NO_IRR_COMPILE_WITH_OSX_DEVICE_",
@@ -82,9 +81,21 @@ class IrrlichtConan(ConanFile):
             "NO_IRR_COMPILE_WITH_OPENGLES1_",
             "NO_IRR_COMPILE_WITH_OPENGLES2_",
         ]
-        cppflags = " ".join(f"-D{name}" for name in disabled_platforms)
+        platform_defs = " ".join(f"-D{name}" for name in disabled_platforms)
         if fpic:
-            cppflags = f"{cppflags} {fpic}"
+            platform_defs = f"{platform_defs} {fpic}"
+
+        # 上游 Makefile 缺 %.o:%.cpp 编译 rule（只有 %.d:%.cpp 建依赖
+        # 和 %.o:%.mm Objective-C），.cpp→.o 走 make <builtin> 内置规则，
+        # 只引 $(CXXFLAGS) 不引 $(CXXINCS)/$(CPPFLAGS)。所以无论命令行
+        # 怎么传 CXXINCS="-I../../include ..."，编译命令里都没 -I 标志，
+        # 触发 fatal error: 'IrrCompileConfig.h' file not found（头文件
+        # 在源码顶层 include/，make 在 source/Irrlicht/ 跑）。
+        # 改为：把 -I../../include 及依赖 include 标志挪到 CXXFLAGS
+        # （builtin rule 引 $(CXXFLAGS)），platform defs 也挪到 CXXFLAGS
+        # 避免 CPPFLAGS 覆盖 Makefile 第 67 行 CPPFLAGS += $(CXXINCS)。
+        cxxincs = "-I../../include -Izlib -Ijpeglib -Ilibpng"
+        cxxflags_extra = f"{cxxincs} {platform_defs}"
 
         return (
             f'CC="{cc}" '
@@ -92,7 +103,7 @@ class IrrlichtConan(ConanFile):
             f'AR="{ar}" '
             f'RANLIB="{ranlib}" '
             f'NDEBUG="{ndebug}" '
-            f'CPPFLAGS="{cppflags}"'
+            f'CXXFLAGS="{cxxflags_extra}"'
         )
 
     def _make_cmd(self, target):
@@ -121,6 +132,7 @@ class IrrlichtConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = ["Irrlicht"]
         self.cpp_info.includedirs = ["include/irrlicht"]
+        self.cpp_info.libdirs = ["lib"]
         self.cpp_info.set_property("cmake_file_name", "Irrlicht")
         self.cpp_info.set_property("cmake_target_name", "Irrlicht::Irrlicht")
         self.cpp_info.requires = [

@@ -23,7 +23,8 @@ build_config:
   ohos_mode: "headless/null-device; X11/OpenGL/SDL/FB/D3D/OSX/Windows backends disabled via NO_IRR_COMPILE_WITH_* macros"
 
 patches_applied:
-  - "0001-makefile-drop-linux-x11-opengl-link-flags.patch"
+  - "0001-makefile-drop-bundled-deps-and-x11.patch"
+  - "0002-x11-device-guard.patch"
 
 test_results:
   type: test_package
@@ -32,11 +33,15 @@ test_results:
     - "createDevice(video::EDT_NULL) returns a valid IrrlichtDevice"
     - "device->getVideoDriver() is non-null"
     - "video driver type is video::EDT_NULL"
-  passed: 0
+  passed: 3
   failed: 0
-  note: "Recipe created; OHOS conan create validation pending."
+  note: "OHOS conan create validation passed on ohos-aarch64 (exit 0); test_package ran 'Irrlicht Engine version 1.8.5'."
 
 knowledge_gained:
   - "Irrlicht 1.8.5 upstream uses source/Irrlicht/Makefile with sharedlib/staticlib targets."
   - "The upstream Linux Makefile branch hard-links X11/OpenGL libraries; OHOS validation uses headless/null-device mode and drops desktop link flags."
   - "IrrCompileConfig.h supports NO_IRR_COMPILE_WITH_* compiler definitions, so platform/render backends can be disabled without invasive source edits."
+  - "IrrCompileConfig.h line 105 defines _IRR_COMPILE_WITH_X11_DEVICE_ unconditionally; only _IRR_COMPILE_WITH_X11_ is controlled by NO_IRR_COMPILE_WITH_X11_. Nine files gated X11 device code on the wrong macro; 0002 patch re-points them."
+  - "Upstream Makefile has no %.o:%.cpp rule; .cpp→.o uses make <builtin> which only honors $(CXXFLAGS), not $(CXXINCS)/$(CPPFLAGS). Include flags must be injected via CXXFLAGS."
+  - "Upstream LINKOBJ bundles zlib/jpeglib/libpng/bzip2 .o files whose hidden/NEON symbols conflict with conan deps; drop the bundled sets and link -lz -lpng -ljpeg -lbz2 instead (keep $(LIBAESGM) = irrlicht's own aesGladman)."
+  - "conan 2.29 VirtualRunEnv injects deps' lib dirs into LD_LIBRARY_PATH but not the just-built package's own; test_package must prepend the package lib dir for runtime SO discovery."

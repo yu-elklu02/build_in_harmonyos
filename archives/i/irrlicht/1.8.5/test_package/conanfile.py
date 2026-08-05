@@ -29,5 +29,21 @@ class IrrlichtTestConan(ConanFile):
     def test(self):
         if can_run(self):
             exe = os.path.join(self.cpp.build.bindir, "test_irrlicht")
-            self.run(exe, env="conanrun")
+            # conan's VirtualRunEnv injects deps' lib dirs into LD_LIBRARY_PATH
+            # but not the just-built package's own; test_irrlicht links
+            # libIrrlicht.so.1.8 (soname) which lives in the irrlicht
+            # package's lib dir, so add that dir explicitly for the run.
+            irrlicht_info = self.dependencies[self.tested_reference_str]
+            irrlicht_libdir = irrlicht_info.cpp_info.libdir
+            existing = os.environ.get("LD_LIBRARY_PATH", "")
+            os.environ["LD_LIBRARY_PATH"] = (
+                f"{irrlicht_libdir}:{existing}" if existing else irrlicht_libdir
+            )
+            try:
+                self.run(exe, env="conanrun")
+            finally:
+                if existing:
+                    os.environ["LD_LIBRARY_PATH"] = existing
+                else:
+                    os.environ.pop("LD_LIBRARY_PATH", None)
 
