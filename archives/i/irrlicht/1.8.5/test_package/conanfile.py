@@ -34,7 +34,8 @@ class IrrlichtTestConan(ConanFile):
             # libIrrlicht.so.1.8 (soname) which lives in the irrlicht
             # package's lib dir, so add that dir explicitly for the run.
             irrlicht_info = self.dependencies[self.tested_reference_str]
-            irrlicht_libdir = irrlicht_info.cpp_info.libdir
+            libdirs = irrlicht_info.cpp_info.libdirs
+            irrlicht_libdir = libdirs[0] if libdirs else "lib"
             existing = os.environ.get("LD_LIBRARY_PATH", "")
             os.environ["LD_LIBRARY_PATH"] = (
                 f"{irrlicht_libdir}:{existing}" if existing else irrlicht_libdir
