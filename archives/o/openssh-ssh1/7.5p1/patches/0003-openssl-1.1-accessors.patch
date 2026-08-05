@@ -3242,7 +3242,7 @@ index 53a7674b5..b434daa08 100644
  		break;
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA:
-@@ -2769,24 +2939,84 @@ sshkey_private_deserialize(struct sshbuf *buf, struct sshkey **kp)
+@@ -2769,24 +2939,85 @@ sshkey_private_deserialize(struct sshbuf *buf, struct sshkey **kp)
  			r = SSH_ERR_ALLOC_FAIL;
  			goto out;
  		}

@@ -3,6 +3,7 @@ category: network
 description: Portable OpenSSH SSH1-compatible release
 homepage: https://www.openssh.com/portable.html
 license: BSD-2-Clause
+latest_version: "7.5p1"
 
 versions:
   7.5p1:
