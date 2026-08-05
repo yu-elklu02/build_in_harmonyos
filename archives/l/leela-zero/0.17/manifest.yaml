@@ -5,7 +5,10 @@ build_system: cmake
 compile_date: 2026-08-02
 
 source:
-  url: "https://github.com/leela-zero/leela-zero/archive/refs/tags/v0.17.tar.gz"
+  url: "https://ghproxy.net/https://github.com/leela-zero/leela-zero/archive/refs/tags/v0.17.tar.gz"
+  fallback_urls:
+    - "https://codeload.github.com/leela-zero/leela-zero/tar.gz/refs/tags/v0.17"
+    - "https://github.com/leela-zero/leela-zero/archive/refs/tags/v0.17.tar.gz"
   sha256: "fc2cc2ae9739aeab058dfceee8e4e67fdcfc0f7bfe2777e565a2ba17a5579267"
 
 dependencies:
@@ -40,3 +43,4 @@ knowledge_gained:
   - "OHOS CPU-only builds must skip the upstream REQUIRED OpenCL discovery and link step."
   - "CMake 4.x requires cmake_minimum_required >= 3.5 for this project."
   - "Boost 1.90.0.1.1 binary in ohpcd may miss Boost.Format headers; leela-zero overlays pinned Boost.Format and Boost.Spirit headers to avoid rebuilding the large Boost source package."
+  - "GitHub source archives use ghproxy.net first, with codeload.github.com and github.com as fallbacks, because CI workers can time out on direct GitHub downloads."
