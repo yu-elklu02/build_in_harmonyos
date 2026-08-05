@@ -49,3 +49,5 @@ knowledge_gained:
   - "OHOS HMDFS can make umask 077 temporary directories unusable; configure temp creation must avoid the strict umask."
   - "OpenSSH portable on OHOS should disable unsupported sandbox and login accounting integrations."
   - "OpenSSL 1.1.0 and later make RSA and DSA structures opaque, including 1.1.1w; OpenSSH 7.5p1 therefore needs RSA/DSA/DH accessor calls instead of direct member dereferences."
+  - "OHOS sysroot ships <shadow.h> with struct spwd but no getspnam; configure must force ac_cv_header_shadow_h=no so defines.h never sets USE_SHADOW and the shadow branches fall through."
+  - "OHOS SELinux MAC denies execution of any ELF whose seclabel is u:object_r:hmdfs:s0 (conan cache lands here); only u:object_r:hnp_file:s0 partitions are executable but unwritable. static linking cannot bypass this — test_package must skip execution on OHOS."

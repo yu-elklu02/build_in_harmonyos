@@ -70,13 +70,25 @@ test_package 执行断言因真机 HMDFS 禁执行二进制而跳过（靠编译
 
 **处理：** 不在 `build()` 跑 `make tests`。靠 test_package 的 SSH1 功能断言验证实际功能。
 
-### B. test_package 执行：HMDFS 禁执行二进制
+### B. test_package 执行：SELinux seclabel `hmdfs` 拒执行二进制
 
 **症状：** `sh: .../bin/ssh: Operation not permitted`（执行 ssh -V）
 
-**根因：** 真机 HMDFS（HarmonyOS 分布式文件系统）默认禁止执行二进制——`/storage` 和 `/data/local/tmp` 挂载点都无 `exec` 标志，内核拒执行任何 ELF。`can_run()` 只看构建配置不看文件系统执行位，故对 OHOS 显式跳过。
+**根因（曾误判为 HMFS exec，实际是 SELinux seclabel）：** 真机 SELinux MAC 策略拒执行——conan cache 路径 `$HOME/.conan2/` 落在 HMFS 分区，文件 seclabel 是 `u:object_r:hmdfs:s0`，内核拒执行任何此类 ELF。可执行标签 `u:object_r:hnp_file:s0` 的分区（如 `/data/service/hnp/`，clang 能跑）真机无写权限。
 
-**处理：** `test_package/conanfile.py` 的 `test()` 加守护：`if self.settings.os == "OHOS": skip`。靠编译通过 + 配方完整性证明。
+**探测依据（2026-08-05 真机实测）：**
+
+| 候选目录 | seclabel | 可写 | 可执行 |
+|---|---|---|---|
+| `$HOME` / `$HOME/tmp` | `hmdfs` | ✅ | ❌（ELF）✅（shell 脚本）|
+| `/data/storage/el2/base/cache` `files` | `hmdfs` | ✅ | ❌（ELF）|
+| `/data/service/hnp/`（clang 所在）| `hnp_file` | ❌ | ✅ |
+| `/tmp` | erofs `ro` | ❌ | — |
+| `/bin` → `/system/bin` | `tmpfs` `ro` | ❌ | — |
+
+**static linking 探测（救不了）：** 曾尝试 `-static` linking 绕开 dynamic loader `/lib/ld-musl-aarch64.so.1`（也被 SELinux 拒执行）。static linked ssh（`file` 确认 `ELF executable, static, stripped`）在 conan cache 仍报 `Operation not permitted`——根因是文件 seclabel `hmdfs` 非 loader/dynamic，static 救不了。已还原该改动。
+
+**处理：** `test_package/conanfile.py` 的 `test()` 加守护：`if self.settings.os == "OHOS": skip`。靠编译通过 + 配方完整性证明。**这是真机 SELinux MAC 硬策略，recipe 改不了**——除非有 root 重打 seclabel（`chcon`/`setfattr`），但真机无 root。
 
 ## 正式分支状态
 
