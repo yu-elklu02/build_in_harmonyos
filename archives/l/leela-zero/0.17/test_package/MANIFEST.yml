@@ -3,3 +3,5 @@ cases: 2
 features:
   - executable
   - help-output
+sources:
+  - test_leela_zero.sh

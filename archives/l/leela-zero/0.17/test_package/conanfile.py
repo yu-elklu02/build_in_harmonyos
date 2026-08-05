@@ -2,20 +2,22 @@
 import os
 
 from conan import ConanFile
+from conan.tools.files import copy
 
 
 class LeelaZeroTestConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     generators = "VirtualRunEnv"
+    exports_sources = "test_leela_zero.sh"
 
     def requirements(self):
         self.requires(self.tested_reference_str)
 
+    def build(self):
+        copy(self, "test_leela_zero.sh", self.source_folder, self.build_folder)
+
     def test(self):
         exe = os.path.join(self.dependencies["leela-zero"].package_folder, "bin", "leelaz")
-        output = os.path.join(self.build_folder, "leelaz-help.txt")
-        self.run(f"{exe} --help > {output}", env="conanrun")
-        with open(output, "r", encoding="utf-8") as handle:
-            text = handle.read()
-        if "Generic options" not in text or "--gtp" not in text:
-            raise AssertionError("leelaz --help output is incomplete")
+        script = os.path.join(self.build_folder, "test_leela_zero.sh")
+        shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+        self.run(f"{shell} {script} {exe}", env="conanrun")
