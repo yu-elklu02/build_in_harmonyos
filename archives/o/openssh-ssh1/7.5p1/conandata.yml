@@ -12,4 +12,10 @@ patches:
   - patch_file: "patches/0003-openssl-1.1-accessors.patch"
     patch_description: "Use OpenSSL 1.1 RSA, DSA, and DH accessor APIs"
     patch_type: "portability"
+  - patch_file: "patches/0004-xcrypt-guard-getspnam.patch"
+    patch_description: "Guard getspnam call with HAVE_GETSPNAM for OHOS sysroot"
+    patch_type: "portability"
+  - patch_file: "patches/0005-test_sshkey-banana-typo.patch"
+    patch_description: "Pass the_banana array not banana function pointer to memcpy"
+    patch_type: "portability"
 

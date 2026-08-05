@@ -41,6 +41,8 @@ patches_applied:
   - "0001-config.sub-ohos.patch"
   - "0002-configure-umask.patch"
   - "0003-openssl-1.1-accessors.patch"
+  - "0004-xcrypt-guard-getspnam.patch"
+  - "0005-test_sshkey-banana-typo.patch"
 
 knowledge_gained:
   - "Autotools config.sub from OpenSSH 7.5p1 needs linux-ohos triplet support."
