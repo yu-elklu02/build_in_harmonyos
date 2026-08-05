@@ -46,4 +46,3 @@ class IrrlichtTestConan(ConanFile):
                     os.environ["LD_LIBRARY_PATH"] = existing
                 else:
                     os.environ.pop("LD_LIBRARY_PATH", None)
-

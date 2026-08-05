@@ -11,4 +11,3 @@ patches:
   - patch_file: "patches/0002-x11-device-guard.patch"
     patch_description: "Re-point CIrrDeviceLinux X11 device guard to _IRR_COMPILE_WITH_X11_ so NO_ macro controls it"
     patch_type: "portability"
-

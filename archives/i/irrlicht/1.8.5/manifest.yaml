@@ -1,22 +1,24 @@
-software: irrlicht
 version: "1.8.5"
-status: draft
+software: irrlicht
+status: published
+build_date: "2026-08-05"
 build_system: makefile
-compile_date: 2026-08-05
 
 source:
   url: "https://sourceforge.net/projects/irrlicht/files/Irrlicht%20SDK/1.8/1.8.5/irrlicht-1.8.5.zip/download"
   sha256: "effb7beed3985099ce2315a959c639b4973aac8210f61e354475a84105944f3d"
+  tar_format: zip
 
-dependencies:
-  required:
+build:
+  system: makefile
+  configure_options: []
+  dependencies:
     - zlib/1.3.1.1
     - libpng/1.6.58
     - libjpeg/10
     - bzip2/1.0.8
-
-build_config:
-  system: makefile
+  cc: clang
+  cxx: clang++
   targets:
     - sharedlib
     - staticlib
@@ -25,6 +27,13 @@ build_config:
 patches_applied:
   - "0001-makefile-drop-bundled-deps-and-x11.patch"
   - "0002-x11-device-guard.patch"
+
+upstream_tests:
+  unit: 0
+  integration: 0
+  other: 0
+  total: 0
+  note: "irrlicht 1.8.5 upstream ships an SDK with example programs, no standalone test suite. test_package adds 3 functional assertions (createDevice / getVideoDriver / EDT_NULL driver type)."
 
 test_results:
   type: test_package
@@ -36,6 +45,12 @@ test_results:
   passed: 3
   failed: 0
   note: "OHOS conan create validation passed on ohos-aarch64 (exit 0); test_package ran 'Irrlicht Engine version 1.8.5'."
+
+verification:
+  conan_create: passed
+  conan_create_detail: "OHOS aarch64 conan create --build=irrlicht --build=missing exit 0; libIrrlicht.so/.a built, test_package linked and ran."
+  test_package: "3/3 tests passed (100%)"
+  compiler: clang 15
 
 knowledge_gained:
   - "Irrlicht 1.8.5 upstream uses source/Irrlicht/Makefile with sharedlib/staticlib targets."
