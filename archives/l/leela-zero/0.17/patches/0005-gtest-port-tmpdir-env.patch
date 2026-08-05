@@ -7,6 +7,9 @@ diff --git a/gtest/googletest/src/gtest-port.cc b/gtest/googletest/src/gtest-por
 -    name_template = "/tmp/";
 +    if (const char* tmpdir = getenv("TMPDIR")) {
 +      name_template = tmpdir;
++      if (!name_template.empty() && name_template.back() != GTEST_PATH_SEP_[0]) {
++        name_template.push_back(GTEST_PATH_SEP_[0]);
++      }
 +    } else {
 +      name_template = "/tmp/";
 +    }

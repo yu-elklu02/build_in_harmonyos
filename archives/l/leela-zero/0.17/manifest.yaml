@@ -6,7 +6,7 @@ compile_date: 2026-08-02
 
 source:
   url: "https://github.com/leela-zero/leela-zero/archive/refs/tags/v0.17.tar.gz"
-  sha256: "fc2cc2ae9739aeab058dfcee8e4e67fdcfc0f7bfe2777e565a2ba17a5579267"
+  sha256: "fc2cc2ae9739aeab058dfceee8e4e67fdcfc0f7bfe2777e565a2ba17a5579267"
 
 dependencies:
   required:
@@ -24,6 +24,8 @@ patches_applied:
   - "0001-cpu-only-no-opencl.patch"
   - "0002-cmake-minimum-version-3.5.patch"
   - "0003-cmake-boost-compat-include.patch"
+  - "0004-cmake-cxx-standard-17.patch"
+  - "0005-gtest-port-tmpdir-env.patch"
 
 test_results:
   type: upstream
