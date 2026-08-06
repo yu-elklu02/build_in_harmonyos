@@ -2,4 +2,4 @@ software: "abcm2ps"
 homepage: "https://github.com/lewdlime/abcm2ps"
 license: "GPL-3.0-or-later"
 versions:
-  - "c"
+  - "8.14.15"
