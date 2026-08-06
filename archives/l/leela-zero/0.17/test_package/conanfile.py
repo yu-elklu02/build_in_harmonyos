@@ -10,14 +10,14 @@ class LeelaZeroTestConan(ConanFile):
     generators = "VirtualRunEnv"
     exports_sources = "test_leela_zero.sh"
 
+    def export_sources(self):
+        copy(self, "test_leela_zero.sh", self.recipe_folder, self.export_sources_folder)
+
     def requirements(self):
         self.requires(self.tested_reference_str)
 
-    def build(self):
-        copy(self, "test_leela_zero.sh", self.source_folder, self.build_folder)
-
     def test(self):
         exe = os.path.join(self.dependencies["leela-zero"].package_folder, "bin", "leelaz")
-        script = os.path.join(self.build_folder, "test_leela_zero.sh")
+        script = os.path.join(self.source_folder, "test_leela_zero.sh")
         shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
         self.run(f"{shell} {script} {exe}", env="conanrun")
