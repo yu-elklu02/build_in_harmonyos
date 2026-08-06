@@ -25,4 +25,7 @@
 - Upstream: `make tests`, covering the 14 default OpenSSH regression targets
   declared by `REGRESS_TARGETS` in `regress/Makefile`.
 - Consumer: `test_package` checks the 7.5p1 version, runs `ssh -1 -G`, and
-  creates an SSH1 RSA key pair with `ssh-keygen -t rsa1`.
+  creates an SSH1 RSA key pair with `ssh-keygen -t rsa1`. On OHOS, the test
+  stages `ssh` and `ssh-keygen` into the HNP private bin directory first so the
+  binaries are executed from an executable SELinux label instead of the HMDFS
+  Conan cache.
