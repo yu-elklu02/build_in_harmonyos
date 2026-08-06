@@ -1,6 +1,6 @@
 software: leela-zero
 version: "0.17"
-status: draft
+status: built
 build_system: cmake
 compile_date: 2026-08-02
 
@@ -33,9 +33,9 @@ test_results:
   type: upstream
   command: "build/tests"
   expected_upstream_tests: 14
-  passed: 0
+  passed: 14
   failed: 0
-  note: "Recipe created; OHOS conan create validation pending."
+  note: "OHOS conan create r4 exit=0; upstream tests passed and test_package help-output smoke test passed."
 
 knowledge_gained:
   - "The v0.17 archive leaves Eigen and GoogleTest submodules empty; source() supplies pinned release archives."
