@@ -1,4 +1,5 @@
 ﻿import os
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -39,13 +40,29 @@ class Abcm2psConan(ConanFile):
 
         config_shell = os.environ.get("CONFIG_SHELL", "bash")
         prefix = self.package_folder.replace("\\", "/")
+        src = self.source_folder.replace("\\", "/")
+        # Upstream configure defaults to gcc; the OHOS sysroot only ships clang.
+        # Export CC/CXX so configure + make pick clang without probing gcc.
+        cc_env = os.environ.get("CC", "clang")
+        cxx_env = os.environ.get("CXX", "clang++")
         self.run(
-            f"{config_shell} ./configure --prefix={prefix}",
+            f"cd '{src}' && CC={cc_env} CXX={cxx_env} {config_shell} ./configure --prefix={prefix}",
             env="conanbuild",
         )
-        self.run("make -j1", env="conanbuild")
-        self.run("make test", env="conanbuild")
-        self.run("make install", env="conanbuild")
+        self.run(f"cd '{src}' && CC={cc_env} CXX={cxx_env} make -j1", env="conanbuild")
+        self.run(f"cd '{src}' && make test", env="conanbuild")
+        # Upstream Makefile hard-calls /usr/bin/install; the OHOS sysroot has no
+        # standalone install binary, and the INSTALL env var is not read by the
+        # generated Makefile. Install the binary manually with shutil so the
+        # package step does not depend on /usr/bin/install.
+        bin_dir = os.path.join(self.package_folder, "bin")
+        os.makedirs(bin_dir, exist_ok=True)
+        shutil.copy(
+            os.path.join(src, "abcm2ps"),
+            os.path.join(bin_dir, "abcm2ps"),
+        )
+        # Preserve the mode (configure + make produced an executable).
+        shutil.copymode(os.path.join(src, "abcm2ps"), os.path.join(bin_dir, "abcm2ps"))
 
     def package_info(self):
         self.buildenv_info.define_path("PATH", os.path.join(self.package_folder, "bin"))
