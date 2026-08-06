@@ -21,7 +21,9 @@ build:
   cc: "clang"
   cxx: "clang++"
 
-patches_applied: []
+patches_applied:
+  - "0001-config.sub-ohos.patch"
+  - "0002-configure-lt-target.patch"
 knowledge_gained:
   - "AAlib 1.4p5 的源码归档目录名为 aalib-1.4.0；在 OpenHarmony 上关闭 X11、SLang 和 curses 驱动以保持零 Conan 前置依赖。"
   - "Windows 本地没有 OpenHarmony Conan profile，必须在 AtomCode 真机环境执行 conan create。"

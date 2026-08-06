@@ -1,5 +1,5 @@
 from conan import ConanFile
-from conan.tools.files import apply_conandata_patches, get
+from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 
@@ -20,6 +20,9 @@ class AAlibConan(ConanFile):
     def layout(self):
         basic_layout(self)
 
+    def export_sources(self):
+        export_conandata_patches(self)
+
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
@@ -32,6 +35,16 @@ class AAlibConan(ConanFile):
             "--disable-shared",
             "--enable-static",
         ])
+
+        if self.settings.os == "OHOS":
+            # AutotoolsToolchain does not inject OHOS build/host triplets here,
+            # while upstream config.sub does not know HarmonyOS uname output.
+            # The linux-ohos triplet works together with 0001-config.sub-ohos.patch.
+            tc.configure_args.extend([
+                "--build=aarch64-linux-ohos",
+                "--host=aarch64-linux-ohos",
+            ])
+
         tc.generate()
 
     def build(self):
