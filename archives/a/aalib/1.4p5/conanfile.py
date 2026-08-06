@@ -1,4 +1,5 @@
 from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
@@ -37,6 +38,10 @@ class AAlibConan(ConanFile):
         ])
 
         if self.settings.os == "OHOS":
+            if self.settings.arch != "armv8":
+                raise ConanInvalidConfiguration(
+                    "aalib/1.4p5 currently supports only OHOS armv8"
+                )
             # AutotoolsToolchain does not inject OHOS build/host triplets here,
             # while upstream config.sub does not know HarmonyOS uname output.
             # The linux-ohos triplet works together with 0001-config.sub-ohos.patch.
@@ -52,6 +57,7 @@ class AAlibConan(ConanFile):
         autotools = Autotools(self)
         autotools.configure()
         autotools.make()
+        autotools.make(args=["check"])
 
     def package(self):
         Autotools(self).install()
