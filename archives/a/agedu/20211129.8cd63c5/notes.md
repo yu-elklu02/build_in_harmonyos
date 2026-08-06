@@ -15,9 +15,9 @@ that upstream tests ran.
 ## Consumer test
 
 The test package scans a fixture directory, checks that the index database is
-created, then produces a text report and checks that it contains the scanned path.
+created, then dumps that index and checks that it contains the scanned path.
 
 ## Platform constraint
 
 The initial HarmonyOS adaptation is restricted to armv8. True-device validation
-is required before changing this package's status from `draft`.
+on ohos-aarch64 passed on 2026-08-06.
