@@ -1,3 +1,5 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, cmake_layout
 
@@ -17,4 +19,7 @@ class AAlibTestConan(ConanFile):
         CMake(self).build()
 
     def test(self):
-        CMake(self).test()
+        self.run(
+            os.path.join(self.cpp.build.bindirs[0], "aalib_smoke"),
+            env="conanrun",
+        )
