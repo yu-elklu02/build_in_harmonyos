@@ -1,0 +1,27 @@
+version: "1.4p5"
+software: "aalib"
+status: "failed"
+build_date: "2026-08-06"
+build_system: "autotools"
+
+source:
+  url: "https://deb.debian.org/debian/pool/main/a/aalib/aalib_1.4p5.orig.tar.gz"
+  sha256: "fbddda9230cf6ee2a4f5706b4b11e2190ae45f5eda1f0409dc4f99b35e0a70ee"
+  tar_format: "tar.gz"
+
+build:
+  system: "autotools"
+  configure_options:
+    - "--with-x11-driver=no"
+    - "--with-slang-driver=no"
+    - "--with-curses-driver=no"
+    - "--disable-shared"
+    - "--enable-static"
+  dependencies: []
+  cc: "clang"
+  cxx: "clang++"
+
+patches_applied: []
+knowledge_gained:
+  - "AAlib 1.4p5 的源码归档目录名为 aalib-1.4.0；在 OpenHarmony 上关闭 X11、SLang 和 curses 驱动以保持零 Conan 前置依赖。"
+  - "Windows 本地没有 OpenHarmony Conan profile，必须在 AtomCode 真机环境执行 conan create。"
