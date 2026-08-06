@@ -19,10 +19,11 @@ deps (-lz -lpng -ljpeg -lbz2) instead, both for sharedlib and staticlib
 targets. Also drop the Linux desktop X11/OpenGL link + include flags
 that the OHOS headless/null-device build does not use.
 
-Add -Wl,-rpath,$ORIGIN to the shared lib link so test_irrlicht can find
-libIrrlicht.so.<soname> next to itself at runtime without relying on
-LD_LIBRARY_PATH (conan's VirtualRunEnv does not inject the just-built
-package's own lib dir into the run env).
+Add a quoted -Wl,-rpath,'$ORIGIN' to the shared lib link so the shell
+does not expand $ORIGIN away before the linker sees it. This lets
+test_irrlicht find libIrrlicht.so.<soname> next to itself at runtime
+without relying on LD_LIBRARY_PATH (conan's VirtualRunEnv does not inject
+the just-built package's own lib dir into the run env).
 
 ---
  source/Irrlicht/Makefile | 8 ++++----
@@ -48,7 +49,7 @@ package's own lib dir into the run env).
 -sharedlib: LDFLAGS += -L/usr/X11R6/lib$(LIBSELECT) -lGL -lXxf86vm
 -staticlib sharedlib: CXXINCS += -I/usr/X11R6/include
 +sharedlib staticlib: LDFLAGS += -lz -lpng -ljpeg -lbz2
-+sharedlib: LDFLAGS += -Wl,-rpath,$$ORIGIN
++sharedlib: LDFLAGS += -Wl,-rpath,'$$ORIGIN'
  
  #OSX specific options
  staticlib_osx sharedlib_osx install_osx: SYSTEM = MacOSX
