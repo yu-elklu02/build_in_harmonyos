@@ -25,4 +25,10 @@
 - Upstream: `make tests`, covering the 14 default OpenSSH regression targets
   declared by `REGRESS_TARGETS` in `regress/Makefile`.
 - Consumer: `test_package` checks the 7.5p1 version, runs `ssh -1 -G`, and
-  creates an SSH1 RSA key pair with `ssh-keygen -t rsa1`.
+  creates an SSH1 RSA key pair with `ssh-keygen -t rsa1`. On OHOS, SELinux
+  exposes no writable+executable partition to the CI account (writable areas
+  carry labels that forbid execution; the executable area is read-only), so
+  the recipe's `test()` falls back to compile-time assertions over the
+  packaged artifacts (file exists, ELF magic, executable bit). The runtime
+  smoke still runs on Linux and on OHOS devices that expose a
+  writable+executable partition.

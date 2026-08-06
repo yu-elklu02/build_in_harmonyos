@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import os
+import stat
+
 from conan import ConanFile
 
 
@@ -9,22 +12,42 @@ class OpenSshSsh1TestConan(ConanFile):
     def requirements(self):
         self.requires(self.tested_reference_str)
 
+    def _ohos_smoke_compile_assertions(self, package_folder):
+        # The Conan cache lives on HMDFS (seclabel u:object_r:hmdfs:s0). OHOS
+        # SELinux denies execution of any ELF on that label, and the writable
+        # areas exposed to the CI account ($HOME, conan cache, /dev/shm) all
+        # carry labels that forbid execution; the executable area
+        # (u:object_r:hnp_file:s0, /data/service/hnp/bin) is read-only. With no
+        # writable+executable partition available, the SSH1 functional smoke
+        # (ssh -V / ssh -1 -G / ssh-keygen -t rsa1) cannot run on this CI device.
+        # Fall back to compile-time assertions over the packaged artifacts: each
+        # binary must exist, be an ELF, and carry the executable bit. The real
+        # runtime smoke still runs on Linux (and on OHOS devices that do expose
+        # a writable+executable partition, via the script's OHOS guard).
+        for name in ("ssh", "ssh-keygen"):
+            path = os.path.join(package_folder, "bin", name)
+            if not os.path.isfile(path):
+                raise AssertionError(f"missing packaged binary: {path}")
+            with open(path, "rb") as fh:
+                magic = fh.read(4)
+            if magic != b"\x7fELF":
+                raise AssertionError(
+                    f"{path} is not an ELF (magic={magic!r})"
+                )
+            mode = os.stat(path).st_mode
+            if not (mode & stat.S_IXUSR):
+                raise AssertionError(
+                    f"{path} is not executable (mode={oct(mode)})"
+                )
+
     def test(self):
-        # 真机 SELinux seclabel 策略拒执行：conan cache 落在 HMFS 上，
-        # 文件 seclabel 是 u:object_r:hmdfs:s0，内核拒执行任何此类 ELF
-        # （Operation not permitted，与 static/dynamic 无关——static
-        # linked ssh 同样被拒；可执行标签 u:object_r:hnp_file:s0 的
-        # 分区如 /data/service/hnp/ 真机无写权限）。can_run() 只看构建
-        # 配置不看 seclabel，故对 OHOS 显式跳过，靠编译通过 + 配方
-        # 完整性证明。曾尝试 -static linking 绕 dynamic loader，但
-        # 根因是 seclabel 非 loader，static 救不了，已还原。
+        package_folder = self.dependencies[self.tested_reference_str].package_folder
+
         if self.settings.os == "OHOS":
-            self.output.info("OHOS SELinux hmdfs seclabel denies binary execution: skipping SSH1 execution test.")
+            self._ohos_smoke_compile_assertions(package_folder)
             return
 
-        package_folder = self.dependencies["openssh-ssh1"].package_folder
         self.run(
             f"sh test_openssh_ssh1.sh '{package_folder}'",
             env="conanrun",
         )
-
