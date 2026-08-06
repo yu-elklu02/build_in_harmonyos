@@ -8,4 +8,3 @@ int main(void) {
     aa_close(context);
     return 0;
 }
-

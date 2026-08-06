@@ -8,4 +8,3 @@ target_link_libraries(aalib_smoke PRIVATE aalib::aalib)
 
 enable_testing()
 add_test(NAME aalib_smoke COMMAND aalib_smoke)
-
