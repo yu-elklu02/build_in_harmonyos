@@ -10,6 +10,8 @@ back to compile-time assertions over the packaged artifacts (each binary
 exists, is an ELF, and carries the executable bit). The runtime smoke still
 runs on Linux and on OHOS devices that do expose a writable+executable
 partition via the script's OHOS guard.
+This is a known platform constraint until OHOS SELinux policy evolves to
+provide a writable-and-executable staging area.
 
 ## Resolved blockers
 
@@ -45,6 +47,8 @@ partition via the script's OHOS guard.
      it falls back to compile-time assertions over the packaged artifacts
      (file exists, ELF magic, executable bit). The runtime smoke still runs
      on Linux and on OHOS devices that expose a writable+executable partition.
+   - This fallback is the documented behavior for the known platform
+     constraint until OHOS SELinux policy evolves.
 
 ## Test coverage
 
