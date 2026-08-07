@@ -34,14 +34,36 @@ class AggregateConan(ConanFile):
         AutotoolsToolchain(self).generate()
 
     def build(self):
-        autotools = Autotools(self)
-        autotools.configure()
-        autotools.make()
+        # basic_layout separates source_folder and build_folder; Autotools
+        # keeps running ./configure from build_folder where it is absent, and
+        # the build_script_folder kwarg is not honored on this conan 2 release.
+        # Mirror the abcm2ps precedent: cd into source_folder for each command.
+        # get(strip_root=True) unpacks the tarball one level down, so the
+        # upstream configure lives under <build root>/aggregate-<version>/.
+        # During build, self.build_folder resolves to .../b/build-release (the
+        # basic_layout build_type subdir), so step up one level to reach the
+        # real build root where strip_root dropped the aggregate-<version> dir.
+        build_root = os.path.dirname(self.build_folder)
+        src = os.path.join(build_root, f"aggregate-{self.version}")
+        prefix = self.package_folder.replace("\\", "/")
+        config_shell = os.environ.get("CONFIG_SHELL", "bash")
+        cc = os.environ.get("CC", "clang")
+        cxx = os.environ.get("CXX", "clang++")
+        self.run(
+            f"cd '{src}' && CC={cc} CXX={cxx} {config_shell} ./configure --prefix={prefix}",
+            env="conanbuild",
+        )
+        self.run(f"cd '{src}' && CC={cc} CXX={cxx} make -j1", env="conanbuild")
 
     def package(self):
-        copy(self, "aggregate", src=self.build_folder,
+        # Built binaries live where make ran: build_root/aggregate-<version>/,
+        # not build_folder (which resolves to the build-release subdir) nor
+        # source_folder (which points at the recipe folder during package()).
+        build_root = os.path.dirname(self.build_folder)
+        src = os.path.join(build_root, f"aggregate-{self.version}")
+        copy(self, "aggregate", src=src,
              dst=os.path.join(self.package_folder, "bin"), keep_path=False)
-        copy(self, "aggregate-ios", src=self.source_folder,
+        copy(self, "aggregate-ios", src=src,
              dst=os.path.join(self.package_folder, "bin"), keep_path=False)
 
     def package_info(self):

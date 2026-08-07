@@ -10,4 +10,9 @@ class AggregateTestConan(ConanFile):
         self.requires(self.tested_reference_str)
 
     def test(self):
-        self.run("sh test.sh", env="conanrun")
+        # VirtualRunEnv injects deps' bindirs but not the tested package's
+        # own bin/ (it is already installed in the package folder by package()).
+        # Append the package bin so the test.sh `aggregate` call resolves.
+        import os
+        pkg_bin = os.path.join(self.dependencies[self.tested_reference_str].package_folder, "bin")
+        self.run(f"PATH=\"{pkg_bin}:$PATH\" sh test.sh", env="conanrun")
