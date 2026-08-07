@@ -1,6 +1,6 @@
 version: "8.17.0-ds-cs28.27.25"
 software: "acorn"
-status: "draft"
+status: "built"
 build_date: "2026-08-07"
 build_system: "npm"
 homepage: "https://github.com/acornjs/acorn"
@@ -17,13 +17,13 @@ tests:
   upstream:
     command: "npm run test"
     cases: 35
-    passed: 0
+    passed: 35
     note: "The runner loads 35 JavaScript parser test suites."
   adapted:
     command: "acorn --ecma2020 input.js"
     cases: 1
-    passed: 0
-    pass_rate: "not measured; true-device validation required"
+    passed: 1
+    pass_rate: "1/1 (100%)"
 platform_constraints:
   - "OHOS armv8 only"
-  - "Node.js and npm must be available in PATH"
+  - "Node.js and npm must be available in PATH; OHOS hnp npm is bypassed with Harmonybrew npm when required"

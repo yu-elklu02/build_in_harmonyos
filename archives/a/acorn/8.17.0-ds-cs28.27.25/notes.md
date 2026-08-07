@@ -8,5 +8,7 @@ The upstream test runner loads 35 parser test suites through `npm run test`.
 The consumer test invokes the packaged CLI, parses JavaScript, and validates
 the JSON AST structure.
 
-The initial HarmonyOS adaptation is restricted to armv8. True-device validation
-is required before changing this package's status from `draft`.
+The initial HarmonyOS adaptation is restricted to armv8. On the validation
+device, the upstream runner completed all 35 listed suites and the packaged
+CLI AST smoke test passed 1/1. The recipe prefers the Harmonybrew Node/npm
+toolchain because the device's hnp npm aborts during its native errno check.
