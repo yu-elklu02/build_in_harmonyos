@@ -1,6 +1,6 @@
 version: "20260408"
 software: "acpica-unix"
-status: "draft"
+status: "built"
 build_date: "2026-08-07"
 build_system: "make"
 homepage: "https://github.com/acpica/acpica"
@@ -16,14 +16,14 @@ patches_applied: []
 tests:
   upstream:
     command: "tests/aslts.sh"
-    cases: 0
+    cases: 1
     passed: 0
-    note: "True-device test-suite count pending validation."
+    note: "The upstream suite is declared but was not executed by conan create; run tests/aslts.sh separately."
   adapted:
     command: "iasl input.asl && iasl -d input.aml"
     cases: 1
-    passed: 0
-    pass_rate: "not measured; true-device validation required"
+    passed: 1
+    pass_rate: "1/1 (100%)"
 platform_constraints:
   - "OHOS armv8 only"
   - "ACPICA must use ACPI_HOST=_LINUX because OHOS uname is not a native ACPICA host target"
