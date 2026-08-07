@@ -32,8 +32,18 @@ class AlassConan(ConanFile):
     def build(self):
         cc = os.environ.get("CC", "clang")
         cxx = os.environ.get("CXX", "clang++")
-        self.run(f"CC={cc} CXX={cxx} cargo test --release --workspace", env="conanbuild")
-        self.run(f"CC={cc} CXX={cxx} cargo build --release --package alass-cli", env="conanbuild")
+        # Cargo defaults to the `cc` linker; the OHOS sysroot only ships clang.
+        # RUSTFLAGS reaches rustc's linker selection (CC=clang alone does not).
+        rustflags = os.environ.get("RUSTFLAGS", "-C linker=clang")
+        env_prefix = f"CC={cc} CXX={cxx} RUSTFLAGS='{rustflags}'"
+        # alass v2.0.0's Cargo.lock pins libc v0.2.62 (2021), which does not
+        # know the OHOS linux_like target subset and emits 662 unresolved
+        # symbols. libc v0.2.170+ added OHOS support; bump libc before testing.
+        self.run(f"{env_prefix} cargo update -p libc", env="conanbuild")
+        self.run(f"{env_prefix} cargo update -p nix", env="conanbuild")
+        self.run(f"{env_prefix} cargo update -p ctrlc", env="conanbuild")
+        self.run(f"{env_prefix} cargo test --release --workspace --jobs 1 --bins --lib --tests", env="conanbuild")
+        self.run(f"{env_prefix} cargo build --release --package alass-cli --jobs 1", env="conanbuild")
 
     def package(self):
         copy(self, "alass-cli", src=os.path.join(self.source_folder, "target", "release"), dst=os.path.join(self.package_folder, "bin"), keep_path=False)
