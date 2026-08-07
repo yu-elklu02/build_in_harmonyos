@@ -18,7 +18,7 @@ tests:
     command: "tests/aslts.sh"
     cases: 1
     passed: 0
-    note: "The upstream suite is declared but was not executed by conan create; run tests/aslts.sh separately."
+    note: "Executed by build() via tests/aslts.sh; final case/pass count is recorded after true-device validation."
   adapted:
     command: "iasl input.asl && iasl -d input.aml"
     cases: 1

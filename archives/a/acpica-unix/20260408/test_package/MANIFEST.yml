@@ -1,7 +1,7 @@
 package: acpica-unix/20260408
 homepage: "https://github.com/acpica/acpica"
 upstream_check_command: "tests/aslts.sh"
-upstream_test_in_build: false
+upstream_test_in_build: true
 upstream_tests:
   - file: "tests/aslts.sh"
     source: "acpica-20260408/tests/aslts.sh"

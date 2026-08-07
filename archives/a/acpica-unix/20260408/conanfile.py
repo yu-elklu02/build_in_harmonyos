@@ -39,6 +39,13 @@ class AcpicaUnixConan(ConanFile):
         # Makefile.config:226 and drops -Werror, so the unknown options stay
         # warnings and the build completes under clang.
         self.run(f'make iasl CC="{cc}" ACPI_HOST=_LINUX NOWERROR=TRUE', cwd=self.source_folder)
+        # Run the upstream ASL test suite after the compiler build. The suite
+        # builds its own iasl/acpiexec variants and exercises compilation,
+        # disassembly, and execution of the upstream ASL cases.
+        self.run(
+            f'CC="{cc}" ACPI_HOST=_LINUX NOWERROR=TRUE bash tests/aslts.sh',
+            cwd=self.source_folder,
+        )
 
     def test(self):
         self.run("generate/unix/bin/iasl -v", cwd=self.source_folder)
