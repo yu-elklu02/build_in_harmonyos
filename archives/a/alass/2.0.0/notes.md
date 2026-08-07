@@ -6,4 +6,4 @@ The recipe runs the three active upstream Rust unit tests with `cargo test --rel
 
 The consumer test aligns an offset SRT file to a reference SRT file and checks the corrected timestamp.
 
-The initial HarmonyOS adaptation is restricted to armv8. If Cargo is unavailable on the true device, the package must remain blocked without claiming a test pass.
+The initial HarmonyOS adaptation is restricted to armv8. True-device validation on ohos-aarch64 passed on 2026-08-07: all three Rust unit tests and the SRT synchronization consumer test succeeded.
