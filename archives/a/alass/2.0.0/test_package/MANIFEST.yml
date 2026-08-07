@@ -1,0 +1,19 @@
+package: alass/2.0.0
+homepage: "https://github.com/kaegi/alass"
+upstream_check_command: "cargo test --release --workspace"
+upstream_test_in_build: true
+upstream_test_command: "cargo test --release --workspace"
+upstream_tests:
+  - file: "alass-core/src/alass.rs"
+    source: "alass-2.0.0/alass-core/src/alass.rs"
+    description: "Core alignment unit tests."
+    command: "cargo test --release --workspace"
+  - file: "alass-core/src/timespan_ops.rs"
+    source: "alass-2.0.0/alass-core/src/timespan_ops.rs"
+    description: "Timespan preparation unit test."
+    command: "cargo test --release --workspace"
+test_package_tests:
+  - file: "test.sh"
+    description: "Aligns an offset SRT file and checks the corrected timestamp."
+    command: "sh test.sh"
+assertion_count: 2

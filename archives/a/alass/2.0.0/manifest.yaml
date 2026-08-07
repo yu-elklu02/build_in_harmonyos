@@ -1,0 +1,28 @@
+version: "2.0.0"
+software: "alass"
+status: "draft"
+build_date: "2026-08-07"
+build_system: "cargo"
+homepage: "https://github.com/kaegi/alass"
+license: "GPL-3.0-only"
+source:
+  url: "https://codeload.github.com/kaegi/alass/tar.gz/refs/tags/v2.0.0"
+  sha256: "ce88f92c7a427b623edcabb1b64e80be70cca2777f3da4b96702820a6cdf1e26"
+  tar_format: "tar.gz"
+build:
+  system: "cargo"
+  dependencies: []
+patches_applied: []
+tests:
+  upstream:
+    command: "cargo test --release --workspace"
+    cases: 3
+    passed: 0
+  adapted:
+    command: "alass-cli reference.srt incorrect.srt output.srt --no-split"
+    cases: 1
+    passed: 0
+    pass_rate: "not measured; true-device validation required"
+platform_constraints:
+  - "OHOS armv8 only"
+  - "Rust Cargo toolchain must be available in PATH"

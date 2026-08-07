@@ -1,0 +1,5 @@
+software: "alass"
+homepage: "https://github.com/kaegi/alass"
+license: "GPL-3.0-only"
+versions:
+  - "2.0.0"
