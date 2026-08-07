@@ -1,0 +1,29 @@
+version: "20260408"
+software: "acpica-unix"
+status: "draft"
+build_date: "2026-08-07"
+build_system: "make"
+homepage: "https://github.com/acpica/acpica"
+license: "Intel ACPI Software License Agreement"
+source:
+  url: "https://codeload.github.com/acpica/acpica/tar.gz/refs/tags/20260408"
+  sha256: "ddc5d3e0f54030e2348484fff681861a161efb4e388e20631209574e7884ad39"
+  tar_format: "tar.gz"
+build:
+  system: "make"
+  dependencies: []
+patches_applied: []
+tests:
+  upstream:
+    command: "tests/aslts.sh"
+    cases: 0
+    passed: 0
+    note: "True-device test-suite count pending validation."
+  adapted:
+    command: "iasl input.asl && iasl -d input.aml"
+    cases: 1
+    passed: 0
+    pass_rate: "not measured; true-device validation required"
+platform_constraints:
+  - "OHOS armv8 only"
+  - "ACPICA must use ACPI_HOST=_LINUX because OHOS uname is not a native ACPICA host target"

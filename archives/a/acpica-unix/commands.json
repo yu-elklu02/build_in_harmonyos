@@ -1,0 +1,9 @@
+{
+  "type": "tool",
+  "commands": [
+    {
+      "name": "iasl",
+      "description": "ACPI Source Language compiler and disassembler"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+software: "acpica-unix"
+display: "ACPICA Unix tools"
+homepage: "https://github.com/acpica/acpica"
+license: "Intel ACPI Software License Agreement"
+type: "tool"
+versions:
+  - "20260408"

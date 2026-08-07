@@ -1,0 +1,14 @@
+package: acpica-unix/20260408
+homepage: "https://github.com/acpica/acpica"
+upstream_check_command: "tests/aslts.sh"
+upstream_test_in_build: false
+upstream_tests:
+  - file: "tests/aslts.sh"
+    source: "acpica-20260408/tests/aslts.sh"
+    description: "Upstream ASL compiler and ACPI execution test suite."
+    command: "tests/aslts.sh"
+test_package_tests:
+  - file: "test.sh"
+    description: "Compiles and disassembles an ASL definition, then checks the restored ASL declaration."
+    command: "sh test.sh"
+assertion_count: 3
