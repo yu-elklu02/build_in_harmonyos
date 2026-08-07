@@ -32,7 +32,13 @@ class AcpicaUnixConan(ConanFile):
         cc = os.environ.get("CC", "clang")
         # ACPICA defaults to _CYGWIN when uname is unfamiliar. Explicitly use
         # the Unix host configuration on HarmonyOS and build only iasl.
-        self.run(f'make iasl CC="{cc}" ACPI_HOST=_LINUX', cwd=self.source_folder)
+        # Makefile.config hard-codes -Werror plus gcc-only warning options
+        # (-Wlogical-op, -Wmissing-parameter-type, -Wold-style-declaration)
+        # that clang rejects as -Wunknown-warning-option; -Werror upgrades
+        # those to hard errors. NOWERROR=TRUE toggles the ifneq guard on
+        # Makefile.config:226 and drops -Werror, so the unknown options stay
+        # warnings and the build completes under clang.
+        self.run(f'make iasl CC="{cc}" ACPI_HOST=_LINUX NOWERROR=TRUE', cwd=self.source_folder)
 
     def test(self):
         self.run("generate/unix/bin/iasl -v", cwd=self.source_folder)
