@@ -1,6 +1,6 @@
 version: "1.6"
 software: "aggregate"
-status: "draft"
+status: "built"
 build_date: "2026-08-07"
 build_system: "autotools"
 
@@ -27,8 +27,8 @@ tests:
   adapted:
     command: "printf prefixes | aggregate"
     cases: 1
-    passed: 0
-    pass_rate: "not measured; true-device validation required"
+    passed: 1
+    pass_rate: "1/1 (100%)"
 
 platform_constraints:
   - "OHOS armv8 only"

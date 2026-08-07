@@ -19,4 +19,4 @@ independent prefix remains in the output.
 ## Platform constraint
 
 The initial HarmonyOS adaptation is restricted to armv8. True-device validation
-is required before changing this package's status from `draft`.
+on ohos-aarch64 passed on 2026-08-07.
