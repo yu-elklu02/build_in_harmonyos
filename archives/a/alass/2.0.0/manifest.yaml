@@ -1,6 +1,6 @@
 version: "2.0.0"
 software: "alass"
-status: "draft"
+status: "blocked"
 build_date: "2026-08-07"
 build_system: "cargo"
 homepage: "https://github.com/kaegi/alass"
@@ -22,7 +22,8 @@ tests:
     command: "alass-cli reference.srt incorrect.srt output.srt --no-split"
     cases: 1
     passed: 0
-    pass_rate: "not measured; true-device validation required"
+    pass_rate: "0/1 (not run; Cargo unavailable on true device)"
 platform_constraints:
   - "OHOS armv8 only"
   - "Rust Cargo toolchain must be available in PATH"
+  - "True-device validation is blocked until cargo and rustc are installed"
