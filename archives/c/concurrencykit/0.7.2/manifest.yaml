@@ -1,6 +1,6 @@
 version: "0.7.2"
 software: "concurrencykit"
-status: "draft"
+status: "blocked"
 build_date: "2026-08-08"
 build_system: "configure + make"
 homepage: "https://github.com/concurrencykit/ck"
@@ -17,9 +17,9 @@ patches_applied:
 tests:
   upstream:
     command: "make regressions"
-    cases: 0
-    passed: 0
-    note: "True-device validation required."
+    cases: 24
+    passed: 15
+    note: "True-device validation on HarmonyOS HongMeng 1.12.0 aarch64 (20 cores). 15/24 PASS, 9/24 TIMEOUT (brlock/epoch/hp/pflock/rwlock/sequence/spinlock/stack/tflock). ck_sequence timeout reproduces on real upstream source with no-affinity A/B control (both rc=124, retries non-convergent 1.15M-1.84M); stripping ck_pr_stall / second CK_SEQUENCE_READ / lowering STEPS all fail to converge. 15-run thread-threshold retest (n=2/4/8/12/16 x3): no thread count stably passes 3 consecutive runs; n=12 fails all 3 (retries=9/9/8, updates=0); only intermittent passes at n=2/8/16. Conclusion: non-deterministic liveness/contention under 1M STEPS + 20-core high-frequency writer; NOT attributable to OHOS pthread or CK memory-ordering defect. Status blocked; cannot promote feat/concurrencykit-0.7.2."
   adapted:
     command: "ctest --output-on-failure"
     cases: 1
