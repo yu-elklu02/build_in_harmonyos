@@ -1,12 +1,12 @@
 version: "20260408"
 software: "acpica-unix"
-status: "built"
-build_date: "2026-08-07"
+status: "blocked"
+build_date: "2026-08-08"
 build_system: "make"
 homepage: "https://github.com/acpica/acpica"
 license: "Intel ACPI Software License Agreement"
 source:
-  url: "https://codeload.github.com/acpica/acpica/tar.gz/refs/tags/20260408"
+  url: "https://github.com/acpica/acpica/archive/refs/tags/20260408.tar.gz"
   sha256: "ddc5d3e0f54030e2348484fff681861a161efb4e388e20631209574e7884ad39"
   tar_format: "tar.gz"
 build:
@@ -16,9 +16,12 @@ patches_applied: []
 tests:
   upstream:
     command: "tests/aslts.sh"
-    cases: 1
+    cases: 174
     passed: 0
-    note: "Executed by build() via tests/aslts.sh; final case/pass count is recorded after true-device validation."
+    note: >
+      Suite runs and compiles 174 test cases, but aggregation is blocked by
+      OHOS toybox /bin/sh (no loop break in nested subshells), so Summary
+      reports 0 pass / 0 fail across all 174 cases. See BLOCKED.md.
   adapted:
     command: "iasl input.asl && iasl -d input.aml"
     cases: 1
@@ -27,3 +30,4 @@ tests:
 platform_constraints:
   - "OHOS armv8 only"
   - "ACPICA must use ACPI_HOST=_LINUX because OHOS uname is not a native ACPICA host target"
+  - "OHOS toybox /bin/sh does not support loop break / process substitution / [[ ]] in nested subshells; upstream aslts.sh suite aggregation is blocked (174 cases compiled but Summary reports 0 pass / 0 fail). Install GNU bash 4+ to unblock."
