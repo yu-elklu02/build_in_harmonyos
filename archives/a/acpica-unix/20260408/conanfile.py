@@ -142,7 +142,7 @@ class AcpicaUnixConan(ConanFile):
                 with open(p) as f:
                     body = f.read()
                 with open(p, "w") as f:
-                    f.write("#!" + hnp_bash + "\n" + body[9:])
+                    f.write("#!" + hnp_bash + body[len("#!/bin/bash"):])
         aslts_tmp = os.path.join(os.path.expanduser("~"), "aslts-tmp")
         os.makedirs(aslts_tmp, exist_ok=True)
         # asltsrun:260 uses `xargs -n 1 -P $procs -I {} bash -c '...'`; the
