@@ -1,31 +1,32 @@
 --- a/tests/aslts/bin/asltsrun
 +++ b/tests/aslts/bin/asltsrun
-@@ -389,11 +389,6 @@ do_summary_of_test_case()
-	cat "$1" |\
+@@ -389,9 +389,4 @@ do_summary_of_test_case()
+ 	cat "$1" |\
 -	while [ 1 ]
 +	while IFS= read -r line
-	do
+ 	do
 -	read line
 -	if [ $? -ne 0 ] ; then
 -		echo "|$2|$cnt|$pass|$fail|$skip|$start|$finish|$total|$outstand0|$blck|$memtotal|$max0|$max1|$max2|$max3|$max4|$max5|$out0|$out1|$out2|$out3|$out4|$out5|$outstand1|$LargeRefCount|$exceptionsnum|" >> "$3"
 -		break
 -	fi
-	if [[ "$line" == *STST* ]]; then
+ 	if [[ "$line" == *STST* ]]; then
 @@ -465,6 +460,7 @@ do_summary_of_test_case()
-	fi
-	done
+ 	fi
+ 	done
 +	echo "|$2|$cnt|$pass|$fail|$skip|$start|$finish|$total|$outstand0|$blck|$memtotal|$max0|$max1|$max2|$max3|$max4|$max5|$out0|$out1|$out2|$out3|$out4|$out5|$outstand1|$LargeRefCount|$exceptionsnum|" >> "$3"
-
-	IFS=$OLD_IFS  
-}
-@@ -500,9 +496,4 @@ do_all_summary()
-	ls "$1" |\
+ 
+ 	IFS=$OLD_IFS  
+ }
+ 
+@@ -500,9 +496,5 @@ do_all_summary()
+ 	ls "$1" |\
 -	while [ 1 ]
 +	while IFS= read -r filename
-	do
+ 	do
 -	read filename
 -	if [ $? -ne 0 ] ; then
 -		break
 -	fi
-
-	if [ "$filename" == nopt -o "$filename" == opt ]; then
+ 
+ 	if [ "$filename" == nopt -o "$filename" == opt ]; then
