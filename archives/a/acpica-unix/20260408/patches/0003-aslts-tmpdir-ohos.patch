@@ -1,0 +1,12 @@
+--- a/tests/aslts.sh
++++ b/tests/aslts.sh
+@@ -7,4 +7,6 @@
+ postfix=`date +%H%M%S`
++_TMPDIR=${TMPDIR:-/tmp}
++mkdir -p "$_TMPDIR" 2>/dev/null || true
+-tmp_iasl=/tmp/iasl-$postfix
+-tmp_acpiexec=/tmp/acpiexec-$postfix
+-tmp_acpibin=/tmp/acpibin-$postfix
++tmp_iasl=$_TMPDIR/iasl-$postfix
++tmp_acpiexec=$_TMPDIR/acpiexec-$postfix
++tmp_acpibin=$_TMPDIR/acpibin-$postfix

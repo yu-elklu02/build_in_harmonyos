@@ -5,3 +5,4 @@ sources:
 patches:
   - patch_file: "patches/0002-aslts-summary-ohos.patch"
     patch_description: "Avoid pipeline subshells while collecting ASLTS results on OHOS."
+  - patch_file: "patches/0003-aslts-tmpdir-ohos.patch"
