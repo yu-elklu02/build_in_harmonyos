@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.15)
+project(test_concurrencykit C)
+find_package(concurrencykit REQUIRED)
+add_executable(test_package test_package.c)
+target_link_libraries(test_package PRIVATE concurrencykit::concurrencykit)
+enable_testing()
+add_test(NAME concurrencykit_smoke COMMAND test_package)
