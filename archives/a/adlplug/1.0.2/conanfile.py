@@ -40,9 +40,6 @@ class AdlplugConan(ConanFile):
                 destination=os.path.join(self.source_folder, info["destination"]),
                 strip_root=True,
             )
-        if self.settings.os != "OHOS":
-            return
-
         # CMake 4.x removed compatibility with CMake < 3.5. ADLplug and
         # submodules declare 3.1-3.3; HarmonyOS real-device CMake is 4.1.2.
         replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),

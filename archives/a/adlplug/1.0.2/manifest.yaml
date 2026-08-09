@@ -29,9 +29,12 @@ patches_applied: []
 
 tests:
   upstream:
-    command: "No upstream automated test target is provided by v1.0.2"
-    cases: 0
-    passed: 0
+    command: "cmake -DWITH_UNIT_TESTS=ON <libADLMIDI source> && ctest --output-on-failure"
+    cases: 3
+    passed: 2
+    pass_rate: "2/3 (66.7%)"
+    failed:
+      - "WoplFileTest: test/wopl-file/wopl_file.cpp Load/Save/Load case returns nullptr for fm_banks/wopl_files/Apogee-IMF-90.wopl."
   adapted:
     command: "Player initialization, emulator enumeration, and chip configuration"
     cases: 1
@@ -42,3 +45,4 @@ knowledge_gained:
   - "ADLplug v1.0.2 is a JUCE audio plugin project whose source release references five pinned submodules."
   - "The OHOS package builds the upstream ADLplug_core target and disables desktop plugin frontends."
   - "HarmonyOS PC real-device conan create and the Player API test_package both passed."
+  - "The bundled libADLMIDI upstream tests ran on HarmonyOS PC: BankMapTest and ConversionTest passed; WoplFileTest failed."
