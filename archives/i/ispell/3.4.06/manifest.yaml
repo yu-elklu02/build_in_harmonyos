@@ -5,8 +5,8 @@ build_date: "2026-07-31"
 build_system: makefile
 
 source:
-  url: "https://www.cs.hmc.edu/~geoff/ispell/ispell-3.4.06.tar.gz"
-  sha256: "FILL_IN_AFTER_FIRST_DOWNLOAD"
+  url: "https://deb.debian.org/debian/pool/main/i/ispell/ispell_3.4.06.orig.tar.gz"
+  sha256: "17c91633d4c8075acc503163a16463fc54ab1c7453280ad39cd3db75c783eba6"
   tar_format: tar.gz
 
 build:

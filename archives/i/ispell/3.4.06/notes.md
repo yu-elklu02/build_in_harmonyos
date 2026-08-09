@@ -7,16 +7,15 @@ ispell 是经典的 Unix 交互式拼写检查器，纯 C 实现，依赖 ncurse
 
 ## 关键适配点
 
-### 1. SHA256 填写
+### 1. 源码归档
 
-真机首次运行前：
+上游站点不再提供 3.4.06 的归档下载。配方使用 Debian 保存的原始
+发布包 `ispell_3.4.06.orig.tar.gz`，其 SHA256 已固定在
+`conandata.yml`：
 
-```bash
-curl -L https://www.cs.hmc.edu/~geoff/ispell/ispell-3.4.06.tar.gz \
-     -o ~/tmp/ispell.tar.gz && sha256sum ~/tmp/ispell.tar.gz
+```text
+17c91633d4c8075acc503163a16463fc54ab1c7453280ad39cd3db75c783eba6
 ```
-
-将哈希填入 `conandata.yml` 的 `sha256` 字段。
 
 ### 2. local.h 配置
 
@@ -54,7 +53,7 @@ ispell 上游 Makefile 在 `make install` 时会尝试安装英语词典（需�
 
 ## 构建状态
 
-- [ ] SHA256 已填写
-- [ ] W0 依赖检查通过（ncurses/6.5 在制品仓）
+- [x] SHA256 已填写
+- [x] W0 依赖检查通过（ncurses/6.5 在制品仓）
 - [ ] conan create 通过
 - [ ] test_package 执行通过
