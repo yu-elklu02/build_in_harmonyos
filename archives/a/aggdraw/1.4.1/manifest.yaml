@@ -38,5 +38,6 @@ tests:
     passed: 0
   adapted:
     command: "test_package/test_aggdraw.py"
-    cases: 1
-    passed: 1
+    cases: 4
+    passed: 4
+    pass_rate: "4/4 (100%)"

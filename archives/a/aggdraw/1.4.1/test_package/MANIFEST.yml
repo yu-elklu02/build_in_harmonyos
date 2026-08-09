@@ -8,6 +8,7 @@ test_package_tests:
   - file: "test_aggdraw.py"
     description: "Imports the packaged native extension and exercises Path, Pen, and Brush APIs."
     command: "env PYTHONPATH=<package_folder> python3 test_aggdraw.py"
+assertion_count: 4
 
 hongmeng_validation:
   platform: "HarmonyOS HongMeng Kernel 1.12.0 aarch64, clang 15.0.4, python 3.12"
