@@ -1,0 +1,10 @@
+sources:
+  "9.4.0":
+    url: "https://gitlab.inria.fr/aevol/aevol/-/archive/aevol-9.4.0/aevol-aevol-9.4.0.tar.gz"
+    sha256: "1d409b4b1a513f981c09b40a1abd15fda6a15645f0b682502cc58e1edcc99881"
+  "json-3.12.0":
+    url: "https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz"
+    sha256: "42f6e95cad6ec532fd372391373363b62a14af6d771056dbfc86160e6dfff7aa"
+  "googletest-1.14.0":
+    url: "https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz"
+    sha256: "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7"

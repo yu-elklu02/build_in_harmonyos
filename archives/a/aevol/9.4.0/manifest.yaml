@@ -1,0 +1,34 @@
+version: "9.4.0"
+software: aevol
+status: adapting
+build_system: cmake
+homepage: "https://www.aevol.fr/"
+license: "GPL-3.0-or-later"
+
+source:
+  url: "https://gitlab.inria.fr/aevol/aevol/-/tree/aevol-9.4.0"
+  commit: "c55229c6c023a99f37fa1703c78a26109270f5"
+  sha256: "1d409b4b1a513f981c09b40a1abd15fda6a15645f0b682502cc58e1edcc99881"
+
+build:
+  system: cmake
+  command: "cmake -Dwith-omp=OFF -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .. && cmake --build . --target all-with-gtests && ctest --output-on-failure && cmake --build . --target install"
+  dependencies:
+    - "zlib"
+  vendored_build_dependencies:
+    - "nlohmann/json 3.12.0"
+    - "GoogleTest 1.14.0"
+
+tests:
+  upstream:
+    command: "cmake --build . --target all-with-gtests && ctest --output-on-failure"
+    cases: 76
+    passed: 0
+  adapted:
+    command: "conan test test_package aevol/9.4.0"
+    cases: 2
+    passed: 0
+
+hongmeng_patches:
+  - "Disable OpenMP on OHOS because the target profile does not provide an OpenMP runtime."
+  - "Pre-fetch nlohmann/json and GoogleTest into the source tree and replace CMake FetchContent network access with local add_subdirectory calls."

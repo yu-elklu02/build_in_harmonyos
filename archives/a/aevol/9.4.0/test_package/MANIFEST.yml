@@ -1,0 +1,12 @@
+build_system: conan
+tests:
+  - name: aevol_create_help
+    type: adapted
+    command: aevol_create_2b --help
+  - name: aevol_run_help
+    type: adapted
+    command: aevol_run_2b --help
+upstream:
+  source: aevol-9.4.0/test/ctest and test/gtest
+  build_system: cmake
+  test_type: ctest
