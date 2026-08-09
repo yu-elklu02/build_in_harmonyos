@@ -1,0 +1,11 @@
+package: adlplug/1.0.2
+homepage: "https://github.com/jpcima/ADLplug"
+upstream_check_command: "No upstream automated test target is provided by v1.0.2"
+upstream_test_in_build: false
+upstream_test_command: "N/A"
+upstream_tests: []
+test_package_tests:
+  - file: "main.cpp"
+    description: "Initializes the ADLplug Player, enumerates ADLMIDI emulators, and configures one synthesis chip."
+    command: "ctest --output-on-failure"
+assertion_count: 2
