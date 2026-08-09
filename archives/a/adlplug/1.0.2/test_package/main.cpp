@@ -11,6 +11,8 @@ int main()
     }
 
     Player player;
+    // Player::init is void in ADLplug v1.0.2; the state change is verified by
+    // set_num_chips() and num_chips() immediately below.
     player.init(44100);
     if (!player.set_num_chips(1) || player.num_chips() == 0) {
         std::cerr << "ADLMIDI player chip setup failed\n";
