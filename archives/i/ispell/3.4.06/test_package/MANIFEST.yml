@@ -14,6 +14,16 @@ test_assertions:
   - ispell -a pipe mode emits "@(#)" version header line
   - ispell -a pipeline executes without crash
 
+upstream_tests: []
+upstream_test_in_build: false
+upstream_test_note: "ispell 3.4.06 has no upstream make test, make check, or other automated test target."
+
+test_package_tests:
+  - file: "test_ispell.sh"
+    cases: 2
+    passed: 2
+    description: "Adapted package test: version output and ispell -a pipe-mode execution."
+
 hongmeng_validation:
   platform: "HarmonyOS HongMeng Kernel 1.12.0 aarch64, clang 15.0.4"
   conan_create: "PASS — exit 0, All ispell tests PASSED"
