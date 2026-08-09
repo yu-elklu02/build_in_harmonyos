@@ -18,7 +18,10 @@ class AggdrawTestConan(ConanFile):
             return
         package_folder = self.dependencies["aggdraw"].package_folder
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_aggdraw.py")
+        # conan self.run's `env` only accepts predefined scope names, not a
+        # ["PYTHONPATH=..."] list, so inline PYTHONPATH via the `env` command
+        # as a prefix so aggdraw's native .so inside the conan cache package
+        # folder is importable by the target Python.
         self.run(
-            f'"{sys.executable}" "{script}"',
-            env=[f"PYTHONPATH={package_folder}"],
+            f'env PYTHONPATH="{package_folder}" "{sys.executable}" "{script}"',
         )

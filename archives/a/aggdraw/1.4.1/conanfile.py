@@ -40,8 +40,32 @@ class AggdrawConan(ConanFile):
         # The target Python on the HarmonyOS PC device builds this CPython C++
         # extension in place.  Disable build isolation and dependency resolution
         # so Conan never downloads undeclared build dependencies.
+        #
+        # HarmonyOS python_3.12 hardcodes CXX="c++" into sysconfig at its own
+        # build time; setuptools build_ext reads sysconfig.get_config_var('CXX')
+        # → "c++" but the device only ships clang/clang++ in PATH, so the wheel
+        # build dies "command 'c++' failed: No such file or directory".  Override
+        # CXX via env so setuptools picks clang++ instead.  LDSHARED is likewise
+        # hardcoded to "cc -shared ..."; the same env override switches the
+        # linker to clang so the .so is produced.
         staging = os.path.join(self.build_folder, "staging")
+        # conan self.run's `env` only accepts predefined scope names, not dict
+        # overrides, so inline CXX/LDSHARED/LDFLAGS via the `env` command prefix.
+        #
+        # HarmonyOS python_3.12 statically links libpython into the python3.12
+        # main binary and does NOT export Python C-API symbols (PyModule_Create2,
+        # etc.) to extensions at runtime — aggdraw.cpython-312.so's NEEDED is
+        # only libc++_shared/libc, so `import aggdraw` dies
+        # "PyModule_Create2: symbol not found".  Link aggdraw.so against the
+        # shipped libpython3.12.so (which DOES export PyModule_Create2) by
+        # appending -L<lib> -lpython3.12 to LDSHARED + LDFLAGS so the .so picks
+        # up the Python C-API symbols at link time.
+        py_lib_dir = os.path.join(os.path.dirname(sys.executable), "..", "lib")
+        py_lib_dir = os.path.abspath(py_lib_dir)
         self.run(
+            f'env CXX=clang++ '
+            f'LDSHARED="clang++ -shared -L{py_lib_dir} -lpython3.12" '
+            f'LDFLAGS="-L{py_lib_dir} -lpython3.12" '
             f'"{sys.executable}" -m pip install . --target "{staging}" '
             "--no-build-isolation --no-deps",
             cwd=self.source_folder,

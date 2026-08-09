@@ -7,4 +7,14 @@ upstream_tests: []
 test_package_tests:
   - file: "test_aggdraw.py"
     description: "Imports the packaged native extension and exercises Path, Pen, and Brush APIs."
-    command: "python3 test_aggdraw.py"
+    command: "env PYTHONPATH=<package_folder> python3 test_aggdraw.py"
+
+hongmeng_validation:
+  platform: "HarmonyOS HongMeng Kernel 1.12.0 aarch64, clang 15.0.4, python 3.12"
+  conan_create: "PASS — exit 0, aggdraw.cpython-312.so built, 'aggdraw native Path/Pen/Brush API: PASSED'"
+  path_moveto_lineto_close_coords: "PASS — Path().moveto(1,2)/lineto(11,2)/lineto(11,12)/close()/coords() returns ≥6 coords"
+  pen: "PASS — aggdraw.Pen('red', 2.0) constructs"
+  brush: "PASS — aggdraw.Brush((0,128,255), 200) constructs"
+  version: "PASS — aggdraw.__version__ == '1.4.1'"
+  final_so_linkage: "aggdraw.cpython-312.so links libpython3.12.so (PyModule_Create2 resolved at import; without this link 'import aggdraw' dies 'PyModule_Create2: symbol not found' because HarmonyOS python3.12 statically links libpython and does NOT export Python C-API symbols to extensions)"
+  notes: "test() prefixes the python call with `env PYTHONPATH=<package_folder>` so aggdraw's native .so inside the conan cache package folder is importable by the target Python. conan self.run's `env` arg only accepts predefined scope names, not a ['PYTHONPATH=...'] list, so inline via the `env` command. The build() method likewise inlines `env CXX=clang++ LDSHARED=... LDFLAGS=...` to override sysconfig's hardcoded CXX='c++' (no 'c++' symlink on device) and to link libpython3.12.so for Python C-API symbols."
