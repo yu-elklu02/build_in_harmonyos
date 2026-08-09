@@ -1,0 +1,10 @@
+package: aggdraw/1.4.1
+homepage: "https://github.com/pytroll/aggdraw"
+upstream_check_command: "No upstream automated tests are included in the aggdraw 1.4.1 sdist"
+upstream_test_in_build: false
+upstream_test_command: "N/A"
+upstream_tests: []
+test_package_tests:
+  - file: "test_aggdraw.py"
+    description: "Imports the packaged native extension and exercises Path, Pen, and Brush APIs."
+    command: "python3 test_aggdraw.py"

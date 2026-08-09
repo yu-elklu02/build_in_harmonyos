@@ -1,0 +1,26 @@
+version: "1.4.1"
+software: aggdraw
+status: adapting
+build_system: setuptools
+homepage: "https://github.com/pytroll/aggdraw"
+license: "Python (MIT style)"
+
+source:
+  url: "https://files.pythonhosted.org/packages/05/bf/4876fb82a906e9303392235e9fe382130b649c0ee4faa7fdb25596c26dff/aggdraw-1.4.1.tar.gz"
+  sha256: "e21d6b77afeeffa259b898d652295757fd35f15a9e11a24823c0d7ca63385c83"
+  tar_format: tar.gz
+
+build:
+  system: setuptools
+  command: "python3 -m pip install . --target <staging> --no-build-isolation --no-deps"
+  dependencies: []
+
+tests:
+  upstream:
+    command: "No upstream automated tests are included in the aggdraw 1.4.1 sdist"
+    cases: 0
+    passed: 0
+  adapted:
+    command: "test_package/test_aggdraw.py"
+    cases: 1
+    passed: 0
