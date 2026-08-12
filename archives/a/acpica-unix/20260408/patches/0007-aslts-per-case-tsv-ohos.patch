@@ -1,0 +1,20 @@
+--- a/tests/aslts/bin/asltsrun
++++ b/tests/aslts/bin/asltsrun
+@@ -221,6 +221,14 @@
+ 	if [ $TEST_RET != 0 ]; then
+ 		echo "ASLTS: FINISH, $TEST_TITLE, FAIL, $FMT_ENDTIME ($FMT_RUNTIME)"
+ 		UTILSTATUS=1
++		STATUS=FAIL
+ 	else
+ 		echo "ASLTS: FINISH, $TEST_TITLE, SUCCESS, $FMT_ENDTIME ($FMT_RUNTIME)"
++		STATUS=PASS
+ 	fi
++
++	# Append per-case result to aslts-results.tsv (auditable TSV: case<TAB>status<TAB>exit-code).
++	# Bypasses do_summary_of_mode's `cat | while read; ... break` pipeline, which on
++	# HarmonyOS toybox /bin/sh rejects ("break: can't break") — leaving __STATUS_OF_TEST_CASES
++	# empty and Summary with blank pass/fail. The Conan recipe build() reads the TSV
++	# to count pass/fail/skip and raise on any FAIL.
++	printf '%s\t%s\t%s\n' "$tcase-$modepart" "$STATUS" "$TEST_RET" >> "$ASLTSDIR/tmp/RESULTS/aslts-results.tsv"
++
+ 	return $TEST_RET

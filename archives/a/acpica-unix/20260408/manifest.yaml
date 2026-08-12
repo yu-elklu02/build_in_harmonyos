@@ -1,6 +1,6 @@
 version: "20260408"
 software: "acpica-unix"
-status: passed
+status: blocked
 build_date: "2026-08-12"
 build_system: "make"
 homepage: "https://github.com/acpica/acpica"
@@ -15,31 +15,46 @@ build:
   hongmeng_patches:
     - "build() declares tool_requires(\"bash/5.3\") — aslts.sh + tests/aslts/bin/* are #!/bin/bash scripts using break/continue/for-((;;)) that toybox /bin/sh rejects ('break: can't break'); invoke aslts.sh through the packaged GNU Bash absolute path so all helpers inherit it"
     - "build() runs aslts.sh in the build stage (where the full upstream source tree still lives, needed by aslts.sh's build_acpi_tools which rebuilds iasl/acpiexec/acpibin from source via make); CC=clang injects compiler into the make rebuild (upstream hardcodes 'cc' absent on HarmonyOS PATH); MAKEFLAGS=-j1 disables GNU make jobserver so it does NOT mkfifo in TMPDIR (HarmonyOS MAC rejects mkfifo in build folder); TMPDIR points 0003-patched staging at writable build_folder/aslts-tmp (HarmonyOS /tmp readonly); PATH prepends the bash package bindir so #!/usr/bin/env bash shebang (0004 patch) on helpers resolves to declared GNU Bash"
+    - "build() tee aslts.sh stdout+stderr to build_folder/aslts-run.log then count per-case×mode Compile lines: `Type: ... Compile => Done` = PASS, trailing `**** Unexpected iASL failure` or `[[ Error:` = FAIL. fail>0 → raise ConanException so conan create exits non-zero. This is口径 4 (上游 __STATUS_OF_TEST* 落盘撞 break blocker 空、Summary PASS/FAIL 空、0007 TSV 写段在 run_test_case 但 Do 1 acpiexec 执行段鸿蒙真机未触达 TSV 空)，唯一可审计逐 case 产物是 aslts-run.log 的 Compile 行。"
 patches_applied:
   - "patches/0002-aslts-summary-ohos.patch — avoid pipeline subshells while collecting ASLTS results"
   - "patches/0003-aslts-tmpdir-ohos.patch — route aslts staging through ${TMPDIR} (HarmonyOS /tmp readonly)"
   - "patches/0004-aslts-shebang-env-ohos.patch — replace #!/bin/bash shebangs on aslts.sh + tests/aslts/bin/* + tests/templates/templates.sh with #!/usr/bin/env bash so helpers resolve GNU Bash from PATH (HarmonyOS has no /bin/bash)"
   - "patches/0005-aslts-no-jobserver-ohos.patch — force aslts.sh's rebuild make -j$jobs to -j1; HarmonyOS MAC rejects GNU make jobserver mkfifo in the build folder (Operation not permitted). MAKEFLAGS=-j1 is overridden by the hardcoded -j$jobs."
+  - "patches/0006-aslts-install-to-mkdir-ohos.patch — replace GNU coreutils install -d -m 775 with mkdir -p -m 775 in tests/aslts/Makefile.def. HarmonyOS PATH has no install binary (Error 127 from Makefile.def:78), causing every per-case make install to bail and __STATUS_OF_TEST_CASES to ship empty. mkdir is toybox-built-in and supports -p -m."
+  - "patches/0007-aslts-per-case-tsv-ohos.patch — append each run_test_case() result to aslts/tmp/RESULTS/aslts-results.tsv. NOTE: on HarmonyOS aslts.sh only reaches Do 0 compile stage (Do 1 acpiexec execute stage bails on the same break blocker), so run_test_case() is never invoked and the TSV is empty; build() falls back to counting Compile lines from aslts-run.log (口径 4)."
 tests:
   upstream:
-    command: "tests/aslts.sh (run in build() via /data/service/.../bash -x)"
-    cases: 48
-    passed: "aslts.sh runs to completion (ASL Test Suite Finished); Summary file reports 'Test Cases: (of 48)' / 'Test Collections: 0 (of 8)'. Break/continue/[[ ]] no longer fall back to toybox /bin/sh (GNU Bash 5.3 via tool_requires). Cases run through templates (nopt/opt), but Summary aggregation reports 0 pass / 0 fail — the per-case result files are written but the upstream Summary aggregator counts collections, not individual case pass/fail. Real progress: aslts.sh exits 0, no 'break: can't break', no mkfifo reject, test_package test() iasl smoke passes."
+    command: 'env CC=clang MAKEFLAGS=-j1 TMPDIR=<build_folder>/aslts-tmp PATH=<bash bindir>:$PATH "<bash>/bin/bash" -x tests/aslts.sh > <build_folder>/aslts-run.log 2>&1'
+    cases: 188
+    passed: 84
+    failed: 104
+    skipped: 0
+    pass_rate: "84/188 (44.7%) — 104 FAIL, 0 SKIP"
     note: >
-      Conan `create` invokes build() unconditionally, so aslts.sh now runs
-      there with the full source tree available. GNU Bash 5.3 resolves the
-      shebang + break/continue/for-((;;)) blockers; MAKEFLAGS=-j1 + TMPDIR
-      resolve the mkfifo + readonly /tmp blockers. aslts.sh runs to
-      'ASL Test Suite Finished' and exits 0.
+      build() reads aslts-run.log per-case×mode Compile lines and counts:
+      `Type: <mode> Compile => ... Done` (bare Done) = PASS (84),
+      `**** Unexpected iASL failure` or `[[ Error:` = FAIL (104), skip 0.
+      fail>0 → raise ConanException so conan create exits non-zero (verified:
+      `ConanException: ACPI upstream ASLTS failed: 84 passed, 104 failed, 0 skipped`).
+      We do NOT trust aslts.sh exit code (returns 0 even when cases bailed) nor
+      Summary (blank pass/fail — do_summary_of_mode's cat|while break blocker).
+      104 FAIL cases are iasl compile failures on HarmonyOS (iasl -ta / recompile
+      of disassembled .dsl fails on bdemo/badasl/namespace/exc/control/etc.),
+      NOT test runner problems — the build tool iasl itself produces these
+      failures, indicating real iasl/ACPICA compile regressions on HarmonyOS
+      clang/libc++ toolchain. See BLOCKED.md for the fail case list.
   adapted:
     command: "iasl input.asl && iasl -d input.aml"
     cases: 1
     passed: 1
-    pass_rate: "1/1 (100%)"
+    pass_rate: "1/1 (100%) — test_package test() iasl smoke (input.asl compiles, iasl -d round-trips, restored ASL matches)"
 platform_constraints:
   - "OHOS armv8 only"
   - "ACPICA must use ACPI_HOST=_LINUX because OHOS uname is not a native ACPICA host target"
   - "OHOS has no /bin/bash; upstream aslts.sh + tests/aslts/bin/* helpers use #!/bin/bash shebangs → bad interpreter. Resolved by tool_requires(\"bash/5.3\") + 0004 shebang→#!/usr/bin/env bash patch + PATH prepend bash bindir."
-  - "OHOS toybox /bin/sh lacks loop break / process substitution / [[ ]] in nested subshells; aslts.sh must run under GNU Bash (declared via tool_requires)."
+  - "OHOS toybox /bin/sh lacks loop break / process substitution / [[ ]] in nested subshells; aslts.sh must run under GNU Bash (declared via tool_requires). Do 1 (acpiexec execute stage) still bails on this — only Do 0 compile stage runs, so 188 cases counted are compile-only, not acpiexec execution."
   - "OHOS MAC rejects GNU make jobserver mkfifo in the build folder; 0005 patch forces make -j1 to avoid the FIFO."
   - "OHOS /tmp is readonly; 0003 patch routes aslts staging through ${TMPDIR} which build() sets to a writable build_folder/aslts-tmp."
+  - "OHOS PATH has no GNU coreutils install; 0006 patch replaces install -d -m 775 with mkdir -p -m 775 in Makefile.def so per-case make install can stage the aml tree."
+  - "104 FAIL: iasl compile failures on HarmonyOS clang/libc++ toolchain (iasl -ta / recompile of disassembled .dsl fails on bdemo/badasl/namespace/exc/control/descriptor/manipulation/name/reference etc.). These are real iasl regressions, not test runner problems — needs upstream iasl clang/libc++ compatibility investigation."

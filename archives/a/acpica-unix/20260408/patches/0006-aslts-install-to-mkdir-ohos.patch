@@ -1,0 +1,7 @@
+--- a/tests/aslts/Makefile.def
++++ b/tests/aslts/Makefile.def
+@@ -67,2 +67,2 @@
+-INST= install
+-INST.dir= $(INST) -d -m $(GDMODE) $@
++INST= mkdir
++INST.dir= $(INST) -p -m $(GDMODE) $@

@@ -1,66 +1,72 @@
-# acpica-unix/20260408 — upstream aslts.sh suite blocked by OHOS toybox /bin/sh
+# BLOCKED — acpica-unix/20260408 upstream ASLTS on HarmonyOS
 
-## Status
+## 真机复验结论（2026-08-12）
 
-`conan create` returns 0; iasl builds; the test_package ASL → AML → DSL smoke
-(`Name (TEST, 0x2A)` recovered) passes. The upstream ASL test suite
-(`tests/aslts.sh`) **does run** — 174 test cases are compiled and exercised —
-but the suite's result aggregation is blocked by the OHOS toybox `/bin/sh`,
-so `Summary` reports 0 pass / 0 fail across all 174 cases. This is an
-environment toolchain limitation, not a recipe bug.
+**conan create 非零退出**（按你定的真验逻辑：fail>0 → raise ConanException）。
 
-## What works
+```
+acpica-unix/20260408: ACPI upstream ASLTS: 84 passed, 104 failed, 0 skipped
+acpica-unix/20260408: ERROR: Error in build() method, line 123
+        raise ConanException(
+ConanException: ACPI upstream ASLTS failed: 84 passed, 104 failed, 0 skipped
+Package '...' build failed
+```
 
-- `conan create archives/a/acpica-unix/20260408 --profile=ohos-aarch64 --build=missing` → exit 0
-- iasl compiler builds under clang with `NOWERROR=TRUE`
-- test_package smoke: iasl compiles `Name (TEST, 0x2A)` to AML (43 bytes, 1 named object), disassembles back to DSL (663 bytes), `0x2A` recovered
-- upstream `tests/aslts.sh` enters its real test loop and compiles **174** `Compiled test package:` cases (bdemo, arithmetic, bfield, constant, oarg, oconst, olocal, onamedglob, …)
+按口径统计（不靠 aslts.sh 退出码、不靠空 Summary）：
 
-## What is blocked (environment, not recipe)
+| 口径 | cases | passed | failed | skipped | pass_rate |
+|---|---|---|---|---|---|
+| per-case×mode Compile 行（aslts-run.log） | 188 | 84 | 104 | 0 | 84/188 (44.7%) |
 
-The upstream aslts.sh suite assumes a full GNU bash 4+ environment. OHOS ships
-toybox as `/bin/sh`, which does not support bash constructs the suite relies on
-in nested subshells:
+- **不得**把 104 FAIL 算作通过、**不得**把 manifest 写成 passed。
+- **不得**把 skip 算作 pass（本轮 skip=0，无歧义）。
 
-- loop `break` outside a `while`/`for` in a pipeline right-hand subshell
-  (`cat "$1" | while [ 1 ]; do … break … done`) — toybox execs the pipeline
-  RHS through `/bin/sh`, so `break` aborts with `can't break`
-- `[[ ]]`, `export -f`, process substitution `< <(cmd)` in nested subshells
+## 104 FAIL case 列表（iasl 编译失败，非测试运行时问题）
 
-The recipe already redirects 6 of these toybox incompatibilities (see the
-build() patch block in `conanfile.py`): TMPDIR for the hard-coded `/tmp/iasl-*`,
-shebang rewrites to the real `/data/service/hnp/bin/bash`, `xargs -I {} bash -c`
-replaced with a bounded `for … & wait` loop, `cat|while`/`ls|while` pipelines
-rewritten as process substitutions, cwd fixed to `tests/`, and Harmonybrew
-GNU findutils + coreutils prepended to PATH for `xargs -I` and `install`.
+从 aslts-run.log 的 `**** Unexpected iASL failure in .../MAIN.asl!` 行提真失败 case（去重后 24 个 case × 4 mode = ~104 行）：
 
-Those 6 rewrites get the suite into its real test loop (174 cases compiled).
-The **residual** 65 `break: can't break` aborts come from other nested
-subshells deeper in the suite (beyond the two `do_summary_of_test_case` /
-`do_all_summary` functions already rewritten) that still land in toybox
-`/bin/sh`. Because the aggregation stage (`do_summary_of_test_case`) is where
-the `break` aborts, the suite writes no per-case status into
-`__STATUS_OF_TEST_CASES`, so `Summary` reports `PASS: 0 / FAIL: 0 / total: 0`
-even though the 174 cases were compiled and run.
+```
+bdemo/ACPICA/bdemo
+complex/misc
+complex/namespace
+complex/operand/tests/oconversion
+complex/result/tests/rcopyobject
+complex/result/tests/rexplicitconv
+complex/result/tests/rindecrement
+complex/result/tests/roptional
+complex/result/tests/rstore
+exceptions/exc
+exceptions/exc_operand/exc_operand1
+exceptions/exc_operand/exc_operand2
+exceptions/exc_ref
+exceptions/exc_result/exc_result2
+exceptions/exc_tbl
+functional/control
+functional/descriptor
+functional/external
+functional/manipulation
+functional/name
+functional/reference
+functional/region
+functional/table
+Identity2MS/abbu
+IMPL/ACPICA/tests/dynobj
+```
 
-A separate, non-blocking observation: iasl reports `201 Errors, 54 Warnings`
-on some upstream ASL fixtures (bdemo, complex/misc, complex/operand/oconversion,
-exc_tbl, exc_result2, …). These are syntax errors in the **upstream ASL test
-fixtures themselves**, not iasl defects — iasl exits 0 and the upstream suite
-treats the missing AML as a test failure, which is the intended behavior.
+## 根因分析
 
-## Unblocking
+这些 FAIL **不是**测试运行时问题（GNU Bash 5.3 + install→mkdir + mkfifo 绕法已让逐 case 真跑通），而是 **iasl 本身在鸿蒙 clang/libc++ 工具链上的编译回归**：
 
-Install a complete GNU bash 4+ (and GNU coreutils/findutils) on the device and
-point the suite's nested subshells at it (not toybox `/bin/sh`), or run
-`tests/aslts.sh` in an environment that already has GNU bash. Once the
-aggregation `break`s are resolved, `Summary` will reflect the real per-case
-pass/fail of the 174 compiled cases and the manifest can be updated with the
-true pass count.
+- `iasl -ta`（编译 ASL→AML）对某些 case 的 MAIN.asl 失败 → `Unexpected iASL failure`
+- `iasl -d`（反汇编 AML→DSL）后重编 DSL→AML 失败 → `[[ Error: re-compilation of X-.dsl failed ]]`
+- `iasl -p X-extInPlace -oE`（externals in place 编）失败 → `[[ Error: compiling X.aml with externals in place failed ]]`
 
-## Evidence
+这些是 iasl/ACPICA 上游在鸿蒙 clang 15 + libc++ C++17 工具链上的真兼容回归，**不是** aslts.sh 跑不通——aslts.sh 跑完了、逐 case 真执行了、失败被真统计出来了。
 
-- full log: `~/acpica-unix-20260408.r-aslts14.log` (2667 lines)
-- `Compiled test package:` count: 174
-- `Summary` output: `PASS: 0 / FAIL: 0 / BLOCKED: 0 / SKIPPED: 0 / total: 0`
-- residual `bin/sh: break: can't break`: 65 occurrences
+## 可行方向（等用户决策）
+
+1. **上游 iasl clang/libc++ 兼容修复**：调查 24 个 case 的 iasl 编译失败根因（可能是 clang 某警告升级为错、或 libc++ 某头缺失），补 iasl 编译补丁让 104 FAIL→0。
+2. **容忍已知失败**：在 manifest 标 `known_failures: [24 case list]`，配方统计时把已知失败排除出 fail 计数（但**不能**假装通过）。
+3. **放弃适配**：鸿蒙真机 iasl 在这 24 个 case 上有真回归，本轮无法绕过。
+
+本轮不推 feat 分支（104 FAIL ≠ 0），等用户检查验证分支后定夺方向。
