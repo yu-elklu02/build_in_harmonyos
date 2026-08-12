@@ -106,8 +106,17 @@ class AggdrawConan(ConanFile):
         if self.settings.os == "OHOS":
             sign_tool = "/data/service/hnp/bin/binary-sign-tool"
             objcopy = "/data/service/hnp/bin/llvm-objcopy"
-            so_file = os.path.join(self.package_folder, "aggdraw.cpython-312.so")
-            if os.path.isfile(so_file):
+            # Wheel build tags the .so with the platform ABI
+            # (aggdraw.cpython-312-aarch64-linux-ohos.so on CI,
+            # aggdraw.cpython-312.so on device); glob-match every aggdraw*.so
+            # in the package folder so the re-sign hits whichever file the
+            # build actually produced. A missed match silently skips the
+            # signature → MAC rejects exec in test_package.
+            import glob as _glob
+            so_pattern = os.path.join(self.package_folder, "aggdraw*.so")
+            for so_file in _glob.glob(so_pattern):
+                if not os.path.isfile(so_file):
+                    continue
                 tmp_signed = so_file + ".signed"
                 self.run(
                     f'"{objcopy}" --remove-section .codesign "{so_file}" 2>/dev/null || true',

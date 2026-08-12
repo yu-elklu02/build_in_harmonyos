@@ -42,6 +42,15 @@ aggdraw 上游是纯 setuptools 配方，鸿蒙真机 + CI 复验撞 5 处鸿蒙
 
 另：CI 的 SDK `lld` 链一个不兼容的 `libxml2.so.16`，故 `LDSHARED`/`LDFLAGS` 用 `-fuse-ld=/data/service/hnp/bin/ld` 选 HNP 链接器（真机环境无此问题但留着不碍）。
 
+## 复检修正（2 处）
+
+首轮 fix 推送后用户复检到两个真问题，本轮修正：
+
+| # | 复检拦点 | 根因 | 修正 |
+|---|---|---|---|
+| 6 | `package()` 只查固定 `aggdraw.cpython-312.so`，CI 实际生成 `aggdraw.cpython-312-aarch64-linux-ohos.so`，ELF 重签名静默跳过、MAC 修复未执行 | wheel build 把 `.so` 名带上平台 ABI 标签（CI `-aarch64-linux-ohos`、真机不带），固定名 `os.path.isfile()` 在 CI 命中失败 → `if` 段整段跳过 | `package()` 改用 `glob.glob(<pkg>/aggdraw*.so)` 通配匹配每个真 ELF 产物签名，不再固定名；命中失败不再静默跳过 |
+| 7 | `commands.json` 缺 CI 要求的 `"type": "tool"` 字段，L0 警告 | aggdraw 配方目录根本无 `commands.json`（find 空），CI L0 检查要该文件含 `"type": "tool"` 声明 | 新建 `archives/a/aggdraw/1.4.1/commands.json`，参照仓库 bam/ansifilter 等配方格式：`name`/`description`/`homepage`/`"type": "tool"`/`versions` 段含 `ref`+`binary:false` |
+
 ## 构建状态
 
 - [x] SHA256 已填写
