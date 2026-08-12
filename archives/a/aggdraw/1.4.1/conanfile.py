@@ -60,8 +60,16 @@ class AggdrawConan(ConanFile):
         # shipped libpython3.12.so (which DOES export PyModule_Create2) by
         # appending -L<lib> -lpython3.12 to LDSHARED + LDFLAGS so the .so picks
         # up the Python C-API symbols at link time.
-        py_lib_dir = os.path.join(os.path.dirname(sys.executable), "..", "lib")
-        py_lib_dir = os.path.abspath(py_lib_dir)
+        # Resolve the libpython3.12.so directory from the running Python's own
+        # install layout, NOT a hardcoded /data/service/hnp/lib. sys.prefix is
+        # the Python installation root (e.g. .../python_3.12) and libpython
+        # ships at <prefix>/lib/libpython3.12.so on both the HarmonyOS PC device
+        # and the CI SDK layout. sysconfig.get_config_var('LIBDIR') is wrong
+        # here (returns "/python3/lib", a relic of the python.org build's DESTDIR
+        # staging), so derive from sys.prefix instead. This is the same path
+        # the running sys.executable lives under, so it tracks whichever Python
+        # Conan invokes — device or CI — without a hardcoded absolute.
+        py_lib_dir = os.path.join(sys.prefix, "lib")
         # CI's SDK lld loads an incompatible libxml2.so.16. The HNP linker is
         # the repository-standard fallback for native OHOS C/C++ links.
         linker = ""
@@ -85,6 +93,33 @@ class AggdrawConan(ConanFile):
             src=self.source_folder,
             dst=os.path.join(self.package_folder, "licenses"),
         )
+        # HarmonyOS MAC (hmmac=use_task) rejects exec of unsigned ELF loaded
+        # from the conan cache p/ folder → test_package's `import aggdraw` dies
+        # "Error loading shared library aggdraw.cpython-312.so: Permission
+        # denied". Re-sign the packaged .so in place: llvm-objcopy strips any
+        # stale .codesign section (tolerate "section not found" on first-sign),
+        # binary-sign-tool sign -selfSign 1 emits a signed copy, os.replace
+        # swaps it in, chmod 0o755 keeps it other-readable+executable. Same
+        # pattern as the daemon/ent/zig/ispell recipes in this repo. Missing
+        # tool or failed sign must fail the build — test_package exec depends
+        # on the signature; do not silently skip.
+        if self.settings.os == "OHOS":
+            sign_tool = "/data/service/hnp/bin/binary-sign-tool"
+            objcopy = "/data/service/hnp/bin/llvm-objcopy"
+            so_file = os.path.join(self.package_folder, "aggdraw.cpython-312.so")
+            if os.path.isfile(so_file):
+                tmp_signed = so_file + ".signed"
+                self.run(
+                    f'"{objcopy}" --remove-section .codesign "{so_file}" 2>/dev/null || true',
+                    quiet=True,
+                )
+                self.run(
+                    f'"{sign_tool}" sign -inFile "{so_file}" -outFile "{tmp_signed}" '
+                    f'-selfSign 1',
+                    quiet=True,
+                )
+                os.replace(tmp_signed, so_file)
+                os.chmod(so_file, 0o755)
 
     def package_info(self):
         self.cpp_info.includedirs = []
