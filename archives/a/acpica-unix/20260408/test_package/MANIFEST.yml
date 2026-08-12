@@ -13,8 +13,8 @@ test_package_tests:
     command: "PATH=<package_folder>/bin:$PATH sh test.sh"
 hongmeng_validation:
   platform: "HarmonyOS HongMeng Kernel 1.12.0 aarch64, clang 15.0.4, GNU Bash 5.3 (via tool_requires)"
-  conan_create: "PASS — exit 0, iasl built, aslts.sh runs to 'ASL Test Suite Finished' in build(), test_package test() iasl smoke 1/1"
-  aslts_run: "PASS — aslts.sh exits 0, no 'break: can\\'t break', no mkfifo reject, no Read-only; Summary 'Test Cases: (of 48)' / 'Test Collections: 0 (of 8)'"
+  conan_create: "PASS — iasl built; the packaged consumer smoke test passes 1/1. Upstream ASLTS is measured separately as 84 passed, 104 failed, 0 skipped."
+  aslts_run: "COMPLETED WITH KNOWN FAILURES — aslts.sh reaches 'ASL Test Suite Finished'; its auditable per-case×mode Compile result is 84/188 passed (104 failed, 0 skipped)."
   test_package: "PASS — input.asl compiles, iasl -d round-trips, restored ASL matches"
   notes: "aslts.sh runs in build() (not test_package) because conan create invokes build() unconditionally and that's where the full upstream source tree lives — aslts.sh's build_acpi_tools rebuilds iasl/acpiexec/acpibin from source via make. GNU Bash 5.3 (tool_requires) resolves the #!/bin/bash shebang + break/continue blockers; 0004 patch rewrites shebangs to #!/usr/bin/env bash + PATH prepend bash bindir so helpers resolve GNU Bash; CC=clang injects compiler into the make rebuild; 0005 patch forces make -j1 to avoid HarmonyOS MAC mkfifo reject; 0003 patch + TMPDIR resolve readonly /tmp. package() ships only iasl + LICENSE, NOT the full source tree (aslts runs in build, not from the published package)."
 assertion_count: 3
