@@ -12,4 +12,4 @@ must be updated with real-device results before the formal branch is pushed.
 - Configure is invoked with explicit GNU/Linux build and HarmonyOS host triplets because the bundled `config.guess` does not recognize HarmonyOS.
 - `CC=clang` is required because the device does not provide a `cc` alias.
 - Autoconf's random `mktemp` directory is replaced with a fixed directory under the Conan build folder because HarmonyOS MAC rejects the random-name creation path.
-- The upstream `make check` suite is executed without suppression. The OHOS patch enables mawk's existing Inf/NaN sign-formatting branch when configure probes omit `HAVE_ISINF`/`HAVE_ISNAN`.
+- The upstream `make check` suite is executed without suppression. OHOS builds use Clang built-in Inf/NaN classification in mawk's existing sign-formatting branch because the device libc does not expose the probed symbols.

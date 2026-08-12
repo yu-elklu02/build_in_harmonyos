@@ -3,9 +3,7 @@ import os
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import (
-    apply_conandata_patches,
     copy,
-    export_conandata_patches,
     get,
     replace_in_file,
 )
@@ -34,9 +32,6 @@ class MawkConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
-    def export_sources(self):
-        export_conandata_patches(self)
-
     def build(self):
         triplets = ""
         if self.settings.os == "OHOS":
@@ -48,9 +43,29 @@ class MawkConan(ConanFile):
                 'tmp=`(umask 077 && mktemp -d -q "$TMPDIR/csXXXXXX") 2>/dev/null` &&',
                 'tmp="$TMPDIR/cs-fixed"\nrm -rf "$tmp"\n(umask 077 && mkdir "$tmp") &&',
             )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "print.c"),
+                "#if (defined(HAVE_ISINF) && defined(HAVE_ISNAN))",
+                "#if (defined(HAVE_ISINF) && defined(HAVE_ISNAN)) || defined(MAWK_OHOS)",
+                strict=True,
+            )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "print.c"),
+                "isinf(p->dval) || isnan(p->dval)",
+                "__builtin_isinf(p->dval) || __builtin_isnan(p->dval)",
+                strict=True,
+            )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "print.c"),
+                "isinf(cp->dval) || isnan(cp->dval)",
+                "__builtin_isinf(cp->dval) || __builtin_isnan(cp->dval)",
+                strict=True,
+            )
             triplets = " --build=aarch64-unknown-linux-gnu --host=aarch64-linux-ohos"
-            apply_conandata_patches(self)
-            env_prefix = f'CC=clang TMPDIR="{tmpdir}" '
+            env_prefix = f'CC=clang CFLAGS="-DMAWK_OHOS" TMPDIR="{tmpdir}" '
         else:
             env_prefix = ""
         self.run(
