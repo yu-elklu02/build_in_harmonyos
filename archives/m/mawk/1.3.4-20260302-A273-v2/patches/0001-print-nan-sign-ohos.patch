@@ -1,0 +1,15 @@
+diff --git a/print.c b/print.c
+--- a/print.c
++++ b/print.c
+@@ -101,4 +101,4 @@
+     case C_DOUBLE:
+-#if (defined(HAVE_ISINF) && defined(HAVE_ISNAN))
++#if (defined(HAVE_ISINF) && defined(HAVE_ISNAN)) || defined(__OHOS__)
+ 	if ((isinf(p->dval) || isnan(p->dval))) {
+ 	    char xbuff[256];
+@@ -504,4 +504,4 @@
+  * isinf() gives a clue about the +/- sign, isnan() does not.
+  */
+-#if (defined(HAVE_ISINF) && defined(HAVE_ISNAN))
++#if (defined(HAVE_ISINF) && defined(HAVE_ISNAN)) || defined(__OHOS__)
+ #define validate_number(cp) \

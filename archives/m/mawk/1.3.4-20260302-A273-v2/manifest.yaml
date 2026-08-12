@@ -11,6 +11,8 @@ build:
   system: autotools
   dependencies: []
   command: "CC=clang TMPDIR=<build_folder>/mawk-tmp ./configure --build=aarch64-unknown-linux-gnu --host=aarch64-linux-ohos --prefix=<package_folder> && make -j1 && make check && make install"
+  patches:
+    - "0001-print-nan-sign-ohos.patch: enable existing NaN/Inf sign formatting when OHOS configure probes omit the macros"
 tests:
   upstream:
     command: "make check"

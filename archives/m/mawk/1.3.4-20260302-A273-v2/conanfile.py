@@ -2,7 +2,13 @@ import os
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.files import copy, get, replace_in_file
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+    replace_in_file,
+)
 from conan.tools.layout import basic_layout
 
 
@@ -28,8 +34,10 @@ class MawkConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
+    def export_sources(self):
+        export_conandata_patches(self)
+
     def build(self):
-        env = {}
         triplets = ""
         if self.settings.os == "OHOS":
             tmpdir = os.path.join(self.build_folder, "mawk-tmp")
@@ -40,15 +48,17 @@ class MawkConan(ConanFile):
                 'tmp=`(umask 077 && mktemp -d -q "$TMPDIR/csXXXXXX") 2>/dev/null` &&',
                 'tmp="$TMPDIR/cs-fixed"\nrm -rf "$tmp"\n(umask 077 && mkdir "$tmp") &&',
             )
-            env = {"CC": "clang", "TMPDIR": tmpdir}
             triplets = " --build=aarch64-unknown-linux-gnu --host=aarch64-linux-ohos"
+            apply_conandata_patches(self)
+            env_prefix = f'CC=clang TMPDIR="{tmpdir}" '
+        else:
+            env_prefix = ""
         self.run(
-            f'sh ./configure{triplets} --prefix="{self.package_folder}"',
+            f'{env_prefix}sh ./configure{triplets} --prefix="{self.package_folder}"',
             cwd=self.source_folder,
-            env=env,
         )
-        self.run("make -j1", cwd=self.source_folder, env=env)
-        self.run("make check", cwd=self.source_folder, env=env)
+        self.run(f"{env_prefix}make -j1", cwd=self.source_folder)
+        self.run(f"{env_prefix}make check", cwd=self.source_folder)
 
     def package(self):
         self.run("make install", cwd=self.source_folder)
