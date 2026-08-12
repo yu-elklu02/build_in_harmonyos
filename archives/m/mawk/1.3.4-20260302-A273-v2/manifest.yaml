@@ -1,0 +1,25 @@
+version: "1.3.4-20260302-a273-v2"
+software: mawk
+status: adapting
+build_system: autotools
+homepage: "https://invisible-island.net/mawk/"
+license: "GPL-2.0-only"
+source:
+  url: "https://invisible-mirror.net/archives/mawk/mawk-1.3.4-20260302.tgz"
+  sha256: "e2c08a77d0a84a01f9be454d1ca3872d4f103f9ada683d075198b0c6e965633d"
+build:
+  system: autotools
+  dependencies: []
+  command: "CC=clang ./configure --host=aarch64-linux-ohos --prefix=<package_folder> && make -j1 && make check && make install"
+tests:
+  upstream:
+    command: "make check"
+    cases: 0
+    passed: 0
+  adapted:
+    command: "test_package/test.sh"
+    cases: 3
+    passed: 0
+platform_constraints:
+  - "OHOS armv8 only"
+  - "Use --host=aarch64-linux-ohos to avoid config.guess on HarmonyOS"
