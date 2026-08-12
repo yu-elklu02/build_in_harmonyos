@@ -24,4 +24,4 @@ platform_constraints:
   - "OHOS armv8 only"
   - "Use explicit build and host triplets because bundled config.guess does not recognize HarmonyOS"
   - "Configure uses a fixed TMPDIR child directory because HarmonyOS MAC rejects Autoconf random directory names"
-  - "OHOS uses Clang built-in Inf/NaN classification in mawk's existing formatter because the device libc does not expose the probed symbols"
+  - "OHOS uses Clang built-in Inf/NaN classification in mawk's existing formatter and POSIX comparison path because the device configure probes do not expose the symbols"

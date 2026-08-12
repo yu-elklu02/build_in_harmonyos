@@ -64,6 +64,20 @@ class MawkConan(ConanFile):
                 "__builtin_isinf(cp->dval) || __builtin_isnan(cp->dval)",
                 strict=True,
             )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "execute.c"),
+                "#if defined(HAVE_ISNAN)",
+                "#if defined(HAVE_ISNAN) || defined(MAWK_OHOS)",
+                strict=True,
+            )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "execute.c"),
+                "isnan(cp->dval) || isnan((cp + 1)->dval)",
+                "__builtin_isnan(cp->dval) || __builtin_isnan((cp + 1)->dval)",
+                strict=True,
+            )
             triplets = " --build=aarch64-unknown-linux-gnu --host=aarch64-linux-ohos"
             env_prefix = f'CC=clang CFLAGS="-DMAWK_OHOS" TMPDIR="{tmpdir}" '
         else:
