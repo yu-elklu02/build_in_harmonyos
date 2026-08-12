@@ -1,0 +1,71 @@
+--- a/tests/aslts.sh
++++ b/tests/aslts.sh
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/Do
++++ b/tests/aslts/bin/Do
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/asltsdiffres
++++ b/tests/aslts/bin/asltsdiffres
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/asltsrun
++++ b/tests/aslts/bin/asltsrun
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/bugstate/bdemosconc
++++ b/tests/aslts/bin/bugstate/bdemosconc
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/bugstate/bdemossum
++++ b/tests/aslts/bin/bugstate/bdemossum
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/bugstate/bdemostabs
++++ b/tests/aslts/bin/bugstate/bdemostabs
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/bugstate/parsebuglist
++++ b/tests/aslts/bin/bugstate/parsebuglist
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/common
++++ b/tests/aslts/bin/common
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/diffproc
++++ b/tests/aslts/bin/diffproc
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/aslts/bin/settings
++++ b/tests/aslts/bin/settings
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+
+--- a/tests/templates/templates.sh
++++ b/tests/templates/templates.sh
+@@ -1,1 +1,1 @@
+-#!/bin/bash
++#!/usr/bin/env bash

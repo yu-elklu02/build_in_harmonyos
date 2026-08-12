@@ -6,3 +6,8 @@ patches:
   - patch_file: "patches/0002-aslts-summary-ohos.patch"
     patch_description: "Avoid pipeline subshells while collecting ASLTS results on OHOS."
   - patch_file: "patches/0003-aslts-tmpdir-ohos.patch"
+    patch_description: "Route aslts staging through ${TMPDIR} (HarmonyOS /tmp readonly)."
+  - patch_file: "patches/0004-aslts-shebang-env-ohos.patch"
+    patch_description: "Replace #!/bin/bash shebangs on aslts.sh + tests/aslts/bin/* + tests/templates/templates.sh with #!/usr/bin/env bash so helpers resolve GNU Bash from PATH (HarmonyOS has no /bin/bash)."
+  - patch_file: "patches/0005-aslts-no-jobserver-ohos.patch"
+    patch_description: "Force aslts.sh's rebuild `make -j$jobs` to -j1; HarmonyOS MAC rejects GNU make jobserver mkfifo in the build folder (Operation not permitted). MAKEFLAGS=-j1 is overridden by the hardcoded -j$jobs."

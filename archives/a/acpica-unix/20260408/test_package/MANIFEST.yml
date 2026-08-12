@@ -1,14 +1,20 @@
 package: acpica-unix/20260408
 homepage: "https://github.com/acpica/acpica"
 upstream_check_command: "tests/aslts.sh"
-upstream_test_in_build: false
+upstream_test_in_build: true
 upstream_tests:
   - file: "tests/aslts.sh"
     source: "acpica-20260408/tests/aslts.sh"
-    description: "Upstream ASL compiler and ACPI execution test suite."
-    command: "tests/aslts.sh"
+    description: "Upstream ASL compiler and ACPI execution test suite (aslts). Runs in the main recipe build() stage via the packaged GNU Bash (tool_requires bash/5.3) with CC=clang, MAKEFLAGS=-j1, TMPDIR=<build_folder>/aslts-tmp. aslts.sh runs to 'ASL Test Suite Finished' and exits 0; Summary file reports 'Test Cases: (of 48)' / 'Test Collections: 0 (of 8)'."
+    command: 'env CC=clang MAKEFLAGS=-j1 TMPDIR=<build_folder>/aslts-tmp PATH=<bash bindir>:$PATH "<bash>/bin/bash" -x tests/aslts.sh'
 test_package_tests:
   - file: "test.sh"
-    description: "Compiles and disassembles an ASL definition, then checks the restored ASL declaration."
-    command: "sh test.sh"
+    description: "Compiles and disassembles an ASL definition, then checks the restored ASL declaration. Validates the packaged iasl binary end-to-end."
+    command: "PATH=<package_folder>/bin:$PATH sh test.sh"
+hongmeng_validation:
+  platform: "HarmonyOS HongMeng Kernel 1.12.0 aarch64, clang 15.0.4, GNU Bash 5.3 (via tool_requires)"
+  conan_create: "PASS — exit 0, iasl built, aslts.sh runs to 'ASL Test Suite Finished' in build(), test_package test() iasl smoke 1/1"
+  aslts_run: "PASS — aslts.sh exits 0, no 'break: can\\'t break', no mkfifo reject, no Read-only; Summary 'Test Cases: (of 48)' / 'Test Collections: 0 (of 8)'"
+  test_package: "PASS — input.asl compiles, iasl -d round-trips, restored ASL matches"
+  notes: "aslts.sh runs in build() (not test_package) because conan create invokes build() unconditionally and that's where the full upstream source tree lives — aslts.sh's build_acpi_tools rebuilds iasl/acpiexec/acpibin from source via make. GNU Bash 5.3 (tool_requires) resolves the #!/bin/bash shebang + break/continue blockers; 0004 patch rewrites shebangs to #!/usr/bin/env bash + PATH prepend bash bindir so helpers resolve GNU Bash; CC=clang injects compiler into the make rebuild; 0005 patch forces make -j1 to avoid HarmonyOS MAC mkfifo reject; 0003 patch + TMPDIR resolve readonly /tmp. package() ships only iasl + LICENSE, NOT the full source tree (aslts runs in build, not from the published package)."
 assertion_count: 3

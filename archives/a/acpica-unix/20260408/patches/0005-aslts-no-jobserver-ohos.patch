@@ -1,0 +1,9 @@
+--- a/tests/aslts.sh
++++ b/tests/aslts.sh
+@@ -94,3 +94,3 @@
+-		make iasl ASLTS=TRUE OPT_CFLAGS="-DACPI_CONTINUE_ON_FATAL" -j$jobs
+-		make acpibin ASLTS=TRUE OPT_CFLAGS="-DACPI_CONTINUE_ON_FATAL" -j$jobs
+-		make acpiexec ASLTS=TRUE OPT_CFLAGS="-DACPI_CONTINUE_ON_FATAL" -j$jobs
++		make iasl ASLTS=TRUE OPT_CFLAGS="-DACPI_CONTINUE_ON_FATAL" -j1
++		make acpibin ASLTS=TRUE OPT_CFLAGS="-DACPI_CONTINUE_ON_FATAL" -j1
++		make acpiexec ASLTS=TRUE OPT_CFLAGS="-DACPI_CONTINUE_ON_FATAL" -j1
