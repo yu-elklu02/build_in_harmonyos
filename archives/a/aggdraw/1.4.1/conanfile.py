@@ -62,10 +62,15 @@ class AggdrawConan(ConanFile):
         # up the Python C-API symbols at link time.
         py_lib_dir = os.path.join(os.path.dirname(sys.executable), "..", "lib")
         py_lib_dir = os.path.abspath(py_lib_dir)
+        # CI's SDK lld loads an incompatible libxml2.so.16. The HNP linker is
+        # the repository-standard fallback for native OHOS C/C++ links.
+        linker = ""
+        if self.settings.os == "OHOS":
+            linker = "-fuse-ld=/data/service/hnp/bin/ld "
         self.run(
             f'env CXX=clang++ '
-            f'LDSHARED="clang++ -shared -L{py_lib_dir} -lpython3.12" '
-            f'LDFLAGS="-L{py_lib_dir} -lpython3.12" '
+            f'LDSHARED="clang++ -shared {linker}-L{py_lib_dir} -lpython3.12" '
+            f'LDFLAGS="{linker}-L{py_lib_dir} -lpython3.12" '
             f'"{sys.executable}" -m pip install . --target "{staging}" '
             "--no-build-isolation --no-deps",
             cwd=self.source_folder,

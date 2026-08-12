@@ -13,8 +13,10 @@ source:
 
 build:
   system: setuptools
-  command: 'env CXX=clang++ LDSHARED="clang++ -shared -L<py_lib> -lpython3.12" LDFLAGS="-L<py_lib> -lpython3.12" python3 -m pip install . --target <staging> --no-build-isolation --no-deps'
+  command: 'env CXX=clang++ LDSHARED="clang++ -shared -fuse-ld=/data/service/hnp/bin/ld -L<py_lib> -lpython3.12" LDFLAGS="-fuse-ld=/data/service/hnp/bin/ld -L<py_lib> -lpython3.12" python3 -m pip install . --target <staging> --no-build-isolation --no-deps'
   dependencies: []
+
+ci_linker_workaround: "Use /data/service/hnp/bin/ld because the CI SDK lld loads an incompatible libxml2.so.16."
 
 hongmeng_patches:
   - "build() inline env CXX=clang++ overrides sysconfig hardcoded CXX='c++' (HarmonyOS device ships clang/clang++ only, no 'c++' symlink)"

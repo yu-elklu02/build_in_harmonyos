@@ -18,6 +18,9 @@ to a package-local staging directory.  `package_info()` exposes that directory
 through `PYTHONPATH`, so the consumer test imports the packaged extension rather
 than the source tree.
 
+The OHOS CI SDK `lld` loads an incompatible `libxml2.so.16`, so the recipe
+selects the HNP linker through `-fuse-ld=/data/service/hnp/bin/ld`.
+
 ## Consumer test
 
 `test_package/test_aggdraw.py` imports the packaged native module, checks its
