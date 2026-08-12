@@ -10,7 +10,7 @@ source:
 build:
   system: autotools
   dependencies: []
-  command: "CC=clang ./configure --host=aarch64-linux-ohos --prefix=<package_folder> && make -j1 && make check && make install"
+  command: "CC=clang TMPDIR=<build_folder>/mawk-tmp ./configure --build=aarch64-unknown-linux-gnu --host=aarch64-linux-ohos --prefix=<package_folder> && make -j1 && make check && make install"
 tests:
   upstream:
     command: "make check"
@@ -22,4 +22,5 @@ tests:
     passed: 0
 platform_constraints:
   - "OHOS armv8 only"
-  - "Use --host=aarch64-linux-ohos to avoid config.guess on HarmonyOS"
+  - "Use explicit build and host triplets because bundled config.guess does not recognize HarmonyOS"
+  - "Configure uses a fixed TMPDIR child directory because HarmonyOS MAC rejects Autoconf random directory names"
