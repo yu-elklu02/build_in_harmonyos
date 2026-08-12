@@ -114,7 +114,12 @@ class AggdrawConan(ConanFile):
             # signature → MAC rejects exec in test_package.
             import glob as _glob
             so_pattern = os.path.join(self.package_folder, "aggdraw*.so")
-            for so_file in _glob.glob(so_pattern):
+            extension_modules = _glob.glob(so_pattern)
+            if not extension_modules:
+                raise ConanInvalidConfiguration(
+                    "aggdraw extension module was not packaged; cannot sign it for OHOS"
+                )
+            for so_file in extension_modules:
                 if not os.path.isfile(so_file):
                     continue
                 tmp_signed = so_file + ".signed"
