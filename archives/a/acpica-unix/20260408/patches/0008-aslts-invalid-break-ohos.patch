@@ -1,0 +1,9 @@
+diff --git a/tests/aslts/Makefile.def b/tests/aslts/Makefile.def
+--- a/tests/aslts/Makefile.def
++++ b/tests/aslts/Makefile.def
+@@ -119,1 +119,1 @@
+-		if [ $$ret != 0 ]; then break; fi; \
++		if [ $$ret != 0 ]; then :; else \
+@@ -126,1 +126,1 @@
+-		done; \
++		done; fi; \
