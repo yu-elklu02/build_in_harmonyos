@@ -19,6 +19,7 @@ patches_applied:
   - "0005-configure-ohos-umask.patch"
 platform_constraints:
   - "OHOS armv8/aarch64"
+  - "OHOS build uses -O0 -fno-strict-aliasing while investigating legacy C undefined behavior"
 tests:
   upstream:
     command: "make check -j1"

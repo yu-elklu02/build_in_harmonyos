@@ -28,7 +28,9 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
    permission failure during configure.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
-builds. It does not use absolute local paths or prebuilt binaries.
+builds. On OHOS, Bison itself is compiled with `-O0 -fno-strict-aliasing` so
+its legacy grammar-analysis C code is not exposed to aggressive alias-based
+optimization. It does not use absolute local paths or prebuilt binaries.
 
 ## Consumer test
 

@@ -70,6 +70,11 @@ class BisonConan(ConanFile):
     def generate(self):
         tc = AutotoolsToolchain(self)
         if self.settings.os == "OHOS":
+            # Bison 2.7's grammar-analysis code predates modern Clang and
+            # relies on aliasing-sensitive C idioms. Keep the OHOS binary
+            # conservative while preserving the upstream test suite.
+            tc.extra_cflags.extend(["-O0", "-fno-strict-aliasing"])
+            tc.extra_cxxflags.extend(["-O0", "-fno-strict-aliasing"])
             tc.configure_args.extend([
                 "--build=aarch64-unknown-linux-gnu",
                 "--host=aarch64-linux-ohos",
