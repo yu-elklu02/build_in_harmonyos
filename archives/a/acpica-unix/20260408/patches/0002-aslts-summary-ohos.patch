@@ -1,7 +1,36 @@
+diff --git a/tests/aslts/bin/Do b/tests/aslts/bin/Do
+index 4b9737b..146b1cd 100755
+--- a/tests/aslts/bin/Do
++++ b/tests/aslts/bin/Do
+@@ -632,17 +632,12 @@ get_iasl_version()
+ 
+ get_aslts_bin_line()
+ {
+-	echo "$1" | awk -F: '{ for (i=1; i<=NF; i++) { print $i}}' |\
+-	while [ 1 ]
++	while IFS= read -r line
+ 	do
+-		read line
+-		if [ $? -ne 0 ]; then
+-			break
+-		fi
+ 		if [[ "$line" == *aslts/bin ]]; then
+ 			echo "$line"
+ 		fi
+-	done
++	done < <(echo "$1" | awk -F: '{ for (i=1; i<=NF; i++) { print $i}}')
+ }
+ 
+ # ############################## MAIN ###############################
+diff --git a/tests/aslts/bin/asltsrun b/tests/aslts/bin/asltsrun
+index 9f647b3..661bc59 100755
 --- a/tests/aslts/bin/asltsrun
 +++ b/tests/aslts/bin/asltsrun
-@@ -389,9 +389,4 @@ do_summary_of_test_case()
- 	cat "$1" |\
+@@ -386,14 +386,8 @@ do_summary_of_test_case()
+ 
+ 	OLD_IFS=$IFS
+ 	IFS=" "
+-	cat "$1" |\
 -	while [ 1 ]
 +	while IFS= read -r line
  	do
@@ -11,21 +40,59 @@
 -			break
 -		fi
  		if [[ "$line" == *STST* ]]; then
-@@ -465,5 +460,6 @@ do_summary_of_test_case()
- 	done
- 
+ 			echo "$line"
+ 			cnt=$[ $cnt + 1 ]
+@@ -462,7 +456,8 @@ do_summary_of_test_case()
+ 				LargeRefCount=$[ $LargeRefCount + 1 ]
+ 			fi
+ 		fi
+-	done
++	done < "$1"
 +	echo "|$2|$cnt|$pass|$fail|$skip|$start|$finish|$total|$outstand0|$blck|$memtotal|$max0|$max1|$max2|$max3|$max4|$max5|$out0|$out1|$out2|$out3|$out4|$out5|$outstand1|$LargeRefCount|$exceptionsnum|" >> "$3"
+ 
  	IFS=$OLD_IFS  
  }
+@@ -497,16 +492,12 @@ do_all_summary()
+ {
+ 	local path summ
  
-@@ -500,9 +496,5 @@ do_all_summary()
- 	ls "$1" |\
+-	ls "$1" |\
 -	while [ 1 ]
-+	while IFS= read -r filename
++	for path in "$1"/*
  	do
 -		read filename
 -		if [ $? -ne 0 ] ; then
 -			break
 -		fi
++		[ -e "$path" ] || continue
++		filename=${path##*/}
  
  		if [ "$filename" == nopt -o "$filename" == opt ]; then
+-			path="$1/$filename"
+ 			if [ -d "$path/32" ]; then
+ 				summ="$path/32/__STATUS_OF_TEST_CASES"
+ 				echo -n "" > "$summ"
+@@ -672,19 +663,14 @@ parse_status_of_test_cases()
+ {
+ 	local x
+ 
+-	cat "$1" |\
+-	while [ 1 ]
++	while IFS= read -r line
+ 	do
+-		read line
+-		if [ $? -ne 0 ] ; then
+-			x="`get_collections_total`"
+-			echo ":$N_TEST_CASES:$N_TESTS:$N_PASS:$N_FAIL:$N_SKIP:$N_DISABLED_BRANCHES:$x:$N_OUTSTAND:$N_BLCK:$N_TOTAL:$N_OUTSTAND_1:$N_LARGE_REF_CNT"
+-			break
+-		fi
+ 		if [ -n "$line" ] ; then
+ 			report_test_case_summary "$line"
+ 		fi
+-	done
++	done < "$1"
++	x="`get_collections_total`"
++	echo ":$N_TEST_CASES:$N_TESTS:$N_PASS:$N_FAIL:$N_SKIP:$N_DISABLED_BRANCHES:$x:$N_OUTSTAND:$N_BLCK:$N_TOTAL:$N_OUTSTAND_1:$N_LARGE_REF_CNT"
+ }
+ 
+ # Generalization of summary information

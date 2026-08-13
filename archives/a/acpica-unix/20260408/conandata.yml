@@ -4,7 +4,7 @@ sources:
 
 patches:
   - patch_file: "patches/0002-aslts-summary-ohos.patch"
-    patch_description: "Avoid pipeline subshells while collecting ASLTS results on OHOS."
+    patch_description: "Run ASLTS result and PATH loops in GNU Bash without pipeline subshells; avoids HarmonyOS toybox /bin/sh break failures."
   - patch_file: "patches/0003-aslts-tmpdir-ohos.patch"
     patch_description: "Route aslts staging through ${TMPDIR} (HarmonyOS /tmp readonly)."
   - patch_file: "patches/0004-aslts-shebang-env-ohos.patch"
