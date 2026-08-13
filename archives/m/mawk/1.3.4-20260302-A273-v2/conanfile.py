@@ -12,7 +12,7 @@ from conan.tools.layout import basic_layout
 
 class MawkConan(ConanFile):
     name = "mawk"
-    version = "1.3.4-20260302-a273-v2"
+    version = "1.3.4-20260302-A273-v2"
     package_type = "application"
     description = "Interpreter for the AWK programming language"
     license = "GPL-2.0-only"

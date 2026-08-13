@@ -3,5 +3,5 @@
   "description": "Fast interpreter for the AWK programming language",
   "homepage": "https://invisible-island.net/mawk/",
   "type": "tool",
-  "versions": ["1.3.4-20260302-a273-v2"]
+  "versions": ["1.3.4-20260302-A273-v2"]
 }

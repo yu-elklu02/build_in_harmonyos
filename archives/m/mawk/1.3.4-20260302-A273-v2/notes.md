@@ -1,4 +1,4 @@
-# mawk 1.3.4-20260302-a273-v2
+# mawk 1.3.4-20260302-A273-v2
 
 mawk is a standalone AWK interpreter implemented in C. It uses Autotools and
 has no Conan runtime or build requirements. On HarmonyOS the recipe passes an
