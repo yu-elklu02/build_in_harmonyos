@@ -4,5 +4,5 @@ upstream_tests:
   command: make check -j1
   source: upstream tests/ and examples/
 consumer_test:
-  command: test.sh
+  command: test_bison.py
   assertions: version and generated parser execution
