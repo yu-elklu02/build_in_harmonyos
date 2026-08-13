@@ -83,7 +83,7 @@ class AcpicaUnixConan(ConanFile):
         # auditable per-case record on HarmonyOS.
         aslts_log = os.path.join(self.build_folder, "aslts-run.log")
         self.run(
-            f'env CC="{cc}" MAKEFLAGS=-j1 TMPDIR="{tmpdir}" PATH="{run_path}" '
+            f'env CC="{cc}" SHELL="{bash_bin}" MAKEFLAGS=-j1 TMPDIR="{tmpdir}" PATH="{run_path}" '
             f'"{bash_bin}" -x tests/aslts.sh > "{aslts_log}" 2>&1',
             cwd=self.source_folder,
         )
