@@ -88,7 +88,16 @@ class BisonConan(ConanFile):
         autotools = Autotools(self)
         autotools.configure()
         autotools.make(args=["-j1"])
-        self.run("make check -j1", env="conanbuild")
+        # Pass BISON explicitly so the test suite uses the just-built 2.7
+        # binary instead of falling back to any system bison on PATH.
+        # On OHOS the system already has bison 3.8.2 at
+        # /data/service/hnp/bin/bison; without this override make check
+        # picks that up and every diagnostic-format test fails.
+        bison_bin = os.path.join(self.build_folder, "src", "bison")
+        self.run(
+            "make check -j1 BISON={}".format(bison_bin),
+            env="conanbuild",
+        )
 
     def package(self):
         Autotools(self).install()
