@@ -5,8 +5,9 @@ has no Conan runtime or build requirements. On HarmonyOS the recipe passes an
 explicit `aarch64-linux-ohos` host triplet because the upstream config.guess
 does not recognize HarmonyOS directly, while config.sub accepts linux-ohos.
 
-The upstream `make check` suite and the installed-package consumer assertions
-must be updated with real-device results before the formal branch is pushed.
+HarmonyOS real-device verification completed successfully: upstream `make
+check` passed 174/174 checks, and the installed-package consumer test passed
+3/3 assertions.
 ## HarmonyOS Notes
 
 - Configure is invoked with explicit GNU/Linux build and HarmonyOS host triplets because the bundled `config.guess` does not recognize HarmonyOS.

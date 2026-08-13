@@ -1,6 +1,6 @@
 version: "1.3.4-20260302-a273-v2"
 software: mawk
-status: adapting
+status: passed
 build_system: autotools
 homepage: "https://invisible-island.net/mawk/"
 license: "GPL-2.0-only"
@@ -14,12 +14,12 @@ build:
 tests:
   upstream:
     command: "make check"
-    cases: 0
-    passed: 0
+    cases: 174
+    passed: 174
   adapted:
     command: "test_package/test.sh"
     cases: 3
-    passed: 0
+    passed: 3
 platform_constraints:
   - "OHOS armv8 only"
   - "Use explicit build and host triplets because bundled config.guess does not recognize HarmonyOS"
