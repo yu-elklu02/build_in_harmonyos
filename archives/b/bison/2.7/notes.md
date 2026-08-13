@@ -20,7 +20,10 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
    OHOS compiler.
 3. `0003-src-system.h.patch` declares gnulib multibyte helpers missing from
    the OHOS build.
-4. `0004-build-aux-config.sub-ohos.patch` accepts the OHOS host triplet.
+4. `source()` makes the bundled configure helper scripts executable and
+   teaches `config.sub` to accept the OHOS host triplet with Python text
+   replacement. This avoids the old patch's line-ending and continuation
+   issues on the vendored script.
 5. `0005-configure-ohos-umask.patch` avoids the HMDFS temporary-directory
    permission failure during configure.
 
