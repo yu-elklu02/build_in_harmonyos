@@ -49,6 +49,8 @@ class AggdrawConan(ConanFile):
         # hardcoded to "cc -shared ..."; the same env override switches the
         # linker to clang so the .so is produced.
         staging = os.path.join(self.build_folder, "staging")
+        clang = "/data/service/hnp/bin/clang"
+        clangxx = "/data/service/hnp/bin/clang++"
         # conan self.run's `env` only accepts predefined scope names, not dict
         # overrides, so inline CXX/LDSHARED/LDFLAGS via the `env` command prefix.
         #
@@ -76,8 +78,8 @@ class AggdrawConan(ConanFile):
         if self.settings.os == "OHOS":
             linker = "-fuse-ld=/data/service/hnp/bin/ld "
         self.run(
-            f'env CXX=clang++ '
-            f'LDSHARED="clang++ -shared {linker}-L{py_lib_dir} -lpython3.12" '
+            f'env CC="{clang}" CXX="{clangxx}" '
+            f'LDSHARED="{clangxx} -shared {linker}-L{py_lib_dir} -lpython3.12" '
             f'LDFLAGS="{linker}-L{py_lib_dir} -lpython3.12" '
             f'"{sys.executable}" -m pip install . --target "{staging}" '
             "--no-build-isolation --no-deps",
