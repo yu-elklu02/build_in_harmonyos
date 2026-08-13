@@ -10,8 +10,8 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
 - Source: https://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz
 - Build system: Autotools
 - Upstream test command: `make check -j1`
-- Test counts: to be recorded from the AtomCode real-device run; no result is
-  claimed before that run.
+- Real-device result: 279/293 passed (95.2%), 14 failed, 0 skipped.
+- The 14 failed cases are `%define`-related bison segmentation faults on OHOS.
 
 ## HarmonyOS changes
 
@@ -20,18 +20,20 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
    OHOS compiler.
 3. `0003-src-system.h.patch` declares gnulib multibyte helpers missing from
    the OHOS build.
+4. `0004-build-aux-config.sub-ohos.patch` accepts the OHOS host triplet.
+5. `0005-configure-ohos-umask.patch` avoids the HMDFS temporary-directory
+   permission failure during configure.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
 builds. It does not use absolute local paths or prebuilt binaries.
 
 ## Consumer test
 
-`test_package/test.sh` checks the installed version, generates a parser from a
-small grammar, compiles it with clang, and executes it against a functional
-assertion.
+`test_package/test.sh` is POSIX `sh`; it checks the installed version, generates
+ a parser from a small grammar, compiles it with clang, and executes it against
+ a functional assertion.
 
 ## Verification state
 
-The package is on the validation branch. `make check -j1` and the consumer test
-must both complete on the AtomCode OpenHarmony PC device before a formal branch
-is created.
+The package remains blocked because the upstream regression suite has 14 real
+segmentation-fault failures. No formal branch is created while they remain.

@@ -2,7 +2,7 @@ software: bison
 version: "2.7"
 homepage: "https://www.gnu.org/software/bison/"
 license: "GPL-3.0-or-later"
-status: adapting
+status: blocked
 build_system: autotools
 build_date: "2026-08-13"
 source:
@@ -16,15 +16,20 @@ patches_applied:
   - "0001-build-aux-config.guess.patch"
   - "0002-src-scan-gram.c.patch"
   - "0003-src-system.h.patch"
+  - "0004-build-aux-config.sub-ohos.patch"
+  - "0005-configure-ohos-umask.patch"
 platform_constraints:
   - "OHOS armv8/aarch64"
 tests:
   upstream:
     command: "make check -j1"
     source: "GNU Bison 2.7 tests/ and examples/"
-    cases: null
-    passed: null
-    note: "Counts will be filled from the real-device make check result."
+    cases: 293
+    passed: 279
+    failed: 14
+    skipped: 0
+    pass_rate: "279/293 (95.2%)"
+    note: "Real-device make check result: 14 tests segfault in bison 2.7 %define-related cases on OHOS; no failures were hidden."
   adapted:
     command: "test_package/test.sh"
     cases: 2

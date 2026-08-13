@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 BISON="$1"
 WORK="${TMPDIR:-/tmp}/bison-test.$$"
