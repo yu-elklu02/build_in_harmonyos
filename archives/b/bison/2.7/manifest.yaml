@@ -1,103 +1,32 @@
 software: bison
-# 版本级 manifest 模板
-# 文件位置: archives/{letter}/{name}/2.7/manifest.yaml
-# 遵循 ARCHIVE-SPEC v2.0
-
-# ============================================================
-# 必须字段
-# ============================================================
-
-# 版本号
 version: "2.7"
-
-# 编译状态
-# published | built | failed | archived
-status: published
-
-# 构建系统类型（顶层字段，用于 verify-build 检查）
+homepage: "https://www.gnu.org/software/bison/"
+license: "GPL-3.0-or-later"
+status: adapting
 build_system: autotools
-
-# 编译日期（YYYY-MM-DD）
-build_date: "2026-06-09"
-
-# ============================================================
-# 源码信息
-# ============================================================
-
+build_date: "2026-08-13"
 source:
-  # 源码下载 URL
-  url: "file:///storage/Users/currentUser/tmp/bison-2.7.tar.gz"
-
-  # 源码校验和
-  sha256: ""
-
-  # 压缩格式
-  # tar.gz | tar.xz | tar.bz2 | zip
-  tar_format: tar.gz
-
-# ============================================================
-# 构建配置
-# ============================================================
-
+  url: "https://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz"
+  sha256: "19bbe7374fd602f7a6654c131c21a15aebdc06cc89493e8ff250cb7f9ed0a831"
 build:
-  # 构建系统类型
-  # cmake | autotools | makefile | meson | custom
   system: autotools
-
-  # 配置选项列表（无额外选项）
-  # 例如:
-  # - "-DCMAKE_BUILD_TYPE=Release"
-  # - "-DCMAKE_SYSTEM_NAME=OHOS"
-
-  # 编译依赖列表（格式: name/version）
   dependencies: []
-  # 例如:
-  # - openssl/1.1.1w
-  # - curl/8.19.0
-
-  # 编译器
-  cc: clang
-  cxx: clang++
-
-# ============================================================
-# 补丁信息
-# ============================================================
-
-# 应用的补丁列表
+  compiler: clang/clang++
 patches_applied:
   - "0001-build-aux-config.guess.patch"
   - "0002-src-scan-gram.c.patch"
   - "0003-src-system.h.patch"
-
-# ============================================================
-# 知识沉淀
-# ============================================================
-
-# 编译中学到的知识
-knowledge_gained: []
-# 例如:
-# - "Bootstrap 需要 -- -DCMAKE_SYSTEM_NAME=OHOS"
-# - "内嵌 libuv 需要禁用，使用系统 libuv"
-
-patch_generation:
-  method: per-file-difflib
-  source_orig_dir: /storage/Users/currentUser/builds/bison-2.7.orig
-  source_work_dir: /storage/Users/currentUser/builds/bison-2.7.work
-  source_orig_hash: efdcc6280f62bbe0
-  source_work_hash: 21d9af68541e1cd1
-  generated_at: '2026-06-09T11:31:00'
-  patches_count: 3
-
-patch_classification:
-  - file: 0001-build-aux-config.guess.patch
-    type: auto
-    platform_only: true
-    guard: pending
-  - file: 0002-src-scan-gram.c.patch
-    type: auto
-    platform_only: true
-    guard: pending
-  - file: 0003-src-system.h.patch
-    type: auto
-    platform_only: true
-    guard: pending
+platform_constraints:
+  - "OHOS armv8/aarch64"
+tests:
+  upstream:
+    command: "make check -j1"
+    source: "GNU Bison 2.7 tests/ and examples/"
+    cases: null
+    passed: null
+    note: "Counts will be filled from the real-device make check result."
+  adapted:
+    command: "test_package/test.sh"
+    cases: 2
+    passed: 0
+    note: "Version check and generated parser execution."

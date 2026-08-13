@@ -1,0 +1,8 @@
+package: bison/2.7
+upstream_tests:
+  build_system: autotools
+  command: make check -j1
+  source: upstream tests/ and examples/
+consumer_test:
+  command: test.sh
+  assertions: version and generated parser execution
