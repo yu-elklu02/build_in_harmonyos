@@ -32,9 +32,10 @@ builds. It does not use absolute local paths or prebuilt binaries.
 
 ## Consumer test
 
-`test_package/test.sh` is POSIX `sh`; it checks the installed version, generates
- a parser from a small grammar, compiles it with clang, and executes it against
- a functional assertion.
+`test_package/test_bison.py` uses absolute bison and clang paths and Python
+subprocesses, avoiding the restricted Conan run environment. It checks the
+installed version, generates a parser from a small grammar, compiles it with
+clang, and executes it against a functional assertion.
 
 ## Verification state
 
