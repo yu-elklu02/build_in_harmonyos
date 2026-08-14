@@ -1,4 +1,5 @@
 import os
+import re
 
 from conan import ConanFile
 from conan.errors import ConanException, ConanInvalidConfiguration
@@ -140,14 +141,66 @@ class BisonConan(ConanFile):
         if check_rc != 0:
             testsuite_log = os.path.join(self.build_folder, "tests", "testsuite.log")
             if os.path.isfile(testsuite_log):
-                with open(testsuite_log, encoding="utf-8", errors="replace") as handle:
-                    for line in handle:
-                        text = line.rstrip()
-                        if "Subject: [GNU Bison 2.7] testsuite:" in text:
-                            self.output.error(text)
-                        elif text.startswith("ERROR: ") or text.startswith("FAIL: "):
-                            self.output.error(text)
+                self._report_testsuite_failures(testsuite_log)
             raise ConanException("bison upstream make check failed")
+
+    def _report_testsuite_failures(self, testsuite_log):
+        with open(testsuite_log, encoding="utf-8", errors="replace") as handle:
+            lines = handle.readlines()
+
+        failed_groups = []
+        capture_subject = False
+        for line in lines:
+            text = line.rstrip()
+            if "Subject: [GNU Bison 2.7] testsuite:" in text:
+                capture_subject = True
+                self.output.error(text)
+                failed_text = text.split("testsuite:", 1)[1]
+            elif capture_subject and line.startswith(" "):
+                self.output.error(text)
+                failed_text = text
+            elif capture_subject:
+                capture_subject = False
+                failed_text = ""
+            else:
+                failed_text = ""
+
+            if capture_subject:
+                failed_groups.extend(re.findall(r"\b\d+\b", failed_text))
+            if text.startswith("FAIL: "):
+                failed_groups.extend(re.findall(r"\b\d+\b", text))
+            if text.startswith("ERROR: ") or text.startswith("FAIL: "):
+                self.output.error(text)
+
+        tests_dir = os.path.dirname(testsuite_log)
+        testsuite_dir = os.path.join(tests_dir, "testsuite.dir")
+        for group in sorted(set(failed_groups), key=int):
+            group_dir = os.path.join(testsuite_dir, group)
+            if not os.path.isdir(group_dir):
+                continue
+            self.output.error("===== bison testsuite group {} details =====".format(group))
+            emitted = 0
+            for root, _, files in os.walk(group_dir):
+                for name in sorted(files):
+                    if name not in ("stdout", "stderr") and not name.endswith((".log", ".out", ".exp")):
+                        continue
+                    path = os.path.join(root, name)
+                    try:
+                        with open(path, encoding="utf-8", errors="replace") as handle:
+                            content = [line.rstrip() for line in handle.readlines()]
+                    except OSError:
+                        continue
+                    if not any(line.strip() for line in content):
+                        continue
+                    rel = os.path.relpath(path, group_dir)
+                    self.output.error("--- {} ---".format(rel))
+                    for line in content[:80]:
+                        self.output.error(line)
+                    emitted += 1
+                    if emitted >= 4:
+                        break
+                if emitted >= 4:
+                    break
 
     def package(self):
         # Standard autotools cross-install: DESTDIR relocates all files
