@@ -107,12 +107,20 @@ class BisonConan(ConanFile):
         src_dir = os.path.join(self.build_folder, "src")
         pkgdata = os.path.join(self.package_folder, "usr", "share", "bison")
         old_path = os.environ.get("PATH", "")
+        # CC/CXX must be explicit: bison's testsuite compiles the generated
+        # .c files to verify correctness. On OHOS the conanbuild env sets
+        # CC but the variable is not inherited by the testsuite subshell
+        # unless we forward it explicitly. Without CC the shell interprets
+        # "$CC -c ..." as "-c: inaccessible or not found" (exit 127).
+        clang = str(self.conf.get("tools.build:compiler_executables", default={})
+                    .get("c", "clang"))
         self.run(
             "make check -j1",
             env="conanbuild",
             extra_env={
                 "PATH": "{}:{}".format(src_dir, old_path),
                 "BISON_PKGDATADIR": pkgdata,
+                "CC": clang,
             },
         )
 
