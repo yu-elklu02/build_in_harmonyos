@@ -11,7 +11,9 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
 - Build system: Autotools
 - Upstream test command: `make check -j1`
 - Real-device result: 279/293 passed (95.2%), 14 failed, 0 skipped.
-- The 14 failed cases are `%define`-related bison segmentation faults on OHOS.
+- The 14 remaining failures are split into three confirmed classes:
+  4 `%define` diagnostic SIGSEGV failures, 2 RTC box-drawing output diffs,
+  and 8 IELR/LAC state-splitting mismatches.
 
 ## HarmonyOS changes
 
@@ -28,6 +30,9 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
    permission failure during configure.
 6. `0006-lib-math-noexcept.patch` aligns gnulib's generated C++ math overloads
    with OHOS libc++ by using `bool` return types and `noexcept` declarations.
+7. `0007-location-null-file-ohos.patch` guards Bison's diagnostic location
+   printer against empty location file names exposed by the OHOS `%define`
+   error-reporting path.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
 builds. On OHOS, Bison itself is compiled with `-O0 -fno-strict-aliasing` so
@@ -43,5 +48,8 @@ clang, and executes it against a functional assertion.
 
 ## Verification state
 
-The package remains blocked because the upstream regression suite has 14 real
-segmentation-fault failures. No formal branch is created while they remain.
+The package remains blocked because the upstream regression suite still has
+non-zero failures. The next validation run checks whether the location guard
+removes the 4 `%define` SIGSEGV failures; the 2 RTC output diffs and 8
+IELR/LAC mismatches remain under investigation. No formal branch is created
+while failures remain.
