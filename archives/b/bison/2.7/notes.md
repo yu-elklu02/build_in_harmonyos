@@ -26,6 +26,8 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
    issues on the vendored script.
 5. `0005-configure-ohos-umask.patch` avoids the HMDFS temporary-directory
    permission failure during configure.
+6. `0006-lib-math-noexcept.patch` aligns gnulib's generated C++ math overloads
+   with OHOS libc++ by using `bool` return types and `noexcept` declarations.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
 builds. On OHOS, Bison itself is compiled with `-O0 -fno-strict-aliasing` so

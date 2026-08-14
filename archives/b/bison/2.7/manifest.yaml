@@ -17,6 +17,7 @@ patches_applied:
   - "0002-src-scan-gram.c.patch"
   - "0003-src-system.h.patch"
   - "0005-configure-ohos-umask.patch"
+  - "0006-lib-math-noexcept.patch"
 platform_constraints:
   - "OHOS armv8/aarch64"
   - "OHOS build uses -O0 -fno-strict-aliasing while investigating legacy C undefined behavior"

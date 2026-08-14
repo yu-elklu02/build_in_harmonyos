@@ -12,6 +12,4 @@ patches:
   - patch_file: "patches/0005-configure-ohos-umask.patch"
     patch_description: "Use an OHOS-compatible umask when configure creates its temporary directory."
   - patch_file: "patches/0006-lib-math-noexcept.patch"
-    patch_description: "Add _GL_MATH_CXX_NOEXCEPT to gnulib math.in.h C++ overloads so they match the noexcept specification required by OHOS libcxx."
-  - patch_file: "patches/0007-muscle-tab-safe-loc.patch"
-    patch_description: "Guard muscle_percent_define_get_loc against a NULL file pointer in the decoded location to prevent SIGSEGV on OHOS aarch64."
+    patch_description: "Match OHOS libcxx bool noexcept math overloads in gnulib math.in.h."
