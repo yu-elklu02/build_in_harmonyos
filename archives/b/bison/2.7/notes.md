@@ -31,8 +31,8 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
 6. `0006-lib-math-noexcept.patch` aligns gnulib's generated C++ math overloads
    with OHOS libc++ by using `bool` return types and `noexcept` declarations.
 7. `0007-location-null-file-ohos.patch` guards Bison's diagnostic location
-   printer against empty location file names exposed by the OHOS `%define`
-   error-reporting path.
+   printer against empty location file names and initializes decoded
+   `%define` locations, covering the OHOS `%define` error-reporting path.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
 builds. On OHOS, Bison itself is compiled with `-O0 -fno-strict-aliasing` so

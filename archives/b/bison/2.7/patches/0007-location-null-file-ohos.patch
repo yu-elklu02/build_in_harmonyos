@@ -34,3 +34,13 @@
           || (caret_info.source = fopen (loc.start.file, "r")))
        || loc.start.column == -1 || loc.start.line == -1)
      return;
+--- a/src/muscle-tab.c
++++ b/src/muscle-tab.c
+@@ -342,5 +342,5 @@ static location
+ location_decode (char const *key)
+ {
+-  location loc;
++  location loc = empty_location;
+   char const *value = muscle_find_const (key);
+   aver (value);
+   aver (*value == '[');
