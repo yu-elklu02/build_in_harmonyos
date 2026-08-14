@@ -114,6 +114,12 @@ class BisonConan(ConanFile):
         # "$CC -c ..." as "-c: inaccessible or not found" (exit 127).
         clang = str(self.conf.get("tools.build:compiler_executables", default={})
                     .get("c", "clang"))
+        # CPPFLAGS must include -I<build>/lib so that bison-generated .c
+        # files can find config.h (which lives in the build tree, not the
+        # source tree). The testsuite's atlocal.in sets this via autoconf
+        # substitution but that substitution is skipped in cross-compile
+        # mode, leaving CPPFLAGS empty.
+        lib_inc = os.path.join(self.build_folder, "lib")
         self.run(
             "make check -j1",
             env="conanbuild",
@@ -121,6 +127,7 @@ class BisonConan(ConanFile):
                 "PATH": "{}:{}".format(src_dir, old_path),
                 "BISON_PKGDATADIR": pkgdata,
                 "CC": clang,
+                "CPPFLAGS": "-I{}".format(lib_inc),
             },
         )
 
