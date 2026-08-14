@@ -81,6 +81,13 @@ class BisonConan(ConanFile):
                 "--host=aarch64-linux-ohos",
                 "--disable-nls",
             ])
+            # AutotoolsToolchain in cross-compile mode sets --prefix=/ by
+            # default, which causes bison to hard-code //share/bison in its
+            # binary (/ + /share = //share). Override to the real install
+            # tree so the skeleton files are found at runtime.
+            tc.configure_args.append(
+                "--prefix={}".format(self.package_folder)
+            )
         tc.generate()
 
     def build(self):
@@ -88,15 +95,19 @@ class BisonConan(ConanFile):
         autotools = Autotools(self)
         autotools.configure()
         autotools.make(args=["-j1"])
-        # Pass BISON explicitly so the test suite uses the just-built 2.7
-        # binary instead of falling back to any system bison on PATH.
-        # On OHOS the system already has bison 3.8.2 at
-        # /data/service/hnp/bin/bison; without this override make check
-        # picks that up and every diagnostic-format test fails.
-        bison_bin = os.path.join(self.build_folder, "src", "bison")
+        # Bison 2.7's testsuite calls the bare name `bison` from PATH
+        # (no $BISON variable, no ../src/bison relative path). On OHOS,
+        # bison 3.8.2 lives at /data/service/hnp/bin/bison and appears
+        # first on PATH, so every diagnostic-format test fails against
+        # 3.8.2 output instead of 2.7 output.
+        # Fix: prepend our just-built src/ dir to PATH so that `bison`
+        # resolves to the 2.7 binary we actually compiled.
+        src_dir = os.path.join(self.build_folder, "src")
+        env_path = "{}:{}".format(src_dir, os.environ.get("PATH", ""))
         self.run(
-            "make check -j1 BISON={}".format(bison_bin),
+            "make check -j1",
             env="conanbuild",
+            extra_env={"PATH": env_path},
         )
 
     def package(self):
