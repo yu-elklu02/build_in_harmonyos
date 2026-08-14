@@ -81,13 +81,14 @@ class BisonConan(ConanFile):
                 "--host=aarch64-linux-ohos",
                 "--disable-nls",
             ])
-            # AutotoolsToolchain in cross-compile mode sets --prefix=/ by
-            # default, which causes bison to hard-code //share/bison in its
-            # binary (/ + /share = //share). Override to the real install
-            # tree so the skeleton files are found at runtime.
-            tc.configure_args.append(
-                "--prefix={}".format(self.package_folder)
-            )
+            # Use --prefix=/usr so bison hard-codes /usr/share/bison as its
+            # data directory. The actual files are installed under
+            # package_folder via DESTDIR (see package()), giving:
+            #   <package_folder>/usr/share/bison/...
+            # At runtime the consumer sets BISON_PKGDATADIR to that path.
+            # This avoids both the //share double-slash (from --prefix=/)
+            # and the nested absolute path (from --prefix=package_folder).
+            tc.configure_args.append("--prefix=/usr")
         tc.generate()
 
     def build(self):
@@ -98,20 +99,28 @@ class BisonConan(ConanFile):
         # Bison 2.7's testsuite calls the bare name `bison` from PATH
         # (no $BISON variable, no ../src/bison relative path). On OHOS,
         # bison 3.8.2 lives at /data/service/hnp/bin/bison and appears
-        # first on PATH, so every diagnostic-format test fails against
-        # 3.8.2 output instead of 2.7 output.
-        # Fix: prepend our just-built src/ dir to PATH so that `bison`
-        # resolves to the 2.7 binary we actually compiled.
+        # first on PATH, so every test ran against 3.8.2 output instead
+        # of 2.7. Fix: prepend build_folder/src to PATH so `bison`
+        # resolves to the 2.7 binary we compiled.
+        # Also point BISON_PKGDATADIR at the skeleton files installed
+        # under package_folder so make check can open m4sugar/m4sugar.m4.
         src_dir = os.path.join(self.build_folder, "src")
-        env_path = "{}:{}".format(src_dir, os.environ.get("PATH", ""))
+        pkgdata = os.path.join(self.package_folder, "usr", "share", "bison")
+        old_path = os.environ.get("PATH", "")
         self.run(
             "make check -j1",
             env="conanbuild",
-            extra_env={"PATH": env_path},
+            extra_env={
+                "PATH": "{}:{}".format(src_dir, old_path),
+                "BISON_PKGDATADIR": pkgdata,
+            },
         )
 
     def package(self):
-        Autotools(self).install()
+        # Standard autotools cross-install: DESTDIR relocates all files
+        # under package_folder while the embedded paths keep /usr prefix.
+        autotools = Autotools(self)
+        autotools.install(args=["DESTDIR={}".format(self.package_folder)])
 
     def package_info(self):
         self.cpp_info.bindirs = ["bin"]
