@@ -1,7 +1,7 @@
 import os
 
 from conan import ConanFile
-from conan.errors import ConanInvalidConfiguration
+from conan.errors import ConanException, ConanInvalidConfiguration
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
@@ -121,7 +121,7 @@ class BisonConan(ConanFile):
         # mode, leaving CPPFLAGS empty.
         lib_dir = os.path.join(self.build_folder, "lib")
         lib_inc = lib_dir
-        self.run(
+        check_rc = self.run(
             "make check -j1",
             env="conanbuild",
             extra_env={
@@ -135,7 +135,19 @@ class BisonConan(ConanFile):
                 # "$CC ... $LIBS", so this must be set in the environment.
                 "LIBS": "-L{} -lbison".format(lib_dir),
             },
+            ignore_errors=True,
         )
+        if check_rc != 0:
+            testsuite_log = os.path.join(self.build_folder, "tests", "testsuite.log")
+            if os.path.isfile(testsuite_log):
+                with open(testsuite_log, encoding="utf-8", errors="replace") as handle:
+                    for line in handle:
+                        text = line.rstrip()
+                        if "Subject: [GNU Bison 2.7] testsuite:" in text:
+                            self.output.error(text)
+                        elif text.startswith("ERROR: ") or text.startswith("FAIL: "):
+                            self.output.error(text)
+            raise ConanException("bison upstream make check failed")
 
     def package(self):
         # Standard autotools cross-install: DESTDIR relocates all files
