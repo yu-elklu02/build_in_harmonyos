@@ -1,6 +1,6 @@
 --- a/src/location.c
 +++ b/src/location.c
-@@ -102,19 +102,21 @@ location_print (FILE *out, location loc)
+@@ -103,19 +103,21 @@ location_print (FILE *out, location loc)
  {
    unsigned res = 0;
    int end_col = 0 != loc.end.column ? loc.end.column - 1 : 0;
@@ -25,18 +25,20 @@
        if (0 <= loc.end.line)
          {
            res += fprintf (out, ":%d", loc.end.line);
-@@ -160,7 +162,7 @@ location_caret (FILE *out, location loc)
+@@ -162,7 +164,8 @@ location_caret (FILE *out, location loc)
  {
    /* FIXME: find a way to support multifile locations, and only open once each
       file. That would make the procedure future-proof.  */
 -  if (! (caret_info.source
-+  if (! (loc.start.file && (caret_info.source
-          || (caret_info.source = fopen (loc.start.file, "r")))
+-         || (caret_info.source = fopen (loc.start.file, "r")))
++  if (! (loc.start.file
++         && (caret_info.source
++             || (caret_info.source = fopen (loc.start.file, "r"))))
        || loc.start.column == -1 || loc.start.line == -1)
      return;
 --- a/src/muscle-tab.c
 +++ b/src/muscle-tab.c
-@@ -342,5 +342,5 @@ static location
+@@ -343,5 +343,5 @@ static location
  location_decode (char const *key)
  {
 -  location loc;
