@@ -11,3 +11,5 @@ patches:
     patch_description: "Declare gnulib multibyte helpers missing from the OHOS build."
   - patch_file: "patches/0005-configure-ohos-umask.patch"
     patch_description: "Use an OHOS-compatible umask when configure creates its temporary directory."
+  - patch_file: "patches/0006-lib-math-noexcept.patch"
+    patch_description: "Add _GL_NOEXCEPT to gnulib math.in.h C++ overloads so they match the noexcept specification required by OHOS libcxx."

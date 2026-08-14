@@ -119,7 +119,8 @@ class BisonConan(ConanFile):
         # source tree). The testsuite's atlocal.in sets this via autoconf
         # substitution but that substitution is skipped in cross-compile
         # mode, leaving CPPFLAGS empty.
-        lib_inc = os.path.join(self.build_folder, "lib")
+        lib_dir = os.path.join(self.build_folder, "lib")
+        lib_inc = lib_dir
         self.run(
             "make check -j1",
             env="conanbuild",
@@ -128,6 +129,11 @@ class BisonConan(ConanFile):
                 "BISON_PKGDATADIR": pkgdata,
                 "CC": clang,
                 "CPPFLAGS": "-I{}".format(lib_inc),
+                # LIBS: link against bison's bundled gnulib (libbison.a) so
+                # that rpl_malloc / rpl_printf / rpl_fprintf are resolved.
+                # The testsuite links each generated parser with
+                # "$CC ... $LIBS", so this must be set in the environment.
+                "LIBS": "-L{} -lbison".format(lib_dir),
             },
         )
 
