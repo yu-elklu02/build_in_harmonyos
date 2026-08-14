@@ -7,32 +7,34 @@ diff -ruN a/lib/math.in.h b/lib/math.in.h
  static int _gl_cxx_ ## func ## d (double d) { return func (d); }        \
  static int _gl_cxx_ ## func ## l (long double l) { return func (l); }
 +
-+/* On compilers/libcs that declare these functions with noexcept (e.g.
-+   OHOS libcxx), the wrapper overloads below must also carry noexcept
-+   or the compiler rejects the redeclaration.  _GL_NOEXCEPT expands to
-+   noexcept in C++11 and later, and to nothing in C or older C++.     */
-+# if defined __cplusplus && __cplusplus >= 201103L
-+#  define _GL_NOEXCEPT noexcept
++/* On compilers/libcs (e.g. OHOS libcxx) that declare math functions
++   with noexcept, the C++ wrapper overloads below must also carry
++   noexcept or the compiler rejects the redeclaration.
++   _GL_MATH_CXX_NOEXCEPT expands to noexcept whenever we are in C++
++   mode (regardless of standard version, because OHOS clang may report
++   __cplusplus as a non-standard value), and to nothing in C.         */
++# ifdef __cplusplus
++#  define _GL_MATH_CXX_NOEXCEPT noexcept
 +# else
-+#  define _GL_NOEXCEPT
++#  define _GL_MATH_CXX_NOEXCEPT
 +# endif
 +
  # define _GL_MATH_CXX_REAL_FLOATING_DECL_2(func) \
  inline int                                                               \
 -func (float f)                                                           \
-+func (float f) _GL_NOEXCEPT                                              \
++func (float f) _GL_MATH_CXX_NOEXCEPT                                    \
  {                                                                        \
    return _gl_cxx_ ## func ## f (f);                                      \
  }                                                                        \
  inline int                                                               \
 -func (double d)                                                          \
-+func (double d) _GL_NOEXCEPT                                             \
++func (double d) _GL_MATH_CXX_NOEXCEPT                                   \
  {                                                                        \
    return _gl_cxx_ ## func ## d (d);                                      \
  }                                                                        \
  inline int                                                               \
 -func (long double l)                                                     \
-+func (long double l) _GL_NOEXCEPT                                        \
++func (long double l) _GL_MATH_CXX_NOEXCEPT                              \
  {                                                                        \
    return _gl_cxx_ ## func ## l (l);                                      \
  }
