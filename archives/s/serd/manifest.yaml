@@ -22,5 +22,5 @@ versions:
     packaging: "packaging/"
   "0.32.10":
     path: "0.32.10"
-    status: adapting
+    status: passed
     source_url: "https://download.drobilla.net/serd-0.32.10.tar.xz"

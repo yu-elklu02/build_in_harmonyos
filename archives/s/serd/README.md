@@ -12,7 +12,7 @@ Serd 是一个轻量级的 RDF 序列化库，用于读写 RDF 数据格式。
 - 构建系统: meson 1.11.1
 - ELF 签名必需，否则 serdi 无法执行
 - 0.32.9-git 测试全部通过（41/41）
-- 0.32.10 新增 Conan recipe，开启上游 Meson 测试并通过 test_package 验证 C API 与 serdi CLI
+- 0.32.10 新增 Conan recipe，上游 Meson 测试 65/65 通过，test_package 验证 C API 与 serdi CLI 2/2 通过
 
 ## 依赖
 - zix >= 0.6.0 (0.32.9-git 适配记录)

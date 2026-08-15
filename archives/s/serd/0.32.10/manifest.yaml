@@ -1,6 +1,6 @@
 software: serd
 version: "0.32.10"
-status: adapting
+status: passed
 build_date: "2026-08-16"
 build_system: meson
 
@@ -25,13 +25,18 @@ build:
 patches_applied: []
 
 upstream_tests:
-  status: pending
+  status: passed
   framework: "Meson test"
-  note: "build() enables upstream tests and runs meson.test(); true HarmonyOS result must be filled after device validation."
+  cases: 65
+  passed: 65
+  failed: 0
+  note: "build() enables upstream tests and runs meson.test(); HarmonyOS validation passed."
 
 adapted_tests:
-  status: pending
+  status: passed
   cases: 2
+  passed: 2
+  failed: 0
   note: "test_package verifies both C API consumption and packaged serdi CLI Turtle-to-NTriples conversion."
 
 knowledge_gained:
