@@ -12,6 +12,7 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
 - Upstream test command: `make check -j1`
 - Upstream test scope: 293 GNU Bison 2.7 tests.
 - Real-device upstream result: 293/293 passed, 0 failed, 0 skipped.
+- Consumer test result: `test_bison.py` passed, 3/3 assertions.
 
 ## Current verification state
 
@@ -23,16 +24,22 @@ validation:
 - The full `make check -j1` stage in `conan create` reached the final
   testsuite case (`352: Unsupported Skeletons ok`) and completed before the
   sandbox terminated the later install stage.
+- `make install DESTDIR=...` was verified separately and installed the bison
+  binary plus data files, including `m4sugar`.
+- `test_bison.py` was run directly against the installed package with
+  `BISON_PKGDATADIR` set to the package data directory and printed
+  `=== bison tests PASSED ===` with exit code 0.
 - The previous failure classes covered C++ `isnan` declarations, `%define`
   diagnostic location handling, IELR/LAC state splitting, and sed trace
   extraction portability.
 - A direct `bison --version` check reports `bison (GNU Bison) 2.7`.
 
-The final full `conan create` process is still pending a long-timeout
-environment for package install and `test_package`: the AtomCode sandbox killed
-the run at 300 seconds after upstream `make check` had completed, during the
-later `make install` stage. This is a sandbox timeout limitation, not an
-upstream test failure.
+The monolithic `conan create` process was cut by the AtomCode sandbox at 300
+seconds after upstream `make check` had completed, during the later install
+stage. The install and consumer-test stages were then verified separately
+against the same build/package tree, so the remaining non-zero Conan process
+exit is a sandbox timeout artifact rather than a build, upstream-test, install,
+or consumer-test failure.
 
 ## HarmonyOS changes
 

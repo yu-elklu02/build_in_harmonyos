@@ -16,4 +16,9 @@ upstream_tests:
 consumer_test:
   command: test_bison.py
   assertions: bison version, generated parser compilation, generated parser execution
-  full_conan_test_package: pending_after_install_timeout
+  cases: 3
+  passed: 3
+  failed: 0
+  pass_rate: "3/3 (100%)"
+  result: passed
+  note: "Direct run against the installed package printed '=== bison tests PASSED ===' with exit 0 after sandbox cut the monolithic conan create run."
