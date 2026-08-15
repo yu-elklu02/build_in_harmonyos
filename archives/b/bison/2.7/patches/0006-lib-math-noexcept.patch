@@ -46,3 +46,19 @@ index 252e205..4f77225 100644
  {                                                                   \
    return _gl_cxx_ ## func ## l (l);                                 \
  }
+@@ -2181,10 +2181,14 @@ _GL_EXTERN_C int rpl_isnanl (long double x) _GL_ATTRIBUTE_CONST;
+     __builtin_isnanf ((float)(x)))
+ # endif
+ # ifdef __cplusplus
+ #  ifdef isnan
++#   if defined _LIBCPP_VERSION
++#    undef isnan
++#   else
+ _GL_MATH_CXX_REAL_FLOATING_DECL_1 (isnan)
+-#   undef isnan
++#    undef isnan
+ _GL_MATH_CXX_REAL_FLOATING_DECL_2 (isnan)
++#   endif
+ #  endif
+ # else
+ /* Ensure isnan is a macro.  */
