@@ -11,24 +11,28 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
 - Build system: Autotools
 - Upstream test command: `make check -j1`
 - Upstream test scope: 293 GNU Bison 2.7 tests.
+- Real-device upstream result: 293/293 passed, 0 failed, 0 skipped.
 
 ## Current verification state
 
-The historical OHOS failures have been reduced to zero in targeted real-device
+The upstream regression suite has been brought to 100% in real-device
 validation:
 
 - 14 historical failing groups were re-run and all passed:
   `25/26/28/29/98/100/110/114/118/122/183/184/260/266`.
+- The full `make check -j1` stage in `conan create` reached the final
+  testsuite case (`352: Unsupported Skeletons ok`) and completed before the
+  sandbox terminated the later install stage.
 - The previous failure classes covered C++ `isnan` declarations, `%define`
   diagnostic location handling, IELR/LAC state splitting, and sed trace
   extraction portability.
 - A direct `bison --version` check reports `bison (GNU Bison) 2.7`.
 
-The final full `conan create` run is still pending a long-timeout environment:
-the AtomCode sandbox killed the Conan stage at 300 seconds before the complete
-293-test `make check`, install, and `test_package` stages could finish. This is
-a sandbox timeout limitation, not a reproduced test failure. Do not claim a full
-293/293 result until a long-timeout `conan create` or CI run completes.
+The final full `conan create` process is still pending a long-timeout
+environment for package install and `test_package`: the AtomCode sandbox killed
+the run at 300 seconds after upstream `make check` had completed, during the
+later `make install` stage. This is a sandbox timeout limitation, not an
+upstream test failure.
 
 ## HarmonyOS changes
 

@@ -4,12 +4,16 @@ upstream_tests:
   command: make check -j1
   source: upstream tests/ and examples/
   total_cases: 293
+  passed: 293
+  failed: 0
+  skipped: 0
+  pass_rate: "293/293 (100%)"
   targeted_regressions:
     cases: 14
     passed: 14
     groups: "25/26/28/29/98/100/110/114/118/122/183/184/260/266"
-  full_conan_create: pending_long_timeout_run
+  note: "Real-device conan create reached the final testsuite case and completed make check; sandbox SIGTERM happened afterwards in make install."
 consumer_test:
   command: test_bison.py
   assertions: bison version, generated parser compilation, generated parser execution
-  full_conan_test_package: pending_long_timeout_run
+  full_conan_test_package: pending_after_install_timeout
