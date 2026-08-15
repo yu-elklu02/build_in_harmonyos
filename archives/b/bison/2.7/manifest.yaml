@@ -2,7 +2,7 @@ software: bison
 version: "2.7"
 homepage: "https://www.gnu.org/software/bison/"
 license: "GPL-3.0-or-later"
-status: blocked
+status: validating
 build_system: autotools
 build_date: "2026-08-13"
 source:
@@ -20,6 +20,8 @@ patches_applied:
   - "0006-lib-math-noexcept.patch"
   - "0007-location-null-file-ohos.patch"
   - "0008-percent-define-loc-fallback-ohos.patch"
+  - "0009-annotation-insert-side-effect-ohos.patch"
+  - "0010-sets-sed-explicit-quiet-ohos.patch"
 platform_constraints:
   - "OHOS armv8/aarch64"
   - "OHOS build uses -O0 -fno-strict-aliasing while investigating legacy C undefined behavior"
@@ -28,13 +30,18 @@ tests:
     command: "make check -j1"
     source: "GNU Bison 2.7 tests/ and examples/"
     cases: 293
-    passed: 279
-    failed: 14
-    skipped: 0
-    pass_rate: "279/293 (95.2%)"
-    note: "Real-device make check result after SIGSEGV fix: 14 non-crash failures split into 3 classes on OHOS: 4 %define diagnostic location diffs, 2 RTC box-drawing output diffs, and 8 IELR/LAC state-splitting mismatches."
+    passed: "pending full conan create"
+    failed: "pending full conan create"
+    skipped: "pending full conan create"
+    pass_rate: "pending full conan create"
+    targeted_regressions:
+      cases: 14
+      passed: 14
+      failed: 0
+      groups: "25/26/28/29/98/100/110/114/118/122/183/184/260/266"
+    note: "Real-device targeted validation confirms all 14 historical upstream failures now pass. Full make check/test_package in one conan create still needs a long-timeout run because the AtomCode sandbox killed the Conan stage at 300s."
   adapted:
     command: "test_package/test_bison.py"
-    cases: 2
-    passed: 0
-    note: "Version check and generated parser execution."
+    cases: 3
+    passed: "pending full conan create"
+    note: "Python consumer test checks bison --version, generated C parser compilation, and parser execution; standalone binary version check passed, full Conan test_package stage is pending long-timeout conan create."
