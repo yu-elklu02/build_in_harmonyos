@@ -16,7 +16,7 @@
          res += fprintf (out, ".%d", loc.start.column);
      }
 -  if (loc.start.file != loc.end.file)
-+  if (start_file != end_file)
++  if (strcmp (start_file, end_file) != 0)
      {
        res += fprintf (out, "-%s",
                        quotearg_n_style (3, escape_quoting_style,
