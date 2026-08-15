@@ -1,0 +1,37 @@
+software: nanopb
+version: "0.4.9.1"
+status: adapting
+build_date: "2026-08-16"
+build_system: cmake
+
+source:
+  url: "https://github.com/nanopb/nanopb/releases/download/nanopb-0.4.9.1/nanopb-0.4.9.1.tar.gz"
+  sha256: "882cd8473ad932b24787e676a808e4fb29c12e086d20bcbfbacc66c183094b5c"
+  tar_format: tar.gz
+
+build:
+  system: cmake
+  configure_options:
+    - "-Dnanopb_BUILD_RUNTIME=ON"
+    - "-Dnanopb_BUILD_GENERATOR=OFF"
+    - "-DBUILD_STATIC_LIBS=ON"
+    - "-DBUILD_SHARED_LIBS=OFF"
+  dependencies: []
+  cc: clang
+  cxx: clang++
+
+patches_applied:
+  - "0001-cmake-runtime-without-generator-deps.patch"
+
+upstream_tests:
+  status: pending
+  framework: "SCons upstream suite"
+  note: "Upstream full tests use SCons + protoc + Python protobuf generator path. The Conan package builds the C runtime without generator dependencies; true OHOS validation should record whether the upstream SCons suite is available or skipped for missing generator/test dependencies."
+
+adapted_tests:
+  status: pending
+  cases: 1
+  note: "test_package builds a C consumer and verifies nanopb stream tag/varint/string encode-decode roundtrip."
+
+knowledge_gained:
+  - "nanopb CMake 0.4.9.1 required protoc and Python before checking nanopb_BUILD_GENERATOR; runtime-only builds need those probes guarded by nanopb_BUILD_GENERATOR."
