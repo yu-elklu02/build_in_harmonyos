@@ -59,13 +59,13 @@ SKILL_ROOT="$(dirname "$(find "${ATOMCODE_HOME:-$HOME/.atomcode}" -name "SKILL.m
 | 协作者（默认） | 直接使用 | 编译软件、提取知识、生成 conanfile.py、创建分支并提交 PR |
 | 主编 | `OHC_ROLE=editor` | 审核 PR、合并知识、重建索引 |
 
-### §0.2 积分赛事 PR 模板（⭐ 积分赛事专用）
+### §0.2 积分赛事 PR 模板（⭐ 积分赛专用）
 
-使用 AtomCode 提交积分赛事 PR 时，必须使用专用模板：
+使用 AtomCode 提交积分赛 PR 时，必须使用专用模板：
 
 - **模板文件**：`templates/积分赛事PR模板.md`
-- **触发条件**：提示词中包含 **"积分模板"** 时自动启用
-- **PR 标题**：必须以 `【积分赛事】` 为前缀
+- **触发条件**：提示词中包含 **"积分赛"、"依赖项"、"知识库扩展"、"高难度挑战"** 时自动启用
+- **PR 标题**：提示词中包含`积分赛`必须以 `【积分赛】`为前缀，包含`依赖项`必须以 `【依赖项】`为前缀，包含`知识库扩展`必须以 `【知识库扩展】`为前缀，包含`高难度挑战`必须以 `【高难度挑战】`为前缀，且标题中仅存在一种关键词前缀
 - **PR 正文**：严格按 `templates/积分赛事PR模板.md` 填写，包含：
   - 三方库信息（名称、版本、仓库地址、适配路径、使用知识库）
   - 测试用例对比（上游 vs 适配后）
@@ -418,7 +418,9 @@ $SKILL_ROOT/scripts/ohc-run.py finish <软件名> <版本> published|built|faile
 | [9/9] gen_summary + PR 原子性 | 重新生成 SUMMARY.md (W2 检查) | 非致命 |
 
 > **W4 Pre-PR 独立审计不在 finish 内部**，在 `submit` 内部作为前置检查执行。
-> 流程顺序：`finish`（含W2+W3）→ `submit`（前置检查W4→git push→创建PR→**AI Review 监控**(5阶段)→**CI 监控**→**SKILL_FEEDBACK 自动生成**）。
+> 流程顺序：`finish`（含W2+W3）→ `submit`（前置检查W4→git push→创建PR→**AI Review 监控**(5阶段)→**检视意见闭环校验**→**CI 监控**→**SKILL_FEEDBACK 自动生成**）。
+>
+> ⚠️ **完成标准（硬性）**：所有检视意见必须在讨论串内回复完毕（accept=修复+标记已解决 / reject=回复原因），闭环校验不通过不会进入 CI 监控；CI 必须 PASSED 才算流程完成。
 > AI 操作路径：`finish` → `submit`，两条命令，不可跳过。
 >
 > **⭐ AI Review 监控（5 阶段，嵌入 submit，HANDOFF 强制）**：
@@ -435,7 +437,7 @@ $SKILL_ROOT/scripts/ohc-run.py finish <软件名> <版本> published|built|faile
 >   - ⚠️ **检视意见不一定正确，需严格判断是否合理才能修改**
 >   - 合理的修改并 push，不合理的回复说明原因
 >   - 所有意见处理完毕后 `--resume` 继续
-> - Phase 5: AI Review 完成 → 进入 CI 监控
+> - Phase 5: AI Review 完成 → 进入 CI 监控（平台 CI 需主动评论 /rebuild 触发，_monitor_ci 自动处理；手动触发用 `python3 scripts/gitcode_pr.py trigger-ci --repo <owner>/<repo> --number <PR号>`）
 >
 > 状态文件 `.submit-state.json` 记录 review_phase（1/3/5），`--resume` 从正确阶段恢复。
 
@@ -698,7 +700,7 @@ python3 $SKILL_ROOT/scripts/ohc-run.py dispatch script zlib bzip2 openssl wget
 cp ci/conan/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
-提交前自动检查 L0a-L0i（conanfile 语法/sha256/test源码/test()方法/MANIFEST/patch格式/环境变量依赖/Go-Rust检测）。
+提交前自动检查 L0a-L0q（conanfile 语法/sha256/test源码/test()方法/MANIFEST/patch格式/环境变量依赖/Go-Rust检测/外部curl下载/settings完整性/exports_sources完整性）。
 
 ### CI 脚本（ci/ 目录，由 Buildbot Worker 执行，纯 shell，无 AI）
 

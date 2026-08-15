@@ -55,6 +55,7 @@ archives/**/share/
 # 运行时标记文件（每次编译重新生成）
 .staging-verified
 .manual-mode-stop
+.build-closed
 .built
 .configured
 .installed
@@ -67,6 +68,17 @@ archives/**/share/
 .verify-passed-partial
 .g0-verified
 .g0-passed
+.build-closed
+.ci-result.json
+ci-metadata.json
+.downloads/
+conanbuild.sh
+conanbuildenv-*.sh
+conanrun.sh
+conanrunenv-*.sh
+deactivate_conanbuild.sh
+deactivate_conanrun.sh
+deactivate_conanrunenv-*.sh
 EXCLUDE_LIST
 TASK_CARD.md
 *.handoff.json
@@ -103,6 +115,9 @@ archives/**/patches/.patch-staging
 # 打包标记（packaging/ 目录存在即为标记）
 archives/**/packaging/.packaged
 
+# arm64 探测二进制（CI 构建时生成，不应提交源码）
+.arm64_probe/
+
 # BitFun snapshot data - auto managed
 .bitfun/
 .cmd-pkgs-cache.json
@@ -125,9 +140,14 @@ evals/
 # ═══════════════════════════════════════
 
 # Conan build artifacts
-*/test_package/conanbuild*.sh
-*/test_package/conanrun*.sh
-*/test_package/deactivate_conan*.sh
+**/test_package/conanbuild*.sh
+**/test_package/conanrun*.sh
+**/test_package/deactivate_conan*.sh
+# Conan CMakeDeps/CMakeToolchain 生成产物（含硬编码本机路径，conan create 自动重生）
+**/test_package/build-release/
+
+# Conan CMakeDeps/CMakeToolchain 生成产物（含硬编码本机路径，conan create 自动重生）
+**/test_package/build-release/
 
 # Python cache
 __pycache__/
@@ -160,3 +180,16 @@ tarballs/
 archives/_migrate_batch*.sh
 config/.zshrc
 .ci-result.json
+
+# CI build-closed marker (runtime artifact, not committed)
+.build-closed
+**/deactivate_conanrunenv-*.sh
+archives/j/jpeginfo/1.7.1/test_package/test.jpg
+
+# Runtime state files
+**/.submit-state.json
+**/.audit-result*.json
+**/.handoff.json
+**/.knowledge-done*
+**/test_package/test_probe
+sources/
