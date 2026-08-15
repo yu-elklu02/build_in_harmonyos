@@ -1,3 +1,4 @@
+import os
 from conan import ConanFile
 from conan.tools.files import copy, get, apply_conandata_patches, export_conandata_patches
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
@@ -55,10 +56,11 @@ class NanopbConan(ConanFile):
     def package(self):
         cmake = CMake(self)
         cmake.install()
-        copy(self, "LICENSE.txt", self.source_folder, self.package_folder, dst="licenses")
+        copy(self, "LICENSE.txt", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"), keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ["protobuf-nanopb"]
+        self.cpp_info.includedirs = ["include/nanopb"]
         self.cpp_info.set_property("cmake_file_name", "nanopb")
         self.cpp_info.set_property("cmake_target_name", "nanopb::nanopb")
         self.cpp_info.set_property("pkg_config_name", "nanopb")

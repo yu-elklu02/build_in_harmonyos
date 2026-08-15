@@ -44,6 +44,11 @@ int main(void)
         return fail("failed to decode field 2 tag");
     if (tag != 2 || wire_type != PB_WT_STRING)
         return fail("unexpected field 2 tag");
+    /* pb_encode_string writes a varint length prefix before the bytes;
+       decode it first, then read exactly that many bytes. */
+    uint64_t string_len = 0;
+    if (!pb_decode_varint(&in, &string_len) || string_len != sizeof(text))
+        return fail("unexpected field 2 string length");
     if (!pb_read(&in, text, sizeof(text)) || memcmp(text, "OHOS", sizeof(text)) != 0)
         return fail("unexpected field 2 payload");
 
