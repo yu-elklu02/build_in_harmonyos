@@ -31,7 +31,7 @@
    muscle_insert (syncline_name, "");
    muscle_syncline_grow (syncline_name, variable_loc);
    muscle_user_name_list_grow ("percent_define_user_variables", variable,
-@@ -482,15 +506,51 @@ muscle_percent_define_get (char const *variable)
+@@ -481,15 +505,54 @@ muscle_percent_define_get (char const *variable)
    return value;
  }
  
@@ -75,7 +75,10 @@
 +          loc.start.line = muscle_find_int (start_line_name, loc.start.line);
 +          loc.start.column =
 +            muscle_find_int (start_column_name, loc.start.column);
-+          loc.end.file = end_file ? end_file : start_file;
++          if (end_file && 0 == strcmp (start_file, end_file))
++            loc.end.file = loc.start.file;
++          else
++            loc.end.file = end_file ? end_file : start_file;
 +          loc.end.line = muscle_find_int (end_line_name, loc.end.line);
 +          loc.end.column = muscle_find_int (end_column_name, loc.end.column);
 +        }
