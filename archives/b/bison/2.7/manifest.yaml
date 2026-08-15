@@ -19,6 +19,7 @@ patches_applied:
   - "0005-configure-ohos-umask.patch"
   - "0006-lib-math-noexcept.patch"
   - "0007-location-null-file-ohos.patch"
+  - "0008-percent-define-loc-fallback-ohos.patch"
 platform_constraints:
   - "OHOS armv8/aarch64"
   - "OHOS build uses -O0 -fno-strict-aliasing while investigating legacy C undefined behavior"
@@ -31,7 +32,7 @@ tests:
     failed: 14
     skipped: 0
     pass_rate: "279/293 (95.2%)"
-    note: "Real-device make check result: 14 failures split into 3 classes on OHOS: 4 SIGSEGV in %define location reporting, 2 RTC box-drawing output diffs, and 8 IELR/LAC state-splitting mismatches."
+    note: "Real-device make check result after SIGSEGV fix: 14 non-crash failures split into 3 classes on OHOS: 4 %define diagnostic location diffs, 2 RTC box-drawing output diffs, and 8 IELR/LAC state-splitting mismatches."
   adapted:
     command: "test_package/test_bison.py"
     cases: 2

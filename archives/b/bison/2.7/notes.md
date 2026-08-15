@@ -33,6 +33,9 @@ GNU Bison is an LALR/GLR parser generator. This recipe targets the native
 7. `0007-location-null-file-ohos.patch` guards Bison's diagnostic location
    printer against empty location file names and initializes decoded
    `%define` locations, covering the OHOS `%define` error-reporting path.
+8. `0008-percent-define-loc-fallback-ohos.patch` stores raw `%define`
+   diagnostic locations at insertion time and uses them as a fallback when the
+   legacy location decoder returns an empty location on OHOS.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
 builds. On OHOS, Bison itself is compiled with `-O0 -fno-strict-aliasing` so
@@ -49,7 +52,8 @@ clang, and executes it against a functional assertion.
 ## Verification state
 
 The package remains blocked because the upstream regression suite still has
-non-zero failures. The next validation run checks whether the location guard
-removes the 4 `%define` SIGSEGV failures; the 2 RTC output diffs and 8
+non-zero failures. The location guard has removed the 4 `%define` SIGSEGV
+failures; the next validation run checks whether raw-location fallback restores
+the expected `%define` diagnostic locations. The 2 RTC output diffs and 8
 IELR/LAC mismatches remain under investigation. No formal branch is created
 while failures remain.
