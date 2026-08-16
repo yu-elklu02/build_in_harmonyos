@@ -121,7 +121,7 @@ class BisonConan(ConanFile):
             tc.extra_cflags.extend(["-O0", "-fno-strict-aliasing"])
             tc.extra_cxxflags.extend(["-O0", "-fno-strict-aliasing"])
             tc.configure_args.extend([
-                "--build=aarch64-unknown-linux-gnu",
+                "--build=aarch64-linux-ohos",
                 "--host=aarch64-linux-ohos",
                 "--disable-nls",
             ])
@@ -139,7 +139,11 @@ class BisonConan(ConanFile):
         apply_conandata_patches(self)
         self._patch_generated_testsuite_sed()
         autotools = Autotools(self)
-        autotools.configure()
+        try:
+            autotools.configure()
+        except ConanException:
+            self._report_config_log_tail()
+            raise
         autotools.make(args=["-j1"])
         # Bison 2.7's testsuite calls the bare name `bison` from PATH
         # (no $BISON variable, no ../src/bison relative path). On OHOS,
@@ -227,6 +231,16 @@ class BisonConan(ConanFile):
             with open(testsuite, "w", encoding="utf-8", newline="\n") as handle:
                 handle.write(text)
             self.output.info("bison: patched generated testsuite sed invocations")
+
+    def _report_config_log_tail(self):
+        config_log = os.path.join(self.build_folder, "config.log")
+        if not os.path.isfile(config_log):
+            return
+        self.output.error("===== bison config.log tail =====")
+        with open(config_log, encoding="utf-8", errors="replace") as handle:
+            lines = [line.rstrip() for line in handle.readlines()]
+        for line in lines[-120:]:
+            self.output.error(line)
 
     def _report_testsuite_failures(self, testsuite_log):
         with open(testsuite_log, encoding="utf-8", errors="replace") as handle:
