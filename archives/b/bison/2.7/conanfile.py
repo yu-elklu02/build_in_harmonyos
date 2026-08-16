@@ -2,7 +2,7 @@ import os
 import re
 
 from conan import ConanFile
-from conan.errors import ConanException, ConanInvalidConfiguration
+from conan.errors import ConanException
 from conan.tools.files import apply_conandata_patches, export_conandata_patches, get
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
@@ -33,22 +33,51 @@ class BisonConan(ConanFile):
 
         config_sub = os.path.join(build_aux, "config.sub")
         text = open(config_sub, encoding="utf-8").read()
-        replacements = (
-            (
-                "  knetbsd*-gnu* | netbsd*-gnu* | \\\n"
+        # CI may fetch the GNU tarball through different mirrors whose
+        # config.sub text has small whitespace/context differences.  Patch the
+        # OHOS triplet by anchor tokens instead of requiring one exact local
+        # copy; otherwise source() fails before configure can even run.
+        changed = 0
+        if "linux-ohos*" not in text:
+            new_text = text.replace(
                 "  kopensolaris*-gnu* | \\\n",
-                "  knetbsd*-gnu* | netbsd*-gnu* | \\\n"
                 "  linux-ohos* | \\\n"
                 "  kopensolaris*-gnu* | \\\n",
-            ),
-            (
-                "              | -mingw32* | -mingw64* | -linux-gnu* | -linux-android* \\\n"
+                1,
+            )
+            if new_text == text:
+                new_text = re.sub(
+                    r"(^[ \t]*kopensolaris\*-[^|\n]*\|[ \t]*\\\n)",
+                    "  linux-ohos* | \\\n" + r"\1",
+                    text,
+                    count=1,
+                    flags=re.M,
+                )
+            if new_text != text:
+                text = new_text
+                changed += 1
+
+        if "-linux-ohos*" not in text:
+            new_text = text.replace(
                 "              | -linux-newlib* | -linux-musl* | -linux-uclibc* \\\n",
-                "              | -mingw32* | -mingw64* | -linux-gnu* | -linux-android* \\\n"
                 "              | -linux-ohos* | \\\n"
                 "              | -linux-newlib* | -linux-musl* | -linux-uclibc* \\\n",
-            ),
-            (
+                1,
+            )
+            if new_text == text:
+                new_text = re.sub(
+                    r"(^[ \t]*\| -linux-newlib\* \| -linux-musl\* \| -linux-uclibc\*.*\\\n)",
+                    "              | -linux-ohos* | \\\n" + r"\1",
+                    text,
+                    count=1,
+                    flags=re.M,
+                )
+            if new_text != text:
+                text = new_text
+                changed += 1
+
+        if "\t-linux-ohos*)" not in text:
+            new_text = text.replace(
                 "\t-linux-dietlibc)\n"
                 "\t\tos=-linux-dietlibc\n"
                 "\t\t;;\n",
@@ -58,14 +87,28 @@ class BisonConan(ConanFile):
                 "\t-linux-ohos*)\n"
                 "\t\tos=-linux-ohos\n"
                 "\t\t;;\n",
-            ),
-        )
-        for old, new in replacements:
-            if old not in text:
-                raise ConanInvalidConfiguration(
-                    "bison config.sub does not match the expected 2.7 source"
+                1,
+            )
+            if new_text == text:
+                new_text = text.replace(
+                    "\t-linux-newlib*)\n"
+                    "\t\tos=-linux-newlib\n"
+                    "\t\t;;\n",
+                    "\t-linux-newlib*)\n"
+                    "\t\tos=-linux-newlib\n"
+                    "\t\t;;\n"
+                    "\t-linux-ohos*)\n"
+                    "\t\tos=-linux-ohos\n"
+                    "\t\t;;\n",
+                    1,
                 )
-            text = text.replace(old, new, 1)
+            if new_text != text:
+                text = new_text
+                changed += 1
+
+        if "linux-ohos" not in text:
+            raise ConanException("failed to patch bison config.sub for OHOS")
+        self.output.info("bison: widened {} config.sub spot(s) with linux-ohos".format(changed))
         with open(config_sub, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(text)
 
