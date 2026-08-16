@@ -1,5 +1,6 @@
 import os
 import shlex
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanException, ConanInvalidConfiguration
@@ -48,6 +49,8 @@ class RemindConan(ConanFile):
         autotools.configure()
         src_build_dir = os.path.join(self.build_folder, "src")
         tests_dir = os.path.join(self.source_folder, "tests")
+        if self.settings.os == "OHOS":
+            tests_dir = self._prepare_ohos_upstream_test_tree()
         shell = "/system/bin/sh" if self.settings.os == "OHOS" else "sh"
         self.run("make -C {} -j1".format(shlex.quote(src_build_dir)), env="conanbuild")
         check_env = (
@@ -97,9 +100,36 @@ class RemindConan(ConanFile):
         os.makedirs(docs_dir, exist_ok=True)
         copy(self, "WHATSNEW", src=os.path.join(self.source_folder, "docs"), dst=docs_dir)
 
+    def _prepare_ohos_upstream_test_tree(self):
+        # Run upstream tests from the build tree instead of the source tree.
+        # Remind deliberately disables RUN for files not owned by the current
+        # effective uid.  Some OHOS sandboxes execute binaries under a
+        # translated uid while the checked-out source tree is owned by the
+        # outer build user, so source-tree tests can spuriously become
+        # RUN_NOTOWNER.  Copying the test data into build_folder keeps the
+        # security check intact while giving the test inputs build-sandbox
+        # ownership.
+        tests_dir = os.path.join(self.build_folder, "tests")
+        man_dir = os.path.join(self.build_folder, "man")
+        if os.path.isdir(tests_dir):
+            shutil.rmtree(tests_dir)
+        if os.path.isdir(man_dir):
+            shutil.rmtree(man_dir)
+        copy(self, "*", src=os.path.join(self.source_folder, "tests"), dst=tests_dir)
+        copy(self, "*.1", src=os.path.join(self.source_folder, "man"), dst=man_dir)
+        for path in (
+            os.path.join(tests_dir, "test-rem"),
+            os.path.join(tests_dir, "test-timezone-support"),
+        ):
+            if os.path.isfile(path):
+                replace_in_file(self, path, "#!/bin/sh", "#!/system/bin/sh")
+        return tests_dir
+
     def _report_test_outputs(self):
         for name in ("test.out", "tz.out"):
-            path = os.path.join(self.source_folder, "tests", name)
+            path = os.path.join(self.build_folder, "tests", name)
+            if not os.path.isfile(path):
+                path = os.path.join(self.source_folder, "tests", name)
             if not os.path.isfile(path):
                 continue
             self.output.error("===== remind {} tail =====".format(name))

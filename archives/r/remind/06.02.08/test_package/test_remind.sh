@@ -21,16 +21,16 @@ fi
 tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/remind-test.XXXXXX")"
 trap 'rm -rf "$tmpdir"' EXIT HUP INT TERM
 
-"$remind" -v 2>&1 | grep -F "REMIND 06.02.08" >/dev/null
+"$remind" -v 2>&1 | grep "REMIND 06.02.08" >/dev/null
 
 cat >"$tmpdir/basic.rem" <<'EOF'
 REM 16 Feb 1991 MSG parser assertion passed
 EOF
 
 "$remind" -q "$tmpdir/basic.rem" 16 Feb 1991 >"$tmpdir/basic.out"
-grep -F "parser assertion passed" "$tmpdir/basic.out" >/dev/null
+grep "parser assertion passed" "$tmpdir/basic.out" >/dev/null
 
 "$remind" -p "$tmpdir/basic.rem" 16 Feb 1991 | "$rem2ps" >"$tmpdir/basic.ps"
-grep -F "%!PS-Adobe" "$tmpdir/basic.ps" >/dev/null
+grep "%!PS-Adobe" "$tmpdir/basic.ps" >/dev/null
 
 echo "=== remind tests PASSED ==="

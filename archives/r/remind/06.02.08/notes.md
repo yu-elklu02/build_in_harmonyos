@@ -30,6 +30,14 @@ tools.
   install from `build_folder/src`, then run upstream scripts in
   `source_folder/tests` with `REMIND_CMD` and `REM2PS` pointing at the generated
   binaries.
+- On OHOS, copy upstream `tests/` and `man/` into `build_folder` and run the
+  upstream scripts from that copied tree.  Remind intentionally disables RUN for
+  non-owned input files; running directly from the checked-out source tree can
+  trip this guard in sandboxed builds where the effective uid differs from the
+  source-tree owner.  The copied build-tree inputs preserve the upstream test
+  logic without weakening the packaged binary's security checks.
+- Use plain POSIX `grep` in `test_package/test_remind.sh`; toybox grep on OHOS
+  does not support `grep -F`.
 
 ## Validation plan
 
