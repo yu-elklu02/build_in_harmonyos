@@ -1,0 +1,32 @@
+# remind/06.02.08 OHOS adaptation notes
+
+Remind is a C command-line calendar and alarm program.  The package builds the
+core `remind` and `rem2ps` tools with Autotools.  Optional Perl/Tk helpers are
+left to upstream install logic; the consumer validation focuses on the native C
+tools.
+
+## Upstream source
+
+- Homepage: https://dianne.skoll.ca/projects/remind/
+- Source: https://dianne.skoll.ca/projects/remind/download/OLD/remind-06.02.08.tar.gz
+- SHA256: `eb69645eb64018e9a2ee10b4d6fad4744a99dbf63dd2bdad7f92d910d1f6d264`
+
+## OHOS changes
+
+- Replace `/bin/sh` shell assumptions in upstream test/build entry points with
+  `/system/bin/sh`.
+- Disable optional readline detection on OHOS.  Remind can run without GNU
+  Readline; the packaged core CLI does not need it for batch calendar parsing.
+- Disable Perl build artifacts to keep packaging deterministic.  Optional
+  rem2html/rem2pdf Perl helpers require external Perl modules and are not part
+  of the core C validation.
+
+## Validation plan
+
+- Upstream: `make test` (`test-basic` + `test-tz`), covering 9 main functional
+  groups and 13 timezone scenarios.
+- Consumer: `test_package/test_remind.sh`, checking:
+  1. `remind -v` reports version 06.02.08.
+  2. A minimal reminder read from stdin emits the expected message.
+  3. `rem2ps` is packaged and executable.
+  4. `rem2ps` emits a PostScript header for a minimal reminder file.
