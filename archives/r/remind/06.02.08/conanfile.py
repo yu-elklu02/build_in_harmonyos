@@ -41,6 +41,8 @@ class RemindConan(ConanFile):
     def build(self):
         if self.settings.os == "OHOS":
             self._patch_ohos_shells()
+            self._patch_ohos_configure()
+            self._prepare_out_of_source_configure_inputs()
         autotools = Autotools(self)
         autotools.configure()
         autotools.make(args=["-j1"])
@@ -59,6 +61,22 @@ class RemindConan(ConanFile):
         makefile_in = os.path.join(self.source_folder, "src", "Makefile.in")
         if os.path.isfile(makefile_in):
             replace_in_file(self, makefile_in, "SHELL= /bin/sh", "SHELL= /system/bin/sh")
+
+    def _patch_ohos_configure(self):
+        configure = os.path.join(self.source_folder, "configure")
+        if not os.path.isfile(configure):
+            return
+        # Autoconf's config.status helper creates ./confXXXXXX with umask 077.
+        # On the OHOS Conan sandbox this private 0700 directory can become
+        # inaccessible to the subprocess that writes subs1.awk.  Keep the temp
+        # directory local to the build tree, but avoid the private umask.
+        replace_in_file(self, configure, "umask 077 && mktemp", "umask 002 && mktemp")
+        replace_in_file(self, configure, "umask 077 && mkdir", "umask 002 && mkdir")
+
+    def _prepare_out_of_source_configure_inputs(self):
+        docs_dir = os.path.join(self.build_folder, "docs")
+        os.makedirs(docs_dir, exist_ok=True)
+        copy(self, "WHATSNEW", src=os.path.join(self.source_folder, "docs"), dst=docs_dir)
 
     def _report_test_outputs(self):
         for name in ("test.out", "tz.out"):

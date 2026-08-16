@@ -20,6 +20,11 @@ tools.
 - Disable Perl build artifacts to keep packaging deterministic.  Optional
   rem2html/rem2pdf Perl helpers require external Perl modules and are not part
   of the core C validation.
+- Copy `docs/WHATSNEW` into the out-of-source build directory before
+  `configure`; Remind's `configure` reads that file via a relative path.
+- Patch the generated Autoconf `config.status` template from `umask 077` to
+  `umask 002` so the OHOS Conan sandbox can write its `confXXXXXX/subs1.awk`
+  helper.
 
 ## Validation plan
 
