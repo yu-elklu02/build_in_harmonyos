@@ -139,6 +139,7 @@ class BisonConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         self._patch_generated_testsuite_sed()
+        self._patch_cxx_register_storage()
         autotools = Autotools(self)
         try:
             autotools.configure()
@@ -239,6 +240,22 @@ class BisonConan(ConanFile):
             with open(testsuite, "w", encoding="utf-8", newline="\n") as handle:
                 handle.write(text)
             self.output.info("bison: patched generated testsuite sed invocations")
+
+    def _patch_cxx_register_storage(self):
+        patched = 0
+        for root in {self.source_folder, self.build_folder}:
+            scanner = os.path.join(root, "examples", "calc++", "calc++-scanner.cc")
+            if not os.path.isfile(scanner):
+                continue
+            with open(scanner, encoding="utf-8") as handle:
+                text = handle.read()
+            new_text = re.sub(r"\bregister[ \t]+", "", text)
+            if new_text != text:
+                with open(scanner, "w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(new_text)
+                patched += 1
+        if patched:
+            self.output.info("bison: removed obsolete C++ register storage from {} scanner file(s)".format(patched))
 
     def _report_config_log_tail(self):
         config_log = os.path.join(self.build_folder, "config.log")
