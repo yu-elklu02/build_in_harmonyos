@@ -172,7 +172,7 @@ class RemindConan(ConanFile):
         # $(srcdir)/../scripts/tkremind and $(srcdir)/../man/*.1 which resolve
         # to the source tree where only the .in templates exist. Copy the
         # generated artifacts into the source tree so install finds them.
-        for sub in ("scripts", "man", "include"):
+        for sub in ("scripts", "man"):
             gen_dir = os.path.join(self.build_folder, sub)
             src_dir = os.path.join(self.source_folder, sub)
             if not os.path.isdir(gen_dir):
@@ -184,6 +184,14 @@ class RemindConan(ConanFile):
                 src_path = os.path.join(src_dir, entry)
                 if not os.path.isfile(src_path):
                     copy(self, entry, src=gen_dir, dst=src_dir, keep_path=False)
+        # include/ is static source-tree data (not a configure artifact), but
+        # the install Makefile's `cp -R ../include/*` resolves from build_folder/src
+        # to build_folder/include/ which does not exist. Mirror it there so the
+        # relative path works.
+        src_inc = os.path.join(self.source_folder, "include")
+        bld_inc = os.path.join(self.build_folder, "include")
+        if os.path.isdir(src_inc) and not os.path.isdir(bld_inc):
+            copy(self, "*", src=src_inc, dst=bld_inc)
         self.run(
             "make -C {} install DESTDIR={}".format(
                 shlex.quote(os.path.join(self.build_folder, "src")),
