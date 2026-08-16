@@ -1,6 +1,6 @@
 --- a/src/AnnotationList.c
 +++ b/src/AnnotationList.c
-@@ -541,9 +541,10 @@ AnnotationList__compute_from_inadequacies (
+@@ -540,9 +540,10 @@ AnnotationList__compute_from_inadequacies (
              else
                {
                  InadequacyList__prependTo (conflict_node,
