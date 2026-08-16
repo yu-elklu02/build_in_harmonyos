@@ -160,6 +160,30 @@ class RemindConan(ConanFile):
                 self.output.error(line)
 
     def package(self):
+        # configure's config.status is long-running; under sandbox timeout
+        # it can be SIGTERM'd before finishing the man/*.1 generation pass,
+        # leaving build_folder without man pages. Re-run config.status once
+        # (idempotent) so man pages and scripts/tkremind materialize before install.
+        config_status = os.path.join(self.build_folder, "config.status")
+        if os.path.isfile(config_status):
+            self.run(shlex.quote(config_status), env="conanbuild", ignore_errors=True)
+        # configure generates scripts/tkremind and man/*.1 into build_folder
+        # (out-of-source), but the install Makefile references them via
+        # $(srcdir)/../scripts/tkremind and $(srcdir)/../man/*.1 which resolve
+        # to the source tree where only the .in templates exist. Copy the
+        # generated artifacts into the source tree so install finds them.
+        for sub in ("scripts", "man", "include"):
+            gen_dir = os.path.join(self.build_folder, sub)
+            src_dir = os.path.join(self.source_folder, sub)
+            if not os.path.isdir(gen_dir):
+                continue
+            for entry in os.listdir(gen_dir):
+                gen_path = os.path.join(gen_dir, entry)
+                if not os.path.isfile(gen_path):
+                    continue
+                src_path = os.path.join(src_dir, entry)
+                if not os.path.isfile(src_path):
+                    copy(self, entry, src=gen_dir, dst=src_dir, keep_path=False)
         self.run(
             "make -C {} install DESTDIR={}".format(
                 shlex.quote(os.path.join(self.build_folder, "src")),
