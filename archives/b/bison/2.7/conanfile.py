@@ -339,3 +339,4 @@ class BisonConan(ConanFile):
     def package_info(self):
         self.cpp_info.bindirs = ["usr/bin"]
         self.runenv_info.define_path("PATH", os.path.join(self.package_folder, "usr", "bin"))
+        self.runenv_info.define_path("BISON_PKGDATADIR", os.path.join(self.package_folder, "usr", "share", "bison"))

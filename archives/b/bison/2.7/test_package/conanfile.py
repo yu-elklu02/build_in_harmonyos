@@ -13,9 +13,14 @@ class BisonTestConan(ConanFile):
         self.requires(self.tested_reference_str)
 
     def test(self):
-        bison = os.path.join(self.dependencies["bison"].package_folder, "usr", "bin", "bison")
+        package_folder = self.dependencies["bison"].package_folder
+        bison = os.path.join(package_folder, "usr", "bin", "bison")
+        pkgdata = os.path.join(package_folder, "usr", "share", "bison")
         script = os.path.join(self.source_folder, "test_bison.py")
         clang = "/data/service/hnp/bin/clang"
-        command = " ".join(shlex.quote(value) for value in
-                             (sys.executable, script, bison, clang))
+        command = "BISON_PKGDATADIR={} {}".format(
+            shlex.quote(pkgdata),
+            " ".join(shlex.quote(value) for value in
+                     (sys.executable, script, bison, clang)),
+        )
         self.run(command)
