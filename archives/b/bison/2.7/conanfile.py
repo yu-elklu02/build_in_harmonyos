@@ -60,14 +60,14 @@ class BisonConan(ConanFile):
         if "-linux-ohos*" not in text:
             new_text = text.replace(
                 "              | -linux-newlib* | -linux-musl* | -linux-uclibc* \\\n",
-                "              | -linux-ohos* | \\\n"
+                "              | -linux-ohos* \\\n"
                 "              | -linux-newlib* | -linux-musl* | -linux-uclibc* \\\n",
                 1,
             )
             if new_text == text:
                 new_text = re.sub(
                     r"(^[ \t]*\| -linux-newlib\* \| -linux-musl\* \| -linux-uclibc\*.*\\\n)",
-                    "              | -linux-ohos* | \\\n" + r"\1",
+                    "              | -linux-ohos* \\\n" + r"\1",
                     text,
                     count=1,
                     flags=re.M,
