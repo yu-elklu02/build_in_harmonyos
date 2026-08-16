@@ -1,3 +1,5 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 
@@ -18,5 +20,5 @@ class NanopbTestConan(ConanFile):
         cmake.build()
 
     def test(self):
-        cmake = CMake(self)
-        cmake.test()
+        test_bin = os.path.join(self.cpp.build.bindirs[0], "test_nanopb")
+        self.run(test_bin, env="conanrun")
