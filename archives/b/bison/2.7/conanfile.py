@@ -330,6 +330,10 @@ class BisonConan(ConanFile):
         # under package_folder while the embedded paths keep /usr prefix.
         autotools = Autotools(self)
         autotools.install(args=["DESTDIR={}".format(self.package_folder)])
+        for name in ("bison", "yacc"):
+            path = os.path.join(self.package_folder, "bin", name)
+            if os.path.isfile(path):
+                os.chmod(path, 0o755)
 
     def package_info(self):
         self.cpp_info.bindirs = ["bin"]
