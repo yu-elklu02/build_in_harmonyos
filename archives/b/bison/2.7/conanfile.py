@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 
 from conan import ConanFile
 from conan.errors import ConanException
@@ -155,14 +156,14 @@ class BisonConan(ConanFile):
         # under package_folder so make check can open m4sugar/m4sugar.m4.
         src_dir = os.path.join(self.build_folder, "src")
         pkgdata = os.path.join(self.package_folder, "usr", "share", "bison")
-        old_path = os.environ.get("PATH", "")
         # CC/CXX must be explicit: bison's testsuite compiles the generated
         # .c files to verify correctness. On OHOS the conanbuild env sets
         # CC but the variable is not inherited by the testsuite subshell
         # unless we forward it explicitly. Without CC the shell interprets
         # "$CC -c ..." as "-c: inaccessible or not found" (exit 127).
-        clang = str(self.conf.get("tools.build:compiler_executables", default={})
-                    .get("c", "clang"))
+        compilers = self.conf.get("tools.build:compiler_executables", default={})
+        clang = str(compilers.get("c", "clang"))
+        clangxx = str(compilers.get("cpp", "clang++"))
         # CPPFLAGS must include -I<build>/lib so that bison-generated .c
         # files can find config.h (which lives in the build tree, not the
         # source tree). The testsuite's atlocal.in sets this via autoconf
@@ -170,20 +171,27 @@ class BisonConan(ConanFile):
         # mode, leaving CPPFLAGS empty.
         lib_dir = os.path.join(self.build_folder, "lib")
         lib_inc = lib_dir
+        # LIBS: link against bison's bundled gnulib (libbison.a) so
+        # that rpl_malloc / rpl_printf / rpl_fprintf are resolved.
+        # The testsuite links each generated parser with "$CC ... $LIBS", so
+        # this must be set in the command environment. Conan 2.29 on the CI
+        # runner does not support ConanFile.run(extra_env=...), so keep these
+        # as POSIX inline assignments.
+        check_env = {
+            "BISON_PKGDATADIR": pkgdata,
+            "CC": clang,
+            "CXX": clangxx,
+            "CPPFLAGS": "-I{}".format(lib_inc),
+            "LIBS": "-L{} -lbison".format(lib_dir),
+        }
+        env_prefix = "PATH={}:$PATH ".format(shlex.quote(src_dir))
+        env_prefix += " ".join(
+            "{}={}".format(key, shlex.quote(value))
+            for key, value in check_env.items()
+        )
         check_rc = self.run(
-            "make check -j1",
+            "{} make check -j1".format(env_prefix),
             env="conanbuild",
-            extra_env={
-                "PATH": "{}:{}".format(src_dir, old_path),
-                "BISON_PKGDATADIR": pkgdata,
-                "CC": clang,
-                "CPPFLAGS": "-I{}".format(lib_inc),
-                # LIBS: link against bison's bundled gnulib (libbison.a) so
-                # that rpl_malloc / rpl_printf / rpl_fprintf are resolved.
-                # The testsuite links each generated parser with
-                # "$CC ... $LIBS", so this must be set in the environment.
-                "LIBS": "-L{} -lbison".format(lib_dir),
-            },
             ignore_errors=True,
         )
         if check_rc != 0:
