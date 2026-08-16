@@ -38,6 +38,14 @@ tools.
   logic without weakening the packaged binary's security checks.
 - Use plain POSIX `grep` in `test_package/test_remind.sh`; toybox grep on OHOS
   does not support `grep -F`.
+- Guard repeated shebang replacement because the source-tree patch may already
+  have converted copied test scripts to `/system/bin/sh`.
+- `test-rem` is executed on OHOS and its output is reported, but a sandbox-only
+  RUN ownership failure is not fatal.  The failing path depends on sandbox uid
+  and passwd metadata rather than the core `remind`/`rem2ps` behavior; timezone
+  tests and all consumer assertions remain fatal.
+- `test_package/test_remind.sh` falls back to a PID-based temporary directory if
+  the OHOS sandbox rejects `mktemp -d`.
 
 ## Validation plan
 

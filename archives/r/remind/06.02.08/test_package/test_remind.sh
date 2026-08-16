@@ -18,7 +18,9 @@ if [ ! -x "$rem2ps" ]; then
 	exit 1
 fi
 
-tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/remind-test.XXXXXX")"
+tmpbase="${TMPDIR:-/tmp}"
+tmpdir="$(mktemp -d "$tmpbase/remind-test.XXXXXX" 2>/dev/null || echo "$tmpbase/remind-test.$$")"
+mkdir -p "$tmpdir"
 trap 'rm -rf "$tmpdir"' EXIT HUP INT TERM
 
 "$remind" -v 2>&1 | grep "REMIND 06.02.08" >/dev/null
