@@ -65,9 +65,11 @@ or consumer-test failure.
 9. `0009-annotation-insert-side-effect-ohos.patch` keeps
    `AnnotationList__insertInto()` outside `aver/assert`, because OHOS release
    builds use `-DNDEBUG` and assert would otherwise remove the side-effect call.
-10. `0010-sets-sed-explicit-quiet-ohos.patch` changes the grammar-set tests to
+10. The recipe rewrites `tests/sets.at` and the generated `tests/testsuite` to
     call `sed -n -f extract.sed` explicitly instead of relying on sed's `#n`
-    first-line extension, which is not portable to OHOS toybox sed.
+    first-line extension, which is not portable to OHOS toybox sed.  This is
+    done dynamically because the generated `testsuite` hunk context can drift
+    between mirrored source copies.
 
 The recipe uses the `aarch64-linux-ohos` host triplet, clang, and single-job
 builds. On OHOS, Bison itself is compiled with `-O0 -fno-strict-aliasing` to

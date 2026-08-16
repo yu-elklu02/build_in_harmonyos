@@ -21,7 +21,8 @@ patches_applied:
   - "0007-location-null-file-ohos.patch"
   - "0008-percent-define-loc-fallback-ohos.patch"
   - "0009-annotation-insert-side-effect-ohos.patch"
-  - "0010-sets-sed-explicit-quiet-ohos.patch"
+recipe_adjustments:
+  - "Rewrite tests/sets.at and generated tests/testsuite to call sed -n -f extract.sed explicitly on OHOS."
 platform_constraints:
   - "OHOS armv8/aarch64"
   - "OHOS build uses -O0 -fno-strict-aliasing while investigating legacy C undefined behavior"

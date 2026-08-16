@@ -137,6 +137,7 @@ class BisonConan(ConanFile):
 
     def build(self):
         apply_conandata_patches(self)
+        self._patch_generated_testsuite_sed()
         autotools = Autotools(self)
         autotools.configure()
         autotools.make(args=["-j1"])
@@ -186,6 +187,46 @@ class BisonConan(ConanFile):
             if os.path.isfile(testsuite_log):
                 self._report_testsuite_failures(testsuite_log)
             raise ConanException("bison upstream make check failed")
+
+    def _patch_generated_testsuite_sed(self):
+        sets_at = os.path.join(self.source_folder, "tests", "sets.at")
+        if os.path.isfile(sets_at):
+            with open(sets_at, encoding="utf-8") as handle:
+                text = handle.read()
+            original = text
+            text = text.replace(
+                "AT_DATA([extract.sed],\n[[#n\n",
+                "AT_DATA([extract.sed],\n"
+                "[[# Extract only selected grammar-set sections.\n",
+            )
+            text = text.replace(
+                "AT_CHECK([sed -f extract.sed $1], 0, [stdout])",
+                "AT_CHECK([sed -n -f extract.sed $1], 0, [stdout])",
+            )
+            if text != original:
+                with open(sets_at, "w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(text)
+                self.output.info("bison: patched sets.at sed invocations")
+
+        testsuite = os.path.join(self.source_folder, "tests", "testsuite")
+        if not os.path.isfile(testsuite):
+            return
+        with open(testsuite, encoding="utf-8") as handle:
+            text = handle.read()
+        original = text
+        text = text.replace(
+            "cat >extract.sed <<'_ATEOF'\n#n\n",
+            "cat >extract.sed <<'_ATEOF'\n"
+            "# Extract only selected grammar-set sections.\n",
+        )
+        text = text.replace(
+            "( $at_check_trace; sed -f extract.sed stderr\n",
+            "( $at_check_trace; sed -n -f extract.sed stderr\n",
+        )
+        if text != original:
+            with open(testsuite, "w", encoding="utf-8", newline="\n") as handle:
+                handle.write(text)
+            self.output.info("bison: patched generated testsuite sed invocations")
 
     def _report_testsuite_failures(self, testsuite_log):
         with open(testsuite_log, encoding="utf-8", errors="replace") as handle:

@@ -19,5 +19,3 @@ patches:
     patch_description: "Preserve raw %define diagnostic locations as a fallback when the legacy decoder returns an empty location on OHOS."
   - patch_file: "patches/0009-annotation-insert-side-effect-ohos.patch"
     patch_description: "Keep IELR annotation insertion side effects outside aver/assert so OHOS release builds with NDEBUG still populate annotation lists."
-  - patch_file: "patches/0010-sets-sed-explicit-quiet-ohos.patch"
-    patch_description: "Use explicit sed -n in the grammar-set tests instead of relying on the #n sed script extension unsupported by OHOS toybox sed."
