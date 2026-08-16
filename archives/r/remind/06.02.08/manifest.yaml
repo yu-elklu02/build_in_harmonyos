@@ -30,9 +30,11 @@ patches_applied:
   - "OHOS: force readline detection off because readline is optional and not required for core CLI validation."
   - "OHOS: copy docs/WHATSNEW into the out-of-source build folder before configure because configure reads it by relative path."
   - "OHOS: relax Autoconf config.status temporary directory umask from 077 to 002 to avoid sandbox denial while writing subs1.awk."
+  - "OHOS: build and install from the generated build_folder/src Makefile; run upstream test scripts from source_folder/tests with REMIND_CMD/REM2PS pointing at build outputs."
 
 knowledge_gained:
   - "Remind's core package is a C Autotools CLI application; Perl/Tk helper tools are optional."
   - "Official archived source for 06.02.08 is available from dianne.skoll.ca/projects/remind/download/OLD/."
   - "Remind 06.02.08 configure reads docs/WHATSNEW relative to the build directory during out-of-source builds."
   - "Autoconf config.status 0700 temp directories can be inaccessible under the OHOS Conan sandbox; patching the generated configure template avoids the denial at the source."
+  - "Remind 06.02.08 has no generated top-level Makefile in the out-of-source build directory; the generated native Makefile lives under build_folder/src."

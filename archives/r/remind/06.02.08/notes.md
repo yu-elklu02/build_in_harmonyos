@@ -25,6 +25,11 @@ tools.
 - Patch the generated Autoconf `config.status` template from `umask 077` to
   `umask 002` so the OHOS Conan sandbox can write its `confXXXXXX/subs1.awk`
   helper.
+- Avoid `autotools.make()` for this project: Remind's configure does not
+  generate a top-level Makefile in the out-of-source build directory.  Build and
+  install from `build_folder/src`, then run upstream scripts in
+  `source_folder/tests` with `REMIND_CMD` and `REM2PS` pointing at the generated
+  binaries.
 
 ## Validation plan
 

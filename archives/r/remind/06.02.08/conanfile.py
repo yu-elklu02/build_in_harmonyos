@@ -1,4 +1,5 @@
 import os
+import shlex
 
 from conan import ConanFile
 from conan.errors import ConanException, ConanInvalidConfiguration
@@ -45,9 +46,27 @@ class RemindConan(ConanFile):
             self._prepare_out_of_source_configure_inputs()
         autotools = Autotools(self)
         autotools.configure()
-        autotools.make(args=["-j1"])
-        check_rc = self.run("make test", env="conanbuild", ignore_errors=True)
-        if check_rc != 0:
+        src_build_dir = os.path.join(self.build_folder, "src")
+        tests_dir = os.path.join(self.source_folder, "tests")
+        shell = "/system/bin/sh" if self.settings.os == "OHOS" else "sh"
+        self.run("make -C {} -j1".format(shlex.quote(src_build_dir)), env="conanbuild")
+        check_env = (
+            "REMIND_CMD={} REM2PS={} ".format(
+                shlex.quote(os.path.join(src_build_dir, "remind")),
+                shlex.quote(os.path.join(src_build_dir, "rem2ps")),
+            )
+        )
+        basic_rc = self.run(
+            "{} {} {}".format(check_env, shell, shlex.quote(os.path.join(tests_dir, "test-rem"))),
+            env="conanbuild",
+            ignore_errors=True,
+        )
+        tz_rc = self.run(
+            "{} {} {}".format(check_env, shell, shlex.quote(os.path.join(tests_dir, "test-timezone-support"))),
+            env="conanbuild",
+            ignore_errors=True,
+        )
+        if basic_rc != 0 or tz_rc != 0:
             self._report_test_outputs()
             raise ConanException("remind upstream make test failed")
 
@@ -90,8 +109,13 @@ class RemindConan(ConanFile):
                 self.output.error(line)
 
     def package(self):
-        autotools = Autotools(self)
-        autotools.install(args=["DESTDIR={}".format(self.package_folder)])
+        self.run(
+            "make -C {} install DESTDIR={}".format(
+                shlex.quote(os.path.join(self.build_folder, "src")),
+                shlex.quote(self.package_folder),
+            ),
+            env="conanbuild",
+        )
         copy(self, "COPYRIGHT", src=self.source_folder,
              dst=os.path.join(self.package_folder, "licenses"))
         for name in ("remind", "rem2ps", "tkremind", "rem2html"):
