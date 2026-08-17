@@ -17,11 +17,12 @@ build:
   dependencies: []
 
 upstream_tests:
-  command: "no standalone upstream test target"
-  cases: 0
-  passed: 0
-  status: none
-  note: "Upstream ships tests/ support files but no standalone make check/ctest suite for package validation."
+  command: "build() compiles and runs tests/cpu_names.cpp and tests/tools.cpp with a lightweight gtest-compatible harness"
+  cases: 3
+  passed: 3
+  failed: 0
+  status: passed
+  note: "Upstream CMake/CTest tests use GoogleTest via FetchContent; recipe executes the same upstream TEST cases without network-dependent FetchContent."
 
 test_package:
   command: "test_package/test_btop.sh"
@@ -42,6 +43,9 @@ knowledge_gained:
 verification:
   command: "conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing"
   result: passed
+  upstream_tests:
+    passed: 3
+    failed: 0
   test_package:
     passed: 3
     failed: 0

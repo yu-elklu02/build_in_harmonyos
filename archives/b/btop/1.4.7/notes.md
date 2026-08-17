@@ -21,6 +21,10 @@ Linux collector reads `/proc` and `/sys`.
 ## Validation plan
 
 - Build/package: `conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing`
+- Upstream tests:
+  1. `cpu_names.amd`
+  2. `cpu_names.intel`
+  3. `tools.string_split`
 - Consumer checks:
   1. `btop --version` reports version `1.4.7`.
   2. `btop --help` prints usage/options text.
@@ -30,4 +34,5 @@ Linux collector reads `/proc` and `/sys`.
 ## Validation result
 
 - `conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing`: passed.
+- Upstream tests: 3/3 passed.
 - `test_package/test_btop.sh`: 3/3 assertions passed.

@@ -48,6 +48,90 @@ private:
 """
 
 
+_GTEST_STUB = r"""#pragma once
+#include <cstdlib>
+#include <exception>
+#include <functional>
+#include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+
+namespace testing {
+struct TestCase {
+    const char* suite;
+    const char* name;
+    void (*func)();
+};
+
+inline std::vector<TestCase>& registry() {
+    static auto* tests = new std::vector<TestCase>();
+    return *tests;
+}
+
+inline int& failure_count() {
+    static auto* failures = new int(0);
+    return *failures;
+}
+
+inline int register_test(const char* suite, const char* name, void (*func)()) {
+    registry().push_back(TestCase{suite, name, func});
+    return 0;
+}
+
+inline void fail(const char* file, int line, const char* expr) {
+    ++failure_count();
+    std::cerr << file << ":" << line << ": EXPECT_EQ failed: " << expr << "\n";
+}
+
+inline int RunAllTests() {
+    for (const auto& test : registry()) {
+        std::cout << "[ RUN      ] " << test.suite << "." << test.name << "\n";
+        const auto before = failure_count();
+        try {
+            test.func();
+        } catch (const std::exception& e) {
+            ++failure_count();
+            std::cerr << "[ EXCEPTION] " << test.suite << "." << test.name << ": " << e.what() << "\n";
+        } catch (...) {
+            ++failure_count();
+            std::cerr << "[ EXCEPTION] " << test.suite << "." << test.name << ": unknown exception\n";
+        }
+        std::cout << (failure_count() == before ? "[       OK ] " : "[  FAILED  ] ")
+                  << test.suite << "." << test.name << "\n";
+    }
+    std::cout << "[==========] " << registry().size() << " upstream test(s) ran.\n";
+    if (failure_count() == 0) {
+        std::cout << "=== btop upstream tests PASSED ===\n";
+    }
+    return failure_count() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+}  // namespace testing
+
+#define TEST(SUITE, NAME) \
+    static void SUITE##_##NAME##_Test(); \
+    static int SUITE##_##NAME##_registered = ::testing::register_test(#SUITE, #NAME, &SUITE##_##NAME##_Test); \
+    static void SUITE##_##NAME##_Test()
+
+#define EXPECT_EQ(A, B) \
+    do { \
+        const auto& _btop_test_lhs = (A); \
+        const auto& _btop_test_rhs = (B); \
+        if (!(_btop_test_lhs == _btop_test_rhs)) { \
+            ::testing::fail(__FILE__, __LINE__, #A " == " #B); \
+        } \
+    } while (0)
+"""
+
+
+_GTEST_MAIN = r"""#include <gtest/gtest.h>
+
+int main() {
+    return testing::RunAllTests();
+}
+"""
+
+
 # clang-15 libc++ lacks std::ranges::* algorithms (C++20 ranges adaptors exist, but
 # std::ranges::find/find_if/all_of/any_of/count/count_if/transform/sort/stable_sort/
 # equal_range/remove_if/distance/empty/for_each do not). btop 1.4.7 uses these via `rng::*`
@@ -242,6 +326,33 @@ class BtopConan(ConanFile):
             "-j1",
         ]
         self.run(" ".join(args), cwd=self.source_folder, env="conanbuild")
+        self._run_upstream_tests(cxx, cxxflags)
+
+    def _run_upstream_tests(self, cxx, cxxflags):
+        save(self, os.path.join(self.source_folder, "include", "gtest", "gtest.h"), _GTEST_STUB)
+        test_main = os.path.join(self.build_folder, "btop_upstream_test_main.cpp")
+        test_bin = os.path.join(self.build_folder, "btop_upstream_tests")
+        save(self, test_main, _GTEST_MAIN)
+        args = [
+            shlex.quote(cxx),
+            "-std=gnu++2b",
+            "-O2",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-I{}".format(shlex.quote(os.path.join(self.source_folder, "include"))),
+            "-I{}".format(shlex.quote(os.path.join(self.source_folder, "src"))),
+            cxxflags,
+            "tests/cpu_names.cpp",
+            "tests/tools.cpp",
+            "src/btop_shared.cpp",
+            shlex.quote(test_main),
+            "-Wl,--gc-sections",
+            "-pthread",
+            "-o",
+            shlex.quote(test_bin),
+        ]
+        self.run(" ".join(args), cwd=self.source_folder, env="conanbuild")
+        self.run(shlex.quote(test_bin), cwd=self.source_folder, env="conanbuild")
 
     def _patch_ohos(self):
         save(self, os.path.join(self.source_folder, "include", "btop_expected_fallback.hpp"), _EXPECTED_FALLBACK)

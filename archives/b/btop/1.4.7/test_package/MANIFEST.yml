@@ -1,9 +1,18 @@
 package: btop/1.4.7
 homepage: "https://github.com/aristocratos/btop"
 
-upstream_check_command: ""
-upstream_test_in_build: false
-upstream_tests: []
+upstream_test_in_build: true
+upstream_check_command: "build() compiles and runs upstream tests/cpu_names.cpp and tests/tools.cpp"
+upstream_tests:
+  - file: tests/cpu_names.cpp
+    id: cpu_names.amd
+    description: "Verify AMD CPU model name trimming."
+  - file: tests/cpu_names.cpp
+    id: cpu_names.intel
+    description: "Verify Intel CPU model name trimming."
+  - file: tests/tools.cpp
+    id: tools.string_split
+    description: "Verify Tools::ssplit string splitting behavior."
 
 test_package_tests:
   - file: test_btop.sh
@@ -22,6 +31,9 @@ status: passed
 hongmeng_validation:
   command: "conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing"
   result: passed
+  upstream_tests:
+    passed: 3
+    failed: 0
   assertions:
     passed: 3
     failed: 0
