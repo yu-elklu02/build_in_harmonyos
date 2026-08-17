@@ -1,4 +1,5 @@
 import os
+import re
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -32,11 +33,27 @@ class MawkConan(ConanFile):
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
 
+    def _ohos_env_prefix(self):
+        if self.settings.os != "OHOS":
+            return ""
+        tmpdir = os.path.join(self.build_folder, "mawk-tmp")
+        os.makedirs(tmpdir, exist_ok=True)
+        return f'CC=clang CFLAGS="-DMAWK_OHOS" TMPDIR="{tmpdir}" '
+
+    def _fix_ohos_man_install(self):
+        if self.settings.os != "OHOS":
+            return
+        makefile = os.path.join(self.source_folder, "man", "Makefile")
+        with open(makefile, "rb") as makefile_obj:
+            data = makefile_obj.read()
+        fixed = re.sub(rb"(?m)^INSTALL[^\r\n]*$", b"INSTALL = ../install-sh -c", data)
+        if fixed != data:
+            with open(makefile, "wb") as makefile_obj:
+                makefile_obj.write(fixed)
+
     def build(self):
         triplets = ""
         if self.settings.os == "OHOS":
-            tmpdir = os.path.join(self.build_folder, "mawk-tmp")
-            os.makedirs(tmpdir, exist_ok=True)
             replace_in_file(
                 self,
                 os.path.join(self.source_folder, "configure"),
@@ -79,18 +96,17 @@ class MawkConan(ConanFile):
                 strict=True,
             )
             triplets = " --build=aarch64-unknown-linux-gnu --host=aarch64-linux-ohos"
-            env_prefix = f'CC=clang CFLAGS="-DMAWK_OHOS" TMPDIR="{tmpdir}" '
-        else:
-            env_prefix = ""
+        env_prefix = self._ohos_env_prefix()
         self.run(
             f'{env_prefix}sh ./configure{triplets} --prefix="{self.package_folder}"',
             cwd=self.source_folder,
         )
+        self._fix_ohos_man_install()
         self.run(f"{env_prefix}make -j1", cwd=self.source_folder)
         self.run(f"{env_prefix}make check", cwd=self.source_folder)
 
     def package(self):
-        self.run("make install", cwd=self.source_folder)
+        self.run(f"{self._ohos_env_prefix()}make install", cwd=self.source_folder)
         copy(self, "COPYING", src=self.source_folder,
              dst=os.path.join(self.package_folder, "licenses"), keep_path=False)
 
