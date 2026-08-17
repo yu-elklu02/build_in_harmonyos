@@ -1,0 +1,39 @@
+software: btop
+version: "1.4.7"
+status: adapting
+build_date: "2026-08-17"
+
+source:
+  url: "https://github.com/aristocratos/btop/archive/refs/tags/v1.4.7.tar.gz"
+  sha256: "933de2e4d1b2211a638be463eb6e8616891bfba73aef5d38060bd8319baeefc6"
+
+build:
+  system: make
+  options:
+    - "PLATFORM=linux"
+    - "GPU_SUPPORT=false"
+    - "INTEL_GPU_SUPPORT=false"
+    - "THREADS=1"
+  dependencies: []
+
+upstream_tests:
+  command: "no standalone upstream test target"
+  cases: 0
+  passed: 0
+  status: none
+  note: "Upstream ships tests/ support files but no standalone make check/ctest suite for package validation."
+
+test_package:
+  command: "test_package/test_btop.sh"
+  assertions: 3
+  status: adapting
+
+patches_applied:
+  - "OHOS: build via Makefile with PLATFORM=linux and GPU support disabled to avoid DRM/ROCm/NVIDIA runtime stacks."
+  - "OHOS: provide a small std::expected fallback for libc++ versions without C++23 <expected>."
+  - "OHOS: replace std::ranges::to usage with explicit vector construction to reduce libc++ C++23 ranges requirements."
+
+knowledge_gained:
+  - "btop 1.4.7 is a C++23 terminal monitor and uses Linux /proc and /sys collectors."
+  - "CMake hard-checks newer C++23 library features; the recipe uses the upstream Makefile route and patches the minimum C++23 library surface used by the CLI path."
+
