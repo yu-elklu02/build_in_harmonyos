@@ -18,3 +18,10 @@ test_package_tests:
 
 test_package_test_count: 3
 assertion_count: 3
+status: passed
+hongmeng_validation:
+  command: "conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing"
+  result: passed
+  assertions:
+    passed: 3
+    failed: 0

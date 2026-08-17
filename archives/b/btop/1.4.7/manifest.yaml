@@ -1,6 +1,6 @@
 software: btop
 version: "1.4.7"
-status: adapting
+status: passed
 build_date: "2026-08-17"
 
 source:
@@ -26,14 +26,22 @@ upstream_tests:
 test_package:
   command: "test_package/test_btop.sh"
   assertions: 3
-  status: adapting
+  status: passed
 
 patches_applied:
   - "OHOS: build via Makefile with PLATFORM=linux and GPU support disabled to avoid DRM/ROCm/NVIDIA runtime stacks."
   - "OHOS: provide a small std::expected fallback for libc++ versions without C++23 <expected>."
   - "OHOS: replace std::ranges::to usage with explicit vector construction to reduce libc++ C++23 ranges requirements."
+  - "OHOS: provide std::ranges algorithm shims for clang-15 libc++."
+  - "OHOS: avoid pthread_cancel and pthread_timedjoin_np on OHOS."
 
 knowledge_gained:
   - "btop 1.4.7 is a C++23 terminal monitor and uses Linux /proc and /sys collectors."
   - "CMake hard-checks newer C++23 library features; the recipe uses the upstream Makefile route and patches the minimum C++23 library surface used by the CLI path."
 
+verification:
+  command: "conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing"
+  result: passed
+  test_package:
+    passed: 3
+    failed: 0

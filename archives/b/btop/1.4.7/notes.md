@@ -15,6 +15,8 @@ Linux collector reads `/proc` and `/sys`.
   is unavailable.
 - Replace `std::ranges::to` uses with explicit vector construction so the build
   does not depend on the newest ranges-to-container implementation.
+- Provide a small `std::ranges` algorithm shim for clang-15 libc++.
+- Avoid `pthread_cancel` and `pthread_timedjoin_np` on OHOS.
 
 ## Validation plan
 
@@ -25,3 +27,7 @@ Linux collector reads `/proc` and `/sys`.
   3. `btop --default-config` emits a default configuration containing
      `shown_boxes = "cpu mem net proc"`.
 
+## Validation result
+
+- `conan create archives/b/btop/1.4.7 --profile=ohos-aarch64 --build=missing`: passed.
+- `test_package/test_btop.sh`: 3/3 assertions passed.
