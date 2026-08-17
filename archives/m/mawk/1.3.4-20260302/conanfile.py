@@ -1,5 +1,6 @@
 import os
 import re
+import glob
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -43,13 +44,37 @@ class MawkConan(ConanFile):
     def _fix_ohos_man_install(self):
         if self.settings.os != "OHOS":
             return
-        makefile = os.path.join(self.source_folder, "man", "Makefile")
-        with open(makefile, "rb") as makefile_obj:
-            data = makefile_obj.read()
-        fixed = re.sub(rb"(?m)^INSTALL[^\r\n]*$", b"INSTALL = ../install-sh -c", data)
-        if fixed != data:
-            with open(makefile, "wb") as makefile_obj:
-                makefile_obj.write(fixed)
+        # OHOS mktemp/install-sh pollution makes man/Makefile's install target
+        # unreliable (non-UTF-8 bytes, broken $RANDOM). Disable the man install
+        # entirely; package() copies the pre-built man pages by hand.
+        man_make = os.path.join(self.source_folder, "man", "Makefile")
+        if os.path.isfile(man_make):
+            with open(man_make, "rb") as f:
+                raw = f.read()
+            # Replace the install recipe body with a no-op, preserving the
+            # `install:` target so top-level `make install` still descends.
+            fixed = re.sub(
+                rb"(?ms)^install:.*?^(?:uninstall:|clean:)",
+                b"install: $(TARGET_DIR)\n\t@echo \"man install skipped (OHOS)\"\n\nuninstall:",
+                raw,
+            )
+            if fixed != raw:
+                with open(man_make, "wb") as f:
+                    f.write(fixed)
+        # install-sh builds tmpdir=${TMPDIR-/tmp}/ins$RANDOM-$$; OHOS dash leaves
+        # $RANDOM empty, so the mkdir test fails with "mawk.1: No such file or
+        # directory". Pin the tmpdir to our fixed mawk-tmp.
+        install_sh = os.path.join(self.source_folder, "install-sh")
+        with open(install_sh, "rb") as sh_obj:
+            sh = sh_obj.read()
+        tmpdir = os.path.join(self.build_folder, "mawk-tmp")
+        os.makedirs(tmpdir, exist_ok=True)
+        sh = sh.replace(
+            b'tmpdir=${TMPDIR-/tmp}/ins$RANDOM-$$',
+            b'tmpdir="' + tmpdir.encode() + b'/ins.$$"',
+        )
+        with open(install_sh, "wb") as sh_obj:
+            sh_obj.write(sh)
 
     def build(self):
         triplets = ""
@@ -107,6 +132,16 @@ class MawkConan(ConanFile):
 
     def package(self):
         self.run(f"{self._ohos_env_prefix()}make install", cwd=self.source_folder)
+        # OHOS: man/Makefile install is disabled (mktemp pollution). Copy the
+        # pre-built man pages by hand so test_package / users still get docs.
+        if self.settings.os == "OHOS":
+            man_src = os.path.join(self.source_folder, "man")
+            man_dst = os.path.join(self.package_folder, "share", "man")
+            for man_file in glob.glob(os.path.join(man_src, "*.1")) + glob.glob(os.path.join(man_src, "*.7")):
+                section = man_file[-1]
+                section_dir = os.path.join(man_dst, "man" + section)
+                os.makedirs(section_dir, exist_ok=True)
+                copy(self, os.path.basename(man_file), src=man_src, dst=section_dir)
         copy(self, "COPYING", src=self.source_folder,
              dst=os.path.join(self.package_folder, "licenses"), keep_path=False)
 
