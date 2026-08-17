@@ -29,9 +29,19 @@ xapian-core 是 Xapian 搜索引擎核心库，提供文档索引、查询、排
   - 添加文档并查询。
   - 校验匹配数量、文档内容和 `Xapian::version_string() == "1.4.22"`。
 
-## 当前状态
+## 真机验证结果
 
-- 本地静态检查：通过。
-- Conan export：通过。
-- HarmonyOS 真机 `conan create`：待执行。
-- 真机通过后再将 manifest 中 1.4.22 的验证结果更新为 passed。
+验证命令：
+
+```bash
+conan create archives/x/xapian-core/1.4.22 --profile=ohos-aarch64 --build=missing
+```
+
+验证结论：
+
+- `conan create`：EXIT=0。
+- `configure`：通过。
+- `make`：通过。
+- `make check`：通过。
+- `test_package build`：通过，`[100%] Built target test_xapian_core`。
+- `test_package test`：通过，输出 `xapian-core smoke test passed: 1.4.22`。

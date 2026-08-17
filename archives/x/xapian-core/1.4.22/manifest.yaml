@@ -1,6 +1,6 @@
 version: "1.4.22"
-status: adapting
-build_date: "2026-07-29"
+status: passed
+build_date: "2026-08-17"
 
 source:
   url: "https://oligarchy.co.uk/xapian/1.4.22/xapian-core-1.4.22.tar.xz"
@@ -28,11 +28,11 @@ verification:
     - "conan inspect ."
     - "conan export archives/x/xapian-core/1.4.22"
   ohos:
-    status: pending
+    status: passed
     run_dir: ""
-    package_ref: ""
-    note: "Pending OHOS real-device validation for 1.4.22."
+    package_ref: "xapian-core/1.4.22"
+    note: "conan create archives/x/xapian-core/1.4.22 --profile=ohos-aarch64 --build=missing EXIT=0; test_package passed: xapian-core smoke test passed: 1.4.22."
   upstream_make_check:
-    status: pending
+    status: passed
     run_dir: ""
-    note: "Pending OHOS real-device validation for 1.4.22."
+    note: "make check passed on HarmonyOS real device."
