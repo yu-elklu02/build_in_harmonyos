@@ -345,6 +345,7 @@ class BtopConan(ConanFile):
             "tests/cpu_names.cpp",
             "tests/tools.cpp",
             "src/btop_shared.cpp",
+            "src/btop_tools.cpp",
             shlex.quote(test_main),
             "-Wl,--gc-sections",
             "-pthread",
