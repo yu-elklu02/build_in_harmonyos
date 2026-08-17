@@ -29,11 +29,11 @@ if [ ! -x "$rem2ps" ]; then
 	exit 1
 fi
 
-# conan's VirtualRunEnv sets PATH to only the package's bin/ dir, so standard
-# utilities like mkdir/mktemp/rm are not on PATH (Error 127). The test only
-# needs to write scratch files; write them directly into the already-existing,
-# writable $package_folder/bin/ using a unique suffix — no mkdir required.
+# The test only needs scratch files; write them directly into the
+# already-existing, writable $package_folder/bin/ using a unique suffix, so no
+# mkdir/mktemp dependency is required.
 scratch="$package_folder/bin/.remind-test.$$"
+trap 'rm -f "$scratch".*' EXIT HUP INT TERM
 
 # remind -v exits 1 (it prints usage after the version banner); under
 # `set -o pipefail` a piped `remind -v | grep` would surface that 1 and
