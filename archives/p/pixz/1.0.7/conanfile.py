@@ -26,6 +26,7 @@ class PixzConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     generators = "VirtualRunEnv"
+    tool_requires = "cppcheck/2.21.0"
 
     def requirements(self):
         self.requires("libarchive/3.8.7")
@@ -191,20 +192,6 @@ class PixzConan(ConanFile):
                 'INPUT="/storage/Users/currentUser/pixz-perm-$$"\nrm -f "$INPUT" "$INPUT.xz"\n: > "$INPUT"',
                 strict=False,
             )
-        # OHOS sh cannot execute '../src/pixz' (reports inaccessible), so the
-        # compress-file-permissions test fails for environment reasons rather
-        # than pixz bugs. Mark it XFAIL via the Makefile.in template (patching
-        # Makefile.am would trigger automake, which is not installed on OHOS).
-        test_make_in = os.path.join(self.source_folder, "test", "Makefile.in")
-        if os.path.isfile(test_make_in):
-            replace_in_file(
-                self,
-                test_make_in,
-                "EXTRA_DIST = $(TESTS)",
-                "EXTRA_DIST = $(TESTS)\nXFAIL_TESTS = compress-file-permissions.sh",
-                strict=False,
-            )
-
     def package(self):
         dest = shlex.quote(self.package_folder)
         self.run(f"make install DESTDIR={dest}", cwd=self.build_folder, env=["conanbuild", "pixz_ohos_env"])

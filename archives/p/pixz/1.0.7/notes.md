@@ -18,7 +18,7 @@ pixz 是 parallel indexed xz 压缩/解压工具，可并行处理 xz 数据，�
 - 上游测试入口：`make check`。
 - 上游测试项：
   - `compress-file-permissions.sh`
-  - `cppcheck-src.sh`（cppcheck 不存在时按上游逻辑 skip）
+  - `cppcheck-src.sh`
   - `single-file-round-trip.sh`
   - `xz-compatibility-c-option.sh`
 - test_package：
@@ -26,6 +26,6 @@ pixz 是 parallel indexed xz 压缩/解压工具，可并行处理 xz 数据，�
 
 ## 当前状态
 
-- 本地静态检查：待执行。
-- Conan export：待执行。
-- HarmonyOS 真机 `conan create`：待执行。
+- 本地静态检查：通过。
+- Conan export：通过。
+- HarmonyOS 真机 `conan create`：待重新验证（当前候选已加入 cppcheck tool dependency，并取消 XFAIL）。
