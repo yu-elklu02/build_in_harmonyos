@@ -26,6 +26,7 @@ class PixzConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     generators = "VirtualRunEnv"
+    exports_sources = "patches/*"
     tool_requires = "cppcheck/2.21.0"
 
     def requirements(self):
