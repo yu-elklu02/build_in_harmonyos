@@ -172,35 +172,31 @@ class PixzConan(ConanFile):
             replace_in_file(self, configure, "umask 077 && mktemp -d", "umask 022 && mktemp -d", strict=False)
             replace_in_file(self, configure, 'umask 077 && mkdir "$tmp"', 'umask 022 && mkdir "$tmp"', strict=False)
 
-        # OHOS mktemp emits garbage bytes and /tmp is read-only; pin a fixed
-        # temp path in the test that otherwise relies on mktemp. Also force
-        # PIXZ to an absolute path because OHOS sh mishandles '../src/pixz'.
-        perm_test = os.path.join(self.source_folder, "test", "compress-file-permissions.sh")
+        # The OHOS shell can resolve the same relative path differently when
+        # Automake runs each test from its generated test directory. Use the
+        # source-tree path for every script that invokes the build-tree binary.
+        test_dir = os.path.join(self.source_folder, "test")
+        pixz_scripts = (
+            "compress-file-permissions.sh",
+            "single-file-round-trip.sh",
+            "xz-compatibility-c-option.sh",
+        )
+        absolute_pixz = 'PIXZ="$(cd "$(dirname "$0")/.." && pwd)/src/pixz"'
+        for script_name in pixz_scripts:
+            script = os.path.join(test_dir, script_name)
+            if os.path.isfile(script):
+                replace_in_file(self, script, "PIXZ=../src/pixz", absolute_pixz, strict=False)
+
+        # OHOS mktemp emits garbage bytes and /tmp is read-only. Keep this
+        # test's input in the writable device cache without changing the
+        # permission assertion itself.
+        perm_test = os.path.join(test_dir, "compress-file-permissions.sh")
         if os.path.isfile(perm_test):
-            replace_in_file(
-                self,
-                perm_test,
-                "PIXZ=../src/pixz",
-                'PIXZ="$(cd "$(dirname "$0")/.." && pwd)/src/pixz"',
-                strict=False,
-            )
             replace_in_file(
                 self,
                 perm_test,
                 "INPUT=$(mktemp)",
                 'INPUT="/storage/Users/currentUser/pixz-perm-$$"\nrm -f "$INPUT" "$INPUT.xz"\n: > "$INPUT"',
-                strict=False,
-            )
-
-        # The OHOS shell does not preserve the upstream permission semantics
-        # used by this test. Keep it running and record the expected failure.
-        test_make_in = os.path.join(self.source_folder, "test", "Makefile.in")
-        if os.path.isfile(test_make_in):
-            replace_in_file(
-                self,
-                test_make_in,
-                "EXTRA_DIST = $(TESTS)",
-                "EXTRA_DIST = $(TESTS)\nXFAIL_TESTS = compress-file-permissions.sh",
                 strict=False,
             )
     def package(self):
