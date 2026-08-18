@@ -9,7 +9,7 @@ from pathlib import Path
 from conan import ConanFile
 from conan.tools.build import load_toolchain_args
 from conan.tools.env import Environment
-from conan.tools.files import get, replace_in_file
+from conan.tools.files import apply_conandata_patches, get, replace_in_file
 from conan.tools.gnu import Autotools, AutotoolsDeps, AutotoolsToolchain, PkgConfigDeps
 from conan.tools.layout import basic_layout
 
@@ -37,6 +37,7 @@ class PixzConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
+        apply_conandata_patches(self)
 
     def generate(self):
         AutotoolsDeps(self).generate()
@@ -63,31 +64,44 @@ class PixzConan(ConanFile):
         if config_shell:
             env.define("CONFIG_SHELL", config_shell)
 
-        # cppcheck 2.21.0 hardcodes FILESDIR (build-time path) and supports
-        # no command-line override (--filesdir/--data-dir both rejected).
-        # Extract FILESDIR from the binary and create a symlink so the
-        # hardcoded build path resolves to the installed cfg directory.
-        if "cppcheck" in self.dependencies.build:
-            cppcheck = self.dependencies.build["cppcheck"]
-            actual_cfg = os.path.join(cppcheck.package_folder, "share", "Cppcheck")
-            if os.path.isfile(os.path.join(actual_cfg, "cfg", "std.cfg")):
-                cppcheck_bin = os.path.join(cppcheck.package_folder, "bin", "cppcheck")
-                hardcoded_filesdir = None
-                if os.path.isfile(cppcheck_bin):
-                    with open(cppcheck_bin, "rb") as bf:
-                        blob = bf.read()
-                    marker = b"FILESDIR set to \""
-                    idx = blob.find(marker)
-                    if idx != -1:
-                        start = idx + len(marker)
-                        end = blob.find(b"\"", start)
-                        if end != -1:
-                            hardcoded_filesdir = blob[start:end].decode("utf-8", "replace")
-                if hardcoded_filesdir and not os.path.exists(hardcoded_filesdir):
-                    symlink_parent = os.path.dirname(hardcoded_filesdir)
-                    os.makedirs(symlink_parent, exist_ok=True)
-                    os.symlink(actual_cfg, hardcoded_filesdir)
+        self._restore_hardcoded_filesdir("cppcheck", "share/Cppcheck")
         env.vars(self).save_script("pixz_ohos_env")
+
+    def _restore_hardcoded_filesdir(self, dependency_name, data_relative_path):
+        """Relocate a tool that embeds a stale absolute FILESDIR in its ELF."""
+        dependency = self.dependencies.build[dependency_name]
+        data_dir = os.path.join(dependency.package_folder, *data_relative_path.split("/"))
+        if not os.path.isfile(os.path.join(data_dir, "cfg", "std.cfg")):
+            raise RuntimeError(f"{dependency_name} package data is incomplete: {data_dir}")
+
+        executable = os.path.join(dependency.package_folder, "bin", dependency_name)
+        with open(executable, "rb") as binary_file:
+            blob = binary_file.read()
+        marker = b'FILESDIR set to "'
+        start = blob.find(marker)
+        if start == -1:
+            raise RuntimeError(f"{dependency_name} FILESDIR marker not found in {executable}")
+        start += len(marker)
+        end = blob.find(b'"', start)
+        if end == -1:
+            raise RuntimeError(f"{dependency_name} FILESDIR marker is unterminated in {executable}")
+        hardcoded_dir = blob[start:end].decode("utf-8", "strict")
+        if not hardcoded_dir or not os.path.isabs(hardcoded_dir):
+            raise RuntimeError(f"{dependency_name} FILESDIR is not an absolute path: {hardcoded_dir!r}")
+
+        if os.path.lexists(hardcoded_dir):
+            if os.path.realpath(hardcoded_dir) != os.path.realpath(data_dir):
+                raise RuntimeError(f"{dependency_name} FILESDIR already exists with a different target: {hardcoded_dir}")
+            return
+
+        os.makedirs(os.path.dirname(hardcoded_dir), exist_ok=True)
+        try:
+            os.symlink(data_dir, hardcoded_dir, target_is_directory=True)
+        except OSError:
+            # Some HarmonyOS-backed filesystems reject symlinks. A copied data
+            # directory preserves the same read-only runtime lookup semantics.
+            shutil.copytree(data_dir, hardcoded_dir)
+        self.output.info(f"{dependency_name}: restored FILESDIR {hardcoded_dir}")
 
     def build(self):
         self._patch_sources()
@@ -238,23 +252,6 @@ class PixzConan(ConanFile):
                 strict=False,
             )
 
-        # cppcheck-src.sh: cppcheck 2.21.0 hardcodes FILESDIR and rejects
-        # --filesdir/--data-dir. The symlink created in generate() makes
-        # the hardcoded path resolve to the installed cfg. pixz 1.0.7
-        # source triggers nullPointerOutOfMemory and
-        # nullPointerArithmeticOutOfMemory warnings (malloc without NULL
-        # check) that the upstream --error-exitcode=1 treats as failure.
-        # Suppress both specific warning IDs so the static-analysis test
-        # passes without changing pixz source.
-        cppcheck_test = os.path.join(test_dir, "cppcheck-src.sh")
-        if os.path.isfile(cppcheck_test):
-            replace_in_file(
-                self,
-                cppcheck_test,
-                "cppcheck --error-exitcode=1 $srcdir/../src",
-                "cppcheck --suppress=nullPointerOutOfMemory --suppress=nullPointerArithmeticOutOfMemory --error-exitcode=1 $srcdir/../src",
-                strict=True,
-            )
     def package(self):
         dest = shlex.quote(self.package_folder)
         self.run(f"make install DESTDIR={dest}", cwd=self.build_folder, env=["conanbuild", "pixz_ohos_env"])

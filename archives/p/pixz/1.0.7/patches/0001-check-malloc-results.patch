@@ -1,0 +1,12 @@
+--- a/src/common.c
++++ b/src/common.c
+@@ -94,2 +94,4 @@ static void *decode_file_index_start(off_t block_seek, lzma_check check) {
+     block_wrapper_t *bw = malloc(sizeof(block_wrapper_t));
++    if (bw == NULL)
++        die("Out of memory allocating block metadata");
+     bw->block = (lzma_block){ .check = check, .filters = bw->filters,
+@@ -131,2 +133,4 @@ static lzma_vli find_file_index(void **bdatap) {
+     gFileIndexBuf = malloc(gFIBSize);
++    if (gFileIndexBuf == NULL)
++        die("Out of memory allocating file index");
+     gStream.avail_out = gFIBSize;
