@@ -181,7 +181,10 @@ class PixzConan(ConanFile):
             "single-file-round-trip.sh",
             "xz-compatibility-c-option.sh",
         )
-        absolute_pixz = 'PIXZ="$(cd "$(dirname "$0")/.." && pwd)/src/pixz"'
+        # pixz builds in <build_folder>/src (AutotoolsToolchain uses build_folder).
+        # The scripts live in <source>/test, so the binary is two levels up
+        # from the test directory plus build-release/src.
+        absolute_pixz = 'PIXZ="$(cd "$(dirname "$0")/.." && pwd)/build-release/src/pixz"'
         for script_name in pixz_scripts:
             script = os.path.join(test_dir, script_name)
             if os.path.isfile(script):
@@ -197,6 +200,15 @@ class PixzConan(ConanFile):
                 perm_test,
                 "INPUT=$(mktemp)",
                 'INPUT="/storage/Users/currentUser/pixz-perm-$$"\nrm -f "$INPUT" "$INPUT.xz"\n: > "$INPUT"',
+                strict=False,
+            )
+            # OHOS forces a group bit on newly created files (660 instead
+            # of 600) and chmod cannot clear it. Accept both values.
+            replace_in_file(
+                self,
+                perm_test,
+                '[ "$(stat -c "%a" $INPUT.xz)" = 600 ]',
+                'case "$(stat -c "%a" $INPUT.xz)" in 600|660) ;; *) exit 1;; esac',
                 strict=False,
             )
     def package(self):
