@@ -26,6 +26,7 @@ class PixzConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     generators = "VirtualRunEnv"
+    tool_requires = "cppcheck/2.21.0"
 
     def requirements(self):
         self.requires("libarchive/3.8.7")
@@ -61,6 +62,16 @@ class PixzConan(ConanFile):
         config_shell = os.environ.get("CONFIG_SHELL")
         if config_shell:
             env.define("CONFIG_SHELL", config_shell)
+
+        # cppcheck's executable retains a build-time FILESDIR, while its
+        # Conan package installs configuration files under share/Cppcheck/cfg.
+        # Point the upstream optional static-analysis test at that installed
+        # data directory so it can run instead of being skipped.
+        cppcheck = self.dependencies.build["cppcheck"]
+        cppcheck_data_dir = os.path.join(cppcheck.package_folder, "share", "Cppcheck", "cfg")
+        if not os.path.isfile(os.path.join(cppcheck_data_dir, "std.cfg")):
+            raise RuntimeError(f"cppcheck std.cfg not found: {cppcheck_data_dir}")
+        env.define("CPPCHECK_DATA_DIR", cppcheck_data_dir)
         env.vars(self).save_script("pixz_ohos_env")
 
     def build(self):
@@ -201,6 +212,16 @@ class PixzConan(ConanFile):
                 "INPUT=$(mktemp)",
                 'INPUT="/storage/Users/currentUser/pixz-perm-$$"\nrm -f "$INPUT" "$INPUT.xz"\n: > "$INPUT"',
                 strict=False,
+            )
+
+        cppcheck_test = os.path.join(test_dir, "cppcheck-src.sh")
+        if os.path.isfile(cppcheck_test):
+            replace_in_file(
+                self,
+                cppcheck_test,
+                "cppcheck --error-exitcode=1 $srcdir/../src",
+                'cppcheck --data-dir="$CPPCHECK_DATA_DIR" --error-exitcode=1 $srcdir/../src',
+                strict=True,
             )
             # OHOS forces a group bit on newly created files (660 instead
             # of 600) and chmod cannot clear it. Accept both values.

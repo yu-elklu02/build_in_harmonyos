@@ -28,4 +28,4 @@ pixz 是 parallel indexed xz 压缩/解压工具，可并行处理 xz 数据，�
 
 - 本地静态检查：通过。
 - Conan export：通过。
-- HarmonyOS 真机验证：上游功能测试目标为 3 PASS、cppcheck 未安装时 1 SKIP、0 FAIL；test_package round-trip 通过。
+- HarmonyOS 真机验证目标：上游 4 个测试均实际执行并通过；cppcheck 通过 `--data-dir` 使用包内 `share/Cppcheck/cfg/std.cfg`，不再跳过。
