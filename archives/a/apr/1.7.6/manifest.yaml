@@ -22,9 +22,10 @@ build:
   cxx: clang++
 
 patches_applied:
-  - "0011-config.guess-ohos.patch"
-  - "0012-config.sub-ohos.patch"
-  - "0013-configure-hmdfs-umask.patch"
+  - "0011-config.guess-harmonyos.patch"
+  - "0012-config.guess-libc-ohos.patch"
+  - "0013-config.sub-ohos.patch"
+  - "0014-configure-hmdfs-umask.patch"
 
 knowledge_gained:
   - "E007: config.guess 需要 __OHOS__ LIBC 检测和 HarmonyOS 系统识别"
