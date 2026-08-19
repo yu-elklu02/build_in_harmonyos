@@ -15,5 +15,5 @@ ohos_adaptation:
 
 versions:
   "1.7.6":
-    status: validation_pending
+    status: built
     build_date: "2026-08-19"

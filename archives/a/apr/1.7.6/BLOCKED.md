@@ -1,6 +1,6 @@
-# Device verification pending
+# Verification note
 
-The local Windows environment can validate recipe syntax and patch application, but cannot execute OHOS aarch64 binaries. No test result is claimed here. The validation branch must be run on an OHOS device with the project profile:
+The OHOS device validation for `conan create` and `test_package/test_apr` is complete with `EXIT=0`. The upstream `make check` suite is recorded but was not executed in the reported device run; do not infer its pass rate from the consumer test. The local Windows environment cannot execute OHOS aarch64 binaries. To reproduce the package validation on an OHOS device:
 
 ```bash
 conan create archives/a/apr/1.7.6 \
@@ -9,4 +9,4 @@ conan create archives/a/apr/1.7.6 \
   -r=ohpcd --build=missing
 ```
 
-That command builds APR and executes the consumer `test_apr` binary when the device runner is available. Run the upstream `make check` separately in the device build directory after a successful create; it is intentionally not asserted as passed by this local preparation.
+The command builds APR and executes the consumer `test_apr` binary. Run upstream `make check` separately if a full upstream-suite result is required.

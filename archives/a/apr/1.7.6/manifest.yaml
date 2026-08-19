@@ -3,7 +3,7 @@ package: apr/1.7.6
 version: "1.7.6"
 homepage: "https://apr.apache.org/"
 license: "Apache-2.0"
-status: validation_pending
+status: built
 build_date: "2026-08-19"
 build_system: autotools
 
