@@ -32,7 +32,10 @@ class QuantLibConan(ConanFile):
         tc = CMakeToolchain(self)
         # OHOS Boost.Math long double promotion is flaky on the failing root-finding path.
         tc.preprocessor_definitions["BOOST_MATH_PROMOTE_DOUBLE_POLICY"] = "0"
-        tc.variables["BUILD_SHARED_LIBS"] = "ON"
+        # boost 1.84 sp_thread_sleep.hpp uses pthread_setcancelstate on
+        # non-Android PTHREAD builds; OHOS lacks that symbol.
+        tc.preprocessor_definitions["BOOST_SP_NO_PTHREAD_SETCANCELSTATE"] = "1"
+        tc.variables["BUILD_SHARED_LIBS"] = "OFF"
         tc.variables["QL_BUILD_EXAMPLES"] = "OFF"
         tc.variables["QL_BUILD_TEST_SUITE"] = "ON"
         tc.variables["QL_BUILD_FUZZ_TEST_SUITE"] = "OFF"
@@ -52,7 +55,11 @@ class QuantLibConan(ConanFile):
 
         test_binary = os.path.join(self.build_folder, "test-suite", "quantlib-test-suite")
         bash = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
-        self.run(f"{shlex.quote(bash)} -c {shlex.quote(shlex.quote(test_binary))}")
+        # Static build: test-suite links libQuantLib.a directly.
+        self.run(
+            f"{shlex.quote(bash)} -c {shlex.quote(shlex.quote(test_binary))}",
+            env=["conanbuild", "conanrun"],
+        )
 
     def package(self):
         cmake = CMake(self)
