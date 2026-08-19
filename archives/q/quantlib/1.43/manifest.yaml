@@ -1,6 +1,6 @@
 software: quantlib
 version: "1.43"
-status: adapting
+status: built
 build_date: "2026-08-19"
 
 source:
@@ -25,7 +25,13 @@ verification:
   local:
     - "python -m py_compile conanfile.py test_package/conanfile.py"
   ohos:
-    status: pending
+    status: passed
+    command: "conan create archives/q/quantlib/1.43 --profile=ohos-aarch64 --build=missing"
+    result: "EXIT=0"
   upstream_make_check:
-    status: pending
+    status: passed
     note: "CMake upstream test suite: quantlib-test-suite"
+    result: "1339/1339 PASS"
+  test_package:
+    status: passed
+    result: "quantlib curve test passed: 0.951229"
