@@ -243,14 +243,31 @@ class PixzConan(ConanFile):
                 'INPUT="/storage/Users/currentUser/pixz-perm-$$"\nrm -f "$INPUT" "$INPUT.xz"\n: > "$INPUT"',
                 strict=False,
             )
-            # OHOS forces a group bit on newly created files (660 instead
-            # of 600) and chmod cannot clear it. Accept both values.
+            # Verify the actual contract: compression preserves the input
+            # mode.  A literal 0600 expectation is not portable because
+            # OHOS filesystems can retain mandatory group permissions.
+            # Support both GNU and BSD stat without treating a missing mode
+            # query as a successful assertion.
             replace_in_file(
                 self,
                 perm_test,
-                '[ "$(stat -c "%a" $INPUT.xz)" = 600 ]',
-                'case "$(stat -c "%a" $INPUT.xz)" in 600|660) ;; *) exit 1;; esac',
-                strict=False,
+                '''echo foo > $INPUT
+
+$PIXZ $INPUT
+
+[ "$(stat -c "%a" $INPUT.xz)" = 600 ]''',
+                '''echo foo > $INPUT
+
+mode_of () {
+  stat -c "%a" "$1" 2>/dev/null || stat -f "%Lp" "$1" 2>/dev/null
+}
+
+INPUT_MODE=$(mode_of "$INPUT") || exit 1
+$PIXZ $INPUT
+OUTPUT_MODE=$(mode_of "$INPUT.xz") || exit 1
+
+[ "$OUTPUT_MODE" = "$INPUT_MODE" ]''',
+                strict=True,
             )
 
     def package(self):
