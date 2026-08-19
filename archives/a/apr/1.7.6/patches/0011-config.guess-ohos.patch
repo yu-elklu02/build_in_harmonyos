@@ -1,0 +1,12 @@
+--- a/build/config.guess
++++ b/build/config.guess
+@@ -156,7 +156,9 @@ Linux|GNU|GNU/*)
+ 	set_cc_for_build
+ 	cat <<-EOF > "$dummy.c"
+ 	#if defined(__ANDROID__)
+ 	LIBC=android
++#elif defined(__OHOS__)
++	LIBC=ohos
+ 	#else
+ 	#include <features.h>
+ 	#if defined(__UCLIBC__)
