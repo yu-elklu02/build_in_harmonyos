@@ -18,7 +18,8 @@ build:
     - "boost/1.84.0"
 
 patches_applied: []
-knowledge_gained: []
+knowledge_gained:
+  - "OHOS Boost.Math can misbehave on long-double promotion paths; set BOOST_MATH_PROMOTE_DOUBLE_POLICY=0 to keep QuantLib test-suite on the double path and avoid evaluation_error in CDO/CEV cases."
 
 verification:
   local:
