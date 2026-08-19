@@ -1,7 +1,11 @@
 software: apr
+package: apr/1.7.6
 version: "1.7.6"
+homepage: "https://apr.apache.org/"
+license: "Apache-2.0"
 status: validation_pending
 build_date: "2026-08-19"
+build_system: autotools
 
 source:
   url: "https://archive.apache.org/dist/apr/apr-1.7.6.tar.gz"

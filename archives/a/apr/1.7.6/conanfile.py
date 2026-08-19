@@ -25,6 +25,8 @@ class AprConan(ConanFile):
     def validate(self):
         if self.settings.os != "OHOS":
             raise ConanInvalidConfiguration("APR recipe is currently validated for OHOS only")
+        if self.settings.arch != "armv8":
+            raise ConanInvalidConfiguration("APR recipe is currently validated for OHOS armv8 only")
 
     def export_sources(self):
         export_conandata_patches(self)

@@ -5,8 +5,9 @@ upstream_tests:
   - source: apr-1.7.6/test
     command: make check
     status: requires_ohos_device
+    test_module_count: 45
 test_package_tests:
   - file: test_apr.c
     command: ./test_apr
     description: APR initialization and memory-pool lifecycle smoke test
-assertion_count: 3
+assertion_count: 2
