@@ -30,6 +30,8 @@ class QuantLibConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        # OHOS Boost.Math long double promotion is flaky on the failing root-finding path.
+        tc.preprocessor_definitions["BOOST_MATH_PROMOTE_DOUBLE_POLICY"] = "0"
         tc.variables["BUILD_SHARED_LIBS"] = "ON"
         tc.variables["QL_BUILD_EXAMPLES"] = "OFF"
         tc.variables["QL_BUILD_TEST_SUITE"] = "ON"
