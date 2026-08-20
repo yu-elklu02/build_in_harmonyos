@@ -111,6 +111,10 @@ class AggdrawConan(ConanFile):
         if self.settings.os == "OHOS":
             sign_tool = "/data/service/hnp/bin/binary-sign-tool"
             objcopy = "/data/service/hnp/bin/llvm-objcopy"
+            if not os.path.isfile(sign_tool) or not os.path.isfile(objcopy):
+                raise ConanInvalidConfiguration(
+                    "OHOS signing tools are required for the aggdraw extension"
+                )
             # Wheel build tags the .so with the platform ABI
             # (aggdraw.cpython-312-aarch64-linux-ohos.so on CI,
             # aggdraw.cpython-312.so on device); glob-match every aggdraw*.so
@@ -127,17 +131,17 @@ class AggdrawConan(ConanFile):
             for so_file in extension_modules:
                 if not os.path.isfile(so_file):
                     continue
-                tmp_signed = so_file + ".signed"
                 self.run(
                     f'"{objcopy}" --remove-section .codesign "{so_file}" 2>/dev/null || true',
-                    quiet=True,
                 )
                 self.run(
-                    f'"{sign_tool}" sign -inFile "{so_file}" -outFile "{tmp_signed}" '
+                    f'"{sign_tool}" sign -inFile "{so_file}" -outFile "{so_file}" '
                     f'-selfSign 1',
-                    quiet=True,
                 )
-                os.replace(tmp_signed, so_file)
+                if not os.path.isfile(so_file):
+                    raise ConanInvalidConfiguration(
+                        f"binary-sign-tool did not produce {so_file}"
+                    )
                 os.chmod(so_file, 0o755)
 
     def package_info(self):
