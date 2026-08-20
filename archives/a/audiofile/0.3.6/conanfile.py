@@ -19,6 +19,8 @@ class AudiofileConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
 
+    exports_sources = "patches/*"
+
     def config_options(self):
         if self.settings.os == "Windows":
             self.options.rm_safe("fPIC")
@@ -37,13 +39,28 @@ class AudiofileConan(ConanFile):
         basic_layout(self)
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        try:
+            get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        except Exception:
+            # download.gnome.org is intermittently unreachable on OHOS
+            # devices; fall back to a local mirror of the upstream tarball.
+            import os, shutil, tarfile
+            mirror = os.path.expanduser(
+                "~/build_in_harmonyos/.audiofile-mirror/audiofile-0.3.6.tar.xz"
+            )
+            if not os.path.isfile(mirror):
+                raise
+            with tarfile.open(mirror, "r:xz") as tf:
+                tf.extractall(self.source_folder)
 
     def generate(self):
         tc = AutotoolsToolchain(self)
         # FLAC would add a transitive dependency that this recipe does not
         # package. Keep the base audio formats and their upstream tests enabled.
         tc.configure_args.extend(["--disable-flac", "--disable-docs", "--disable-examples"])
+        # sfcommands mix C and C++ (AudioFormat.cpp); on OHOS with libc++
+        # the C linker driver omits -lc++, so add it explicitly.
+        tc.extra_ldflags.append("-lc++")
         tc.generate()
 
     def build(self):
