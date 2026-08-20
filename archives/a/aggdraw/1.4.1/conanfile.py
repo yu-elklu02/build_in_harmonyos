@@ -70,14 +70,18 @@ class AggdrawConan(ConanFile):
         # the running sys.executable lives under, so it tracks whichever Python
         # Conan invokes — device or CI — without a hardcoded absolute.
         py_lib_dir = os.path.join(sys.prefix, "lib")
+        compiler_executables = self.conf.get(
+            "tools.build:compiler_executables", default={}, check_type=dict
+        ) or {}
+        cxx = compiler_executables.get("cpp") or "clang++"
         # CI's SDK lld loads an incompatible libxml2.so.16. The HNP linker is
         # the repository-standard fallback for native OHOS C/C++ links.
         linker = ""
         if self.settings.os == "OHOS":
             linker = "-fuse-ld=/data/service/hnp/bin/ld "
         self.run(
-            f'env CXX=clang++ '
-            f'LDSHARED="clang++ -shared {linker}-L{py_lib_dir} -lpython3.12" '
+            f'env CXX="{cxx}" '
+            f'LDSHARED="{cxx} -shared {linker}-L{py_lib_dir} -lpython3.12" '
             f'LDFLAGS="{linker}-L{py_lib_dir} -lpython3.12" '
             f'"{sys.executable}" -m pip install . --target "{staging}" '
             "--no-build-isolation --no-deps",
