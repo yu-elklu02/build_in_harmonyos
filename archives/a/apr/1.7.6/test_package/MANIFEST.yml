@@ -1,11 +1,12 @@
 package: apr/1.7.6
 homepage: https://apr.apache.org/
-upstream_test_in_build: true
+upstream_test_in_build: false
 upstream_tests:
   - source: apr-1.7.6/test
     command: make check
-    status: executed_by_conan_build
+    status: not_counted_platform_failure
     test_module_count: 45
+    failure: "OHOS device: Error 159; testmutexscope and testall failed after the library build succeeded"
 test_package_tests:
   - file: test_apr.c
     command: ./test_apr

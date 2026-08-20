@@ -5,15 +5,16 @@
 - Build system: autotools
 - Target: HarmonyOS PC, `os=OHOS`, `arch=armv8`
 - Compiler: clang/clang++
-- Status: validated on device with `conan create`
+- Status: library and consumer test validated on device; upstream suite has an OHOS platform failure
 
 ## Adaptation
 
-The recipe applies three focused patches:
+The recipe applies four focused patches:
 
-- `0011-config.guess-ohos.patch`: recognizes `HarmonyOS` and maps aarch64 to `aarch64-unknown-linux-ohos`; avoids the device `/tmp` limitation during libc detection.
-- `0012-config.sub-ohos.patch`: accepts the `ohos-linux` triplet.
-- `0013-configure-hmdfs-umask.patch`: changes temporary-directory creation from umask `077` to `022` for HMDFS compatibility.
+- `0011-config.guess-harmonyos.patch`: recognizes `HarmonyOS` and maps aarch64 to `aarch64-unknown-linux-ohos`.
+- `0012-config.guess-libc-ohos.patch`: adds OHOS libc detection for compiler-based config.guess paths.
+- `0013-config.sub-ohos.patch`: accepts the `ohos-linux` triplet.
+- `0014-configure-hmdfs-umask.patch`: changes temporary-directory creation from umask `077` to `022` for HMDFS compatibility.
 
 ## Dependencies
 
@@ -31,4 +32,4 @@ configure: aarch64-unknown-linux-ohos
 test_package: test_apr built and executed
 ```
 
-The upstream test suite is recorded in `test_package/MANIFEST.yml` as `make check` with 45 test modules. The device report confirms the Conan consumer test; this local Windows environment cannot execute OHOS binaries, so no upstream pass rate is claimed.
+The upstream suite contains 45 test modules and is recorded for comparison, but is not counted as passed on OHOS. The device run returned `Error 159` from `testmutexscope` and `testall`; this is an OHOS platform test failure after successful compilation. The recipe therefore does not execute `make check`. The Conan consumer test remains the supported adaptation smoke test.
