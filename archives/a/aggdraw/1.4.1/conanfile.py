@@ -98,20 +98,18 @@ class AggdrawConan(ConanFile):
                 raise ConanInvalidConfiguration(
                     "OHOS signing tools are required for the aggdraw extension"
                 )
-            tmp_signed = extension + ".signed"
             self.run(
                 f'"{objcopy}" --remove-section .codesign "{extension}" '
                 f'2>/dev/null || true'
             )
             self.run(
                 f'"{sign_tool}" sign -inFile "{extension}" '
-                f'-outFile "{tmp_signed}" -selfSign 1'
+                f'-outFile "{extension}" -selfSign 1'
             )
-            if not os.path.isfile(tmp_signed):
+            if not os.path.isfile(extension):
                 raise ConanInvalidConfiguration(
-                    f"binary-sign-tool did not produce {tmp_signed}"
+                    f"binary-sign-tool did not produce {extension}"
                 )
-            os.replace(tmp_signed, extension)
             os.chmod(extension, 0o755)
 
     def package(self):
