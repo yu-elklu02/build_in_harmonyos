@@ -1,8 +1,11 @@
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.files import copy, get
+from conan.tools.files import apply_conandata_patches, copy, get
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
+
+import os
+import stat
 
 
 class BarcodeConan(ConanFile):
@@ -16,6 +19,8 @@ class BarcodeConan(ConanFile):
     topics = ("barcode", "svg", "ean", "upc")
 
     settings = "os", "arch", "compiler", "build_type"
+
+    exports_sources = "patches/*"
 
     def validate(self):
         if self.settings.os not in ("Linux", "OHOS"):
@@ -43,9 +48,25 @@ class BarcodeConan(ConanFile):
                 "--build=aarch64-unknown-linux-gnu",
                 "--host=aarch64-unknown-linux-gnu",
             ])
+            # barcode.h uses #include <gettext.h>; the bundled copy lives in
+            # lib/. Add the absolute path so clang finds it regardless of the
+            # working directory (the relative -Ilib in Makefile.am resolves
+            # against build-release, where lib/ does not exist).
+            tc.extra_cflags.append(f"-I{self.source_folder}/lib")
+            # clang 15 defaults to -fno-common; barcode 0.99 (2013) relies on
+            # tentative definitions of globals like 'streaming' across multiple
+            # translation units, which -fno-common turns into duplicate symbols.
+            tc.extra_cflags.append("-fcommon")
         tc.generate()
 
     def build(self):
+        apply_conandata_patches(self)
+        # HMDFS strips the executable bit on copy; restore it so
+        # Autotools.configure() can run ./configure.
+        configure_path = os.path.join(self.source_folder, "configure")
+        if os.path.isfile(configure_path):
+            current_mode = os.stat(configure_path).st_mode
+            os.chmod(configure_path, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         autotools = Autotools(self)
         autotools.configure()
         autotools.make()

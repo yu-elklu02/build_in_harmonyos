@@ -15,5 +15,6 @@ class BarcodeTestConan(ConanFile):
         if cross_building(self):
             return
         barcode = os.path.join(self.dependencies["barcode"].package_folder, "bin", "barcode")
-        self.run(f'"{barcode}" -e code128 -o barcode.svg 1234567890', env="conanrun")
-        self.run('grep -q "<svg" barcode.svg && grep -q "1234567890" barcode.svg')
+        # -S selects SVG output; -b gives the data to encode; -e sets the encoding.
+        self.run(f'"{barcode}" -S -b 1234567890 -e code128 -o barcode.svg', env="conanrun")
+        self.run('grep -q "<svg" barcode.svg && grep -q "1234567890" barcode.svg', env="conanrun")
