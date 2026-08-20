@@ -34,9 +34,8 @@ platform limitation; none of them change upstream library behaviour.
 - `generate()` adds `-lc++` to `extra_ldflags`: `sfcommands` mix C and C++
   (`AudioFormat.cpp`), but the C linker driver omits `-lc++` on OHOS, causing
   `undefined symbol: operator new(unsigned long)` etc.
-- `source()` falls back to a local mirror tarball at
-  `~/build_in_harmonyos/.audiofile-mirror/audiofile-0.3.6.tar.xz` when
-  `download.gnome.org` is unreachable on the device.
+- Source retrieval uses the checksum-pinned upstream GNOME release archive;
+  the recipe does not depend on a workstation or device-local mirror.
 
 ### Build/test summary
 

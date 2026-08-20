@@ -28,9 +28,9 @@ patches_applied:
 tests:
   upstream:
     command: "make check"
-    cases: 36
-    passed: 36
-    note: "The 35 non-FLAC tests in test/ plus libaudiofile/UnitTests are executed during build(). All 35 tests passed; UnitTests compiled and linked with the patched gtest."
+    cases: 35
+    passed: 35
+    note: "The 35 non-FLAC test/ targets are executed during build(); all passed on the OHOS device. libaudiofile/UnitTests is built as part of make check with the patched gtest."
   test_package:
     command: "test_package/test_audiofile.cpp"
     cases: 1
@@ -46,4 +46,3 @@ platform:
     - "OHOS musl libc does not expose PATH_MAX via <limits.h>. 0004 defines PATH_MAX 4096 in 12 test files and fixes C++11 narrowing in Sign.cpp with static_cast<uint32_t>."
     - "Tests hardcode /tmp which is read-only on OHOS. 0005 uses $TMPDIR (falling back to '.') so mkstemp can create temp files."
     - "sfcommands mix C and C++ (AudioFormat.cpp); the C linker driver omits -lc++ on OHOS. generate() adds -lc++ to extra_ldflags."
-    - "download.gnome.org is intermittently unreachable on the OHOS device; source() falls back to a local mirror tarball at ~/build_in_harmonyos/.audiofile-mirror/audiofile-0.3.6.tar.xz."

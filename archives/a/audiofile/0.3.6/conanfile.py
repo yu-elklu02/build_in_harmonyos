@@ -39,19 +39,7 @@ class AudiofileConan(ConanFile):
         basic_layout(self)
 
     def source(self):
-        try:
-            get(self, **self.conan_data["sources"][self.version], strip_root=True)
-        except Exception:
-            # download.gnome.org is intermittently unreachable on OHOS
-            # devices; fall back to a local mirror of the upstream tarball.
-            import os, shutil, tarfile
-            mirror = os.path.expanduser(
-                "~/build_in_harmonyos/.audiofile-mirror/audiofile-0.3.6.tar.xz"
-            )
-            if not os.path.isfile(mirror):
-                raise
-            with tarfile.open(mirror, "r:xz") as tf:
-                tf.extractall(self.source_folder)
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def generate(self):
         tc = AutotoolsToolchain(self)
