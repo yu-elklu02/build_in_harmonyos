@@ -1,6 +1,6 @@
 # Verification note
 
-The OHOS device validation for `conan create` and `test_package/test_apr` is complete with `EXIT=0`. The upstream `make check` suite is recorded but was not executed in the reported device run; do not infer its pass rate from the consumer test. The local Windows environment cannot execute OHOS aarch64 binaries. To reproduce the package validation on an OHOS device:
+The OHOS device validation for `conan create` and `test_package/test_apr` is complete with `EXIT=0` for the previous recipe. The current recipe additionally runs the upstream `make check` target during `build()`, so this validation branch must be rerun on an OHOS device. The local Windows environment cannot execute OHOS aarch64 binaries. To reproduce the package validation on an OHOS device:
 
 ```bash
 conan create archives/a/apr/1.7.6 \
@@ -9,4 +9,4 @@ conan create archives/a/apr/1.7.6 \
   -r=ohpcd --build=missing
 ```
 
-The command builds APR and executes the consumer `test_apr` binary. Run upstream `make check` separately if a full upstream-suite result is required.
+The command builds APR, runs upstream `make check`, and executes the consumer `test_apr` binary.

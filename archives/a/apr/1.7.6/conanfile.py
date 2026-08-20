@@ -50,6 +50,8 @@ class AprConan(ConanFile):
         autotools = Autotools(self)
         autotools.configure()
         autotools.make()
+        # Run APR's upstream test suite after the library is built.
+        autotools.make(target="check")
 
     def package(self):
         autotools = Autotools(self)

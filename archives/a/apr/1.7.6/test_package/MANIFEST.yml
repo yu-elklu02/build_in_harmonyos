@@ -1,10 +1,10 @@
 package: apr/1.7.6
 homepage: https://apr.apache.org/
-upstream_test_in_build: false
+upstream_test_in_build: true
 upstream_tests:
   - source: apr-1.7.6/test
     command: make check
-    status: requires_ohos_device
+    status: executed_by_conan_build
     test_module_count: 45
 test_package_tests:
   - file: test_apr.c
