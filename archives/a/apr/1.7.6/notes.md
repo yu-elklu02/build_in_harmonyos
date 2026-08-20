@@ -32,4 +32,4 @@ configure: aarch64-unknown-linux-ohos
 test_package: test_apr built and executed
 ```
 
-The upstream suite contains 45 test modules and is recorded for comparison, but is not counted as passed on OHOS. The device run returned `Error 159` from `testmutexscope` and `testall`; this is an OHOS platform test failure after successful compilation. The recipe therefore does not execute `make check`. The Conan consumer test remains the supported adaptation smoke test.
+The upstream suite contains 45 test modules and is recorded for comparison, but is not counted as passed on OHOS. The device run identified platform failures after successful compilation: `testmutexscope` exited 159 (`SIGSYS`) because the proc-mutex pshared syscall is sandbox-rejected; `testall` exited 139 (`SIGSEGV`) with failures in `testdso` (8/9, `.libs` dlopen path), `testfile` (4/61, hardlink/errno semantics), `testfilecopy` (2/4, copy API), `testflock` (2/3, fork/exec), `testfnmatch` (2/4, libc result), and `testmmap` (crash after mmap return 2). The recipe therefore does not execute `make check`. The Conan consumer test remains the supported adaptation smoke test.
