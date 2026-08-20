@@ -81,10 +81,11 @@ class AggdrawConan(ConanFile):
                 f'-c "{source_path}" -o "{object_path}"'
             )
             object_files.append(object_path)
+        linker = "-fuse-ld=/data/service/hnp/bin/ld " if self.settings.os == "OHOS" else ""
         extension = os.path.join(staging, "aggdraw" + ext_suffix)
         objects = " ".join(f'"{obj}"' for obj in object_files)
         self.run(
-            f'"{cxx}" -shared {objects} '
+            f'"{cxx}" -shared {linker}{objects} '
             f'-L"{py_lib_dir}" -lpython{py_version} -o "{extension}"'
         )
 
@@ -97,11 +98,11 @@ class AggdrawConan(ConanFile):
             src=self.source_folder,
             dst=os.path.join(self.package_folder, "licenses"),
         )
-        # On OHOS, clang's default linker emits the platform code signature
-        # required by dlopen. Do not post-process the extension with
-        # binary-sign-tool: that tool can report success for an ELF shared
-        # object while producing a module that Python still rejects with
-        # EACCES. Keep the linker-produced signature intact.
+        # On OHOS, the HNP linker emits the platform code signature required
+        # by dlopen. Do not post-process the extension with binary-sign-tool:
+        # that tool can report success for an ELF shared object while
+        # producing a module that Python rejects with EACCES. Keep the
+        # linker-produced signature intact.
         if self.settings.os == "OHOS":
             import glob as _glob
             extension_modules = _glob.glob(
