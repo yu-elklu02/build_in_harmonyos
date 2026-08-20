@@ -58,6 +58,9 @@ class AprConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["apr-1"]
+        # APR installs public headers below include/apr-1 while the headers
+        # include each other as <apr_*.h>; export both roots for consumers.
+        self.cpp_info.includedirs = ["include/apr-1", "include"]
         self.cpp_info.set_property("cmake_file_name", "apr")
         self.cpp_info.set_property("cmake_target_name", "apr::apr")
         self.cpp_info.set_property("pkg_config_name", "apr-1")
