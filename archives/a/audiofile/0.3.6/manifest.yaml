@@ -1,0 +1,38 @@
+package: "audiofile"
+version: "0.3.6"
+status: "draft"
+build_system: "autotools"
+homepage: "https://audiofile.68k.org/"
+license: "LGPL-2.0-only, GPL-2.0-only"
+
+source:
+  url: "https://download.gnome.org/sources/audiofile/0.3/audiofile-0.3.6.tar.xz"
+  sha256: "ea2449ad3f201ec590d811db9da6d02ffc5e87a677d06b92ab15363d8cb59782"
+  tar_format: "tar.xz"
+
+build:
+  system: "autotools"
+  configure_options:
+    - "--disable-flac"
+    - "--disable-docs"
+    - "--disable-examples"
+  dependencies: []
+
+patches_applied: []
+
+tests:
+  upstream:
+    command: "make check"
+    cases: 36
+    passed: null
+    note: "The 35 non-FLAC tests in test/ plus libaudiofile/UnitTests are executed during build()."
+  test_package:
+    command: "test_package/test_audiofile.cpp"
+    cases: 1
+    passed: null
+    note: "Writes a WAV file, reads it back, and asserts format, channel count, frame count, and samples."
+
+platform:
+  validated_architecture: "OHOS/armv8"
+  limitations:
+    - "Pending device validation; do not interpret this draft manifest as a passed result."

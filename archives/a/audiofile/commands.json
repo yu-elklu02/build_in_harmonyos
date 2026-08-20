@@ -1,0 +1,7 @@
+{
+  "name": "audiofile",
+  "description": "Audio File Library",
+  "homepage": "https://audiofile.68k.org/",
+  "type": "library",
+  "versions": ["0.3.6"]
+}

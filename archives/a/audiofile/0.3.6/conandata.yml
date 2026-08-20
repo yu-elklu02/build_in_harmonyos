@@ -1,0 +1,7 @@
+sources:
+  "0.3.6":
+    url: "https://download.gnome.org/sources/audiofile/0.3/audiofile-0.3.6.tar.xz"
+    sha256: "ea2449ad3f201ec590d811db9da6d02ffc5e87a677d06b92ab15363d8cb59782"
+
+patches:
+  "0.3.6": []
