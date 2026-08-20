@@ -88,6 +88,31 @@ class AggdrawConan(ConanFile):
             f'"{cxx}" -shared {linker}{objects} '
             f'-L"{py_lib_dir}" -lpython{py_version} -o "{extension}"'
         )
+        if self.settings.os == "OHOS":
+            # Sign the final ELF while it is still in the build staging area.
+            # Signing after Conan copies it into the package cache produces a
+            # tool-successful signature that OHOS Python rejects from dlopen.
+            sign_tool = "/data/service/hnp/bin/binary-sign-tool"
+            objcopy = "/data/service/hnp/bin/llvm-objcopy"
+            if not os.path.isfile(sign_tool) or not os.path.isfile(objcopy):
+                raise ConanInvalidConfiguration(
+                    "OHOS signing tools are required for the aggdraw extension"
+                )
+            tmp_signed = extension + ".signed"
+            self.run(
+                f'"{objcopy}" --remove-section .codesign "{extension}" '
+                f'2>/dev/null || true'
+            )
+            self.run(
+                f'"{sign_tool}" sign -inFile "{extension}" '
+                f'-outFile "{tmp_signed}" -selfSign 1'
+            )
+            if not os.path.isfile(tmp_signed):
+                raise ConanInvalidConfiguration(
+                    f"binary-sign-tool did not produce {tmp_signed}"
+                )
+            os.replace(tmp_signed, extension)
+            os.chmod(extension, 0o755)
 
     def package(self):
         staging = os.path.join(self.build_folder, "staging")
@@ -98,11 +123,8 @@ class AggdrawConan(ConanFile):
             src=self.source_folder,
             dst=os.path.join(self.package_folder, "licenses"),
         )
-        # On OHOS, the HNP linker emits the platform code signature required
-        # by dlopen. Do not post-process the extension with binary-sign-tool:
-        # that tool can report success for an ELF shared object while
-        # producing a module that Python rejects with EACCES. Keep the
-        # linker-produced signature intact.
+        # Keep the signed build artifact intact when copying it into the
+        # package. The signature is deliberately created in build().
         if self.settings.os == "OHOS":
             import glob as _glob
             extension_modules = _glob.glob(
