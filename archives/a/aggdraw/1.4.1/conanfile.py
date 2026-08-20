@@ -81,11 +81,10 @@ class AggdrawConan(ConanFile):
                 f'-c "{source_path}" -o "{object_path}"'
             )
             object_files.append(object_path)
-        linker = "-fuse-ld=/data/service/hnp/bin/ld " if self.settings.os == "OHOS" else ""
         extension = os.path.join(staging, "aggdraw" + ext_suffix)
         objects = " ".join(f'"{obj}"' for obj in object_files)
         self.run(
-            f'"{cxx}" -shared {linker}{objects} '
+            f'"{cxx}" -shared {objects} '
             f'-L"{py_lib_dir}" -lpython{py_version} -o "{extension}"'
         )
 
@@ -98,52 +97,21 @@ class AggdrawConan(ConanFile):
             src=self.source_folder,
             dst=os.path.join(self.package_folder, "licenses"),
         )
-        # HarmonyOS MAC (hmmac=use_task) rejects exec of unsigned ELF loaded
-        # from the conan cache p/ folder → test_package's `import aggdraw` dies
-        # "Error loading shared library aggdraw.cpython-312.so: Permission
-        # denied". Re-sign the packaged .so in place: llvm-objcopy strips any
-        # stale .codesign section (tolerate "section not found" on first-sign),
-        # binary-sign-tool sign -selfSign 1 emits a signed copy, os.replace
-        # swaps it in, chmod 0o755 keeps it other-readable+executable. Same
-        # pattern as the daemon/ent/zig/ispell recipes in this repo. Missing
-        # tool or failed sign must fail the build — test_package exec depends
-        # on the signature; do not silently skip.
+        # On OHOS, clang's default linker emits the platform code signature
+        # required by dlopen. Do not post-process the extension with
+        # binary-sign-tool: that tool can report success for an ELF shared
+        # object while producing a module that Python still rejects with
+        # EACCES. Keep the linker-produced signature intact.
         if self.settings.os == "OHOS":
-            sign_tool = "/data/service/hnp/bin/binary-sign-tool"
-            objcopy = "/data/service/hnp/bin/llvm-objcopy"
-            if not os.path.isfile(sign_tool) or not os.path.isfile(objcopy):
-                raise ConanInvalidConfiguration(
-                    "OHOS signing tools are required for the aggdraw extension"
-                )
-            # Wheel build tags the .so with the platform ABI
-            # (aggdraw.cpython-312-aarch64-linux-ohos.so on CI,
-            # aggdraw.cpython-312.so on device); glob-match every aggdraw*.so
-            # in the package folder so the re-sign hits whichever file the
-            # build actually produced. A missed match silently skips the
-            # signature → MAC rejects exec in test_package.
             import glob as _glob
-            so_pattern = os.path.join(self.package_folder, "aggdraw*.so")
-            extension_modules = _glob.glob(so_pattern)
+            extension_modules = _glob.glob(
+                os.path.join(self.package_folder, "aggdraw*.so")
+            )
             if not extension_modules:
                 raise ConanInvalidConfiguration(
-                    "aggdraw extension module was not packaged; cannot sign it for OHOS"
+                    "aggdraw extension module was not packaged"
                 )
             for so_file in extension_modules:
-                if not os.path.isfile(so_file):
-                    continue
-                tmp_signed = so_file + ".signed"
-                self.run(
-                    f'"{objcopy}" --remove-section .codesign "{so_file}" 2>/dev/null || true',
-                )
-                self.run(
-                    f'"{sign_tool}" sign -inFile "{so_file}" -outFile "{tmp_signed}" '
-                    f'-selfSign 1',
-                )
-                if not os.path.isfile(tmp_signed):
-                    raise ConanInvalidConfiguration(
-                        f"binary-sign-tool did not produce {tmp_signed}"
-                    )
-                os.replace(tmp_signed, so_file)
                 os.chmod(so_file, 0o755)
 
     def package_info(self):
