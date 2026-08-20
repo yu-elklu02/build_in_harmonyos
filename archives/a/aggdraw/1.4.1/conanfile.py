@@ -37,55 +37,56 @@ class AggdrawConan(ConanFile):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def build(self):
-        # The target Python on the HarmonyOS PC device builds this CPython C++
-        # extension in place.  Disable build isolation and dependency resolution
-        # so Conan never downloads undeclared build dependencies.
-        #
-        # HarmonyOS python_3.12 hardcodes CXX="c++" into sysconfig at its own
-        # build time; setuptools build_ext reads sysconfig.get_config_var('CXX')
-        # → "c++" but the device only ships clang/clang++ in PATH, so the wheel
-        # build dies "command 'c++' failed: No such file or directory".  Override
-        # CXX via env so setuptools picks clang++ instead.  LDSHARED is likewise
-        # hardcoded to "cc -shared ..."; the same env override switches the
-        # linker to clang so the .so is produced.
-        staging = os.path.join(self.build_folder, "staging")
-        # conan self.run's `env` only accepts predefined scope names, not dict
-        # overrides, so inline CXX/LDSHARED/LDFLAGS via the `env` command prefix.
-        #
-        # HarmonyOS python_3.12 statically links libpython into the python3.12
-        # main binary and does NOT export Python C-API symbols (PyModule_Create2,
-        # etc.) to extensions at runtime — aggdraw.cpython-312.so's NEEDED is
-        # only libc++_shared/libc, so `import aggdraw` dies
-        # "PyModule_Create2: symbol not found".  Link aggdraw.so against the
-        # shipped libpython3.12.so (which DOES export PyModule_Create2) by
-        # appending -L<lib> -lpython3.12 to LDSHARED + LDFLAGS so the .so picks
-        # up the Python C-API symbols at link time.
-        # Resolve the libpython3.12.so directory from the running Python's own
-        # install layout, NOT a hardcoded /data/service/hnp/lib. sys.prefix is
-        # the Python installation root (e.g. .../python_3.12) and libpython
-        # ships at <prefix>/lib/libpython3.12.so on both the HarmonyOS PC device
-        # and the CI SDK layout. sysconfig.get_config_var('LIBDIR') is wrong
-        # here (returns "/python3/lib", a relic of the python.org build's DESTDIR
-        # staging), so derive from sys.prefix instead. This is the same path
-        # the running sys.executable lives under, so it tracks whichever Python
-        # Conan invokes — device or CI — without a hardcoded absolute.
-        py_lib_dir = os.path.join(sys.prefix, "lib")
+        # Build the extension directly. The CI Python image does not guarantee
+        # setuptools, while pyproject.toml would require setuptools.build_meta.
+        # Direct compilation keeps the package independent of worker site-packages.
         compiler_executables = self.conf.get(
             "tools.build:compiler_executables", default={}, check_type=dict
         ) or {}
         cxx = compiler_executables.get("cpp") or "clang++"
-        # CI's SDK lld loads an incompatible libxml2.so.16. The HNP linker is
-        # the repository-standard fallback for native OHOS C/C++ links.
-        linker = ""
-        if self.settings.os == "OHOS":
-            linker = "-fuse-ld=/data/service/hnp/bin/ld "
+        import sysconfig
+
+        py_include = sysconfig.get_path("include")
+        py_platinclude = sysconfig.get_path("platinclude")
+        # OHOS Python can report a stale build-time LIBDIR; libpython is next to
+        # the running interpreter under sys.prefix on both device and CI.
+        py_lib_dir = os.path.join(sys.prefix, "lib")
+        py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+        ext_suffix = sysconfig.get_config_var("EXT_SUFFIX") or ".so"
+        source_files = [
+            "aggdraw.cxx",
+            "agg2/src/agg_arc.cpp",
+            "agg2/src/agg_bezier_arc.cpp",
+            "agg2/src/agg_curves.cpp",
+            "agg2/src/agg_rounded_rect.cpp",
+            "agg2/src/agg_path_storage.cpp",
+            "agg2/src/agg_rasterizer_scanline_aa.cpp",
+            "agg2/src/agg_trans_affine.cpp",
+            "agg2/src/agg_vcgen_contour.cpp",
+            "agg2/src/agg_vcgen_stroke.cpp",
+        ]
+        objects_dir = os.path.join(self.build_folder, "objects")
+        staging = os.path.join(self.build_folder, "staging")
+        os.makedirs(objects_dir, exist_ok=True)
+        os.makedirs(staging, exist_ok=True)
+        include_flags = f'-I"{self.source_folder}/agg2/include" -I"{py_include}"'
+        if py_platinclude and py_platinclude != py_include:
+            include_flags += f' -I"{py_platinclude}"'
+        object_files = []
+        for source in source_files:
+            source_path = os.path.join(self.source_folder, source)
+            object_path = os.path.join(objects_dir, os.path.basename(source) + ".o")
+            self.run(
+                f'"{cxx}" -fPIC -O2 -DVERSION=1.4.1 {include_flags} '
+                f'-c "{source_path}" -o "{object_path}"'
+            )
+            object_files.append(object_path)
+        linker = "-fuse-ld=/data/service/hnp/bin/ld " if self.settings.os == "OHOS" else ""
+        extension = os.path.join(staging, "aggdraw" + ext_suffix)
+        objects = " ".join(f'"{obj}"' for obj in object_files)
         self.run(
-            f'env CXX="{cxx}" '
-            f'LDSHARED="{cxx} -shared {linker}-L{py_lib_dir} -lpython3.12" '
-            f'LDFLAGS="{linker}-L{py_lib_dir} -lpython3.12" '
-            f'"{sys.executable}" -m pip install . --target "{staging}" '
-            "--no-build-isolation --no-deps",
-            cwd=self.source_folder,
+            f'"{cxx}" -shared {linker}{objects} '
+            f'-L"{py_lib_dir}" -lpython{py_version} -o "{extension}"'
         )
 
     def package(self):
