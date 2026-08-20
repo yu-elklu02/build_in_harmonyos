@@ -1,0 +1,7 @@
+sources:
+  "0.99":
+    url: "https://ftp.gnu.org/gnu/barcode/barcode-0.99.tar.xz"
+    sha256: "e87ecf6421573e17ce35879db8328617795258650831affd025fba42f155cdc6"
+
+patches:
+  "0.99": []
