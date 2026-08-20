@@ -131,17 +131,19 @@ class AggdrawConan(ConanFile):
             for so_file in extension_modules:
                 if not os.path.isfile(so_file):
                     continue
+                tmp_signed = so_file + ".signed"
                 self.run(
                     f'"{objcopy}" --remove-section .codesign "{so_file}" 2>/dev/null || true',
                 )
                 self.run(
-                    f'"{sign_tool}" sign -inFile "{so_file}" -outFile "{so_file}" '
+                    f'"{sign_tool}" sign -inFile "{so_file}" -outFile "{tmp_signed}" '
                     f'-selfSign 1',
                 )
-                if not os.path.isfile(so_file):
+                if not os.path.isfile(tmp_signed):
                     raise ConanInvalidConfiguration(
-                        f"binary-sign-tool did not produce {so_file}"
+                        f"binary-sign-tool did not produce {tmp_signed}"
                     )
+                os.replace(tmp_signed, so_file)
                 os.chmod(so_file, 0o755)
 
     def package_info(self):
