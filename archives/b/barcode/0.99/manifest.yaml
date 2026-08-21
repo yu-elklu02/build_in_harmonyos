@@ -1,6 +1,6 @@
 package: "barcode"
 version: "0.99"
-status: "draft"
+status: "passed"
 build_system: "autotools"
 homepage: "https://www.gnu.org/software/barcode/"
 license: "GPL-3.0-or-later"
@@ -17,7 +17,9 @@ build:
     - "--host=aarch64-unknown-linux-gnu (OHOS only)"
   dependencies: []
 
-patches_applied: []
+patches_applied:
+  - "patches/0001-configure-umask.patch"
+  - "patches/0002-makefile-sample-gnu.patch"
 
 tests:
   upstream:
@@ -28,10 +30,10 @@ tests:
   test_package:
     command: "barcode -e code128 -o barcode.svg 1234567890; verify SVG output"
     cases: 1
-    passed: null
-    note: "Generates a Code 128 SVG and checks for SVG markup plus the encoded payload."
+    passed: 1
+    note: "Real-device test generated Code 128 SVG successfully and verified SVG markup plus the encoded payload."
 
 platform:
   validated_architecture: "OHOS/armv8"
   limitations:
-    - "Pending device validation; do not interpret draft status as a passed result."
+    - "The upstream release archive has no automated test suite; functional coverage is provided by test_package."

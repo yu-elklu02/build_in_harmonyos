@@ -8,6 +8,6 @@ build_system: autotools
 
 versions:
   "0.99":
-    status: draft
+    status: passed
     format: conan
-    note: "Pending OHOS armv8 device validation."
+    note: "OHOS armv8 conan create passed; test_package generated and validated Code 128 SVG output."

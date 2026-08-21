@@ -11,7 +11,11 @@ For OHOS, the 2013 bundled configure scripts are given portable GNU build and
 host triplets. This only affects configure-time platform identification; the
 Conan profile compiler remains the OHOS compiler.
 
-Device validation is pending. Run:
+HarmonyOS armv8 real-device validation passed with `conan create` exit 0.
+The consumer test generated a Code 128 SVG with `-S -b 1234567890` and
+verified both SVG markup and the encoded payload.
+
+Reproduce with:
 
 ```bash
 conan create archives/b/barcode/0.99 \
