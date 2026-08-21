@@ -37,7 +37,19 @@ class Botan2Conan(ConanFile):
         basic_layout(self)
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        try:
+            get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        except Exception:
+            # github.com is intermittently unreachable on OHOS devices;
+            # fall back to a local mirror of the upstream tarball.
+            import os, tarfile
+            mirror = os.path.expanduser(
+                "~/build_in_harmonyos/.botan2-mirror/botan-2.19.5.tar.gz"
+            )
+            if not os.path.isfile(mirror):
+                raise
+            with tarfile.open(mirror, "r:gz") as tf:
+                tf.extractall(self.source_folder)
 
     def _compiler(self):
         executables = self.conf.get(
@@ -54,10 +66,27 @@ class Botan2Conan(ConanFile):
         self.run(configure, cwd=self.build_folder)
         self.run("make -j1", cwd=self.build_folder)
         self.run("make -j1 tests", cwd=self.build_folder)
+        # Botan's Makefile invokes 'ar crs libbotan-2.a <all .o>' as a single
+        # ~13 KB command line. OHOS toybox shell silently truncates it, so the
+        # archive is never produced. Recreate it with a glob (short command).
+        if not os.path.isfile(os.path.join(self.build_folder, "libbotan-2.a")):
+            self.run("rm -f libbotan-2.a && ar crs libbotan-2.a build/obj/lib/*.o",
+                     cwd=self.build_folder)
 
     def package(self):
-        copy(self, "libbotan-2*.a", src=os.path.join(self.build_folder, "lib"), dst=os.path.join(self.package_folder, "lib"))
-        copy(self, "*", src=os.path.join(self.build_folder, "include", "botan-2"), dst=os.path.join(self.package_folder, "include", "botan-2"), keep_path=True)
+        # configure.py / make run with cwd=self.build_folder, so the static
+        # archive lands in build_folder root (not build_folder/lib).
+        copy(self, "libbotan-2*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"))
+        # Botan's configure.py generates symlinks for headers. conan's copy()
+        # preserves symlinks, which break once src/ is absent from the package.
+        # Use shutil.copytree with follow_symlinks=True to dereference them.
+        import shutil
+        shutil.copytree(
+            os.path.join(self.build_folder, "build", "include"),
+            os.path.join(self.package_folder, "include"),
+            symlinks=False,
+            dirs_exist_ok=True,
+        )
         copy(self, "license.txt", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
 
     def package_info(self):
