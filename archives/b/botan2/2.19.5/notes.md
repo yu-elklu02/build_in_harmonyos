@@ -18,10 +18,10 @@ The OHOS `armv8` real-machine run completed successfully:
   `all tests ok`.
 - The `botan2_sha256` consumer test passed through `ctest` (1/1).
 
-The `0001-tests-tmpdir.patch` redirects the upstream test runner's temporary
-file creation from read-only `/tmp` to `TMPDIR` (falling back to the current
-directory) only on OHOS. This fixes the upstream `DataSinkFlush` test without
-changing behavior on other platforms.
+The `0001-tests-tmpdir.patch` redirects the upstream POSIX test runner's
+temporary file creation from `/tmp` to `TMPDIR` (falling back to the current
+directory). This fixes the upstream `DataSinkFlush` test on OHOS without
+platform-specific conditional compilation.
 
 Reproduce the validation with:
 

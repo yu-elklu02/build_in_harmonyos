@@ -1,15 +1,11 @@
 --- a/src/tests/tests.cpp
 +++ b/src/tests/tests.cpp
-@@ -523,7 +523,12 @@
+@@ -523,7 +523,8 @@
  #if defined(BOTAN_TARGET_OS_HAS_POSIX1)
  
     // POSIX only calls for 6 'X' chars but OpenBSD allows arbitrary amount
-+#if defined(__OHOS__) || defined(__ohos__)
 +   const char* tmpdir = std::getenv("TMPDIR");
-+   std::string mkstemp_basename = std::string(tmpdir ? tmpdir : ".") + "/" + basename + ".XXXXXXXXXX";
-+#else
-    std::string mkstemp_basename = "/tmp/" + basename + ".XXXXXXXXXX";
-+#endif
++   std::string mkstemp_basename = std::string(tmpdir && *tmpdir ? tmpdir : ".") + "/" + basename + ".XXXXXXXXXX";
  
     int fd = ::mkstemp(&mkstemp_basename[0]);
  
