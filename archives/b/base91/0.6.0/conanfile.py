@@ -43,10 +43,10 @@ class Base91Conan(ConanFile):
         self.run(f'make CC="{self._compiler()}" check', cwd=self.source_folder)
 
     def package(self):
-        self.run(
-            f'make CC="{self._compiler()}" prefix="{self.package_folder}" install',
-            cwd=self.source_folder,
-        )
+        # 'make install' needs the 'install' utility, which is not on the
+        # Conan PATH in OHOS toybox. Copy the artifacts manually instead.
+        copy(self, "base91", src=self.source_folder, dst=f"{self.package_folder}/bin")
+        copy(self, "base91.1", src=self.source_folder, dst=f"{self.package_folder}/share/man/man1")
         copy(self, "LICENSE", src=self.source_folder, dst=f"{self.package_folder}/licenses")
 
     def package_info(self):
