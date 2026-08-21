@@ -1,0 +1,13 @@
+software: botan2
+display: "Botan 2"
+description: "C++ cryptography library"
+category: crypto
+homepage: "https://botan.randombits.net/"
+license: "BSD-2-Clause"
+build_system: custom
+
+versions:
+  "2.19.5":
+    status: draft
+    format: conan
+    note: "Pending OHOS armv8 device validation."

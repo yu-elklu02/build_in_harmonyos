@@ -1,0 +1,35 @@
+package: "botan2"
+version: "2.19.5"
+status: "draft"
+build_system: "custom"
+homepage: "https://botan.randombits.net/"
+license: "BSD-2-Clause"
+
+source:
+  url: "https://github.com/randombit/botan/archive/refs/tags/2.19.5.tar.gz"
+  sha256: "8d4a3826787f9febbdc225172ad2d39d7d3960346c5721fe46cb27d480d7e1de"
+  tar_format: "tar.gz"
+
+build:
+  system: "custom"
+  command: "python configure.py --build-targets=static,tests && make -j1 && make tests"
+  dependencies: []
+
+patches_applied: []
+
+tests:
+  upstream:
+    command: "make tests"
+    cases: 93
+    passed: null
+    note: "Botan's generated botan-test executable runs the 93 upstream test modules under src/tests; the runtime pass count is recorded after device validation."
+  test_package:
+    command: "test_package/test_botan2.cpp"
+    cases: 1
+    passed: null
+    note: "SHA-256 digest assertion through Botan::HashFunction."
+
+platform:
+  target_architecture: "OHOS/armv8"
+  limitations:
+    - "Pending device validation; do not interpret draft status as a passed result."
