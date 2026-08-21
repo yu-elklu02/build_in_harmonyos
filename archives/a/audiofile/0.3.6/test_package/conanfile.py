@@ -1,3 +1,5 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, cmake_layout
 from conan.tools.build import cross_building
@@ -20,5 +22,5 @@ class AudiofileTestConan(ConanFile):
 
     def test(self):
         if not cross_building(self):
-            cmake = CMake(self)
-            cmake.test()
+            test_bin = os.path.join(self.cpp.build.bindirs[0], "test_audiofile")
+            self.run(test_bin, env="conanrun")

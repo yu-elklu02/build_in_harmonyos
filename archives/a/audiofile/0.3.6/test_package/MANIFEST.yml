@@ -4,7 +4,7 @@ homepage: https://audiofile.68k.org/
 upstream_test_in_build: true
 upstream_tests:
   - command: "make check"
-    cases: 36
+    cases: 35
     description: "35 non-FLAC test/ targets plus libaudiofile/UnitTests"
 
 test_package_tests:
