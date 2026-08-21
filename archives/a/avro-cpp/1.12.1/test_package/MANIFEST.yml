@@ -5,7 +5,7 @@ upstream_test_in_build: true
 upstream_tests:
   - command: "ctest --output-on-failure"
     cases: 12
-    description: "Apache Avro C++ CMakeLists.txt registers 12 upstream CTest executables"
+    description: "Apache Avro C++ CMakeLists.txt registers 12 upstream CTest executables; device summary confirmed 7 targets built, not the pass count"
 
 test_package_tests:
   - file: test_avro_cpp.cpp

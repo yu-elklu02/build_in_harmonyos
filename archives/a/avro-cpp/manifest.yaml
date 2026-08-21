@@ -8,6 +8,6 @@ build_system: cmake
 
 versions:
   "1.12.1":
-    status: draft
+    status: passed
     format: conan
-    note: "Pending OHOS armv8 device validation."
+    note: "OHOS armv8 build and test_package passed; upstream ctest pass count remains unclaimed pending full log."
