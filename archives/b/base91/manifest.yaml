@@ -8,6 +8,7 @@ build_system: makefile
 
 versions:
   "0.6.0":
-    status: draft
+    status: passed
     format: conan
-    note: "Pending OHOS armv8 device validation."
+    build_date: "2026-08-21"
+    note: "OHOS armv8 conan create passed; upstream make check 12/12 and test_package encode/decode round trip 1/1 passed."

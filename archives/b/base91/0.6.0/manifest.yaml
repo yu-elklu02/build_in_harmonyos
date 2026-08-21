@@ -1,6 +1,6 @@
 package: "base91"
 version: "0.6.0"
-status: "draft"
+status: "passed"
 build_system: "makefile"
 homepage: "https://base91.sourceforge.net/"
 license: "BSD-3-Clause"
@@ -21,15 +21,14 @@ tests:
   upstream:
     command: "make check"
     cases: 12
-    passed: null
-    note: "test/test.sh has 12 explicit pass/fail checks: version, a random round trip, six checksums, and four decode/compare round trips."
+    passed: 12
+    note: "test/test.sh completed all 12 explicit checks: version, a random round trip, six checksums, and four decode/compare round trips."
   test_package:
     command: "test_package/test_base91.sh <base91-binary>"
     cases: 1
-    passed: null
-    note: "Encodes and decodes a payload, then compares the original and recovered files."
+    passed: 1
+    note: "The real-device test encoded and decoded a payload, then compared the original and recovered files."
 
 platform:
   target_architecture: "OHOS/armv8"
-  limitations:
-    - "Pending device validation; do not interpret draft status as a passed result."
+  limitations: []

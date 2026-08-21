@@ -7,11 +7,14 @@ invocation.
 `make check` runs the upstream `test/test.sh` functional suite. It encodes and
 decodes bundled data, then checks expected checksums and decoded output.
 
-The package installs `base91` plus `b91enc` and `b91dec` command aliases. The
-consumer test performs an independent encode/decode round trip with the
-installed `base91` binary.
+The package installs the `base91` binary, its man page, and the upstream
+LICENSE. The consumer test performs an independent encode/decode round trip
+with the installed binary.
 
-Device validation is pending:
+HarmonyOS armv8 device validation passed with `conan create` exit 0. The
+upstream suite passed 12/12 checks and the consumer round-trip passed 1/1.
+
+Reproduce with:
 
 ```bash
 conan create archives/b/base91/0.6.0 \
