@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.15)
+project(test_avro_cpp CXX)
+find_package(avrocpp CONFIG REQUIRED)
+add_executable(test_avro_cpp test_avro_cpp.cpp)
+target_link_libraries(test_avro_cpp PRIVATE avrocpp_s)
+enable_testing()
+add_test(NAME avro_schema_parse COMMAND test_avro_cpp)

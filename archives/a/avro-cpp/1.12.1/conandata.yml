@@ -1,0 +1,7 @@
+sources:
+  "1.12.1":
+    url: "https://github.com/apache/avro/archive/refs/tags/release-1.12.1.tar.gz"
+    sha256: "c915b531ed952c067a56810c8b0a87f4d8837079b45c73ebdd6065d8e0a54381"
+
+patches:
+  "1.12.1": []

@@ -1,0 +1,13 @@
+software: avro-cpp
+display: "Apache Avro C++"
+description: "Apache Avro C++ serialization library"
+category: serialization
+homepage: "https://avro.apache.org/"
+license: Apache-2.0
+build_system: cmake
+
+versions:
+  "1.12.1":
+    status: draft
+    format: conan
+    note: "Pending OHOS armv8 device validation."
