@@ -8,6 +8,11 @@ class AvroCppTestConan(ConanFile):
 
     def requirements(self):
         self.requires(self.tested_reference_str)
+        # avro's public headers include <fmt/core.h>, <boost/...>, <zlib.h>;
+        # declare them so CMakeDeps generates their config files.
+        self.requires("boost/1.84.0", transitive_headers=True)
+        self.requires("fmt/8.1.1", transitive_headers=True)
+        self.requires("zlib/1.3.1", transitive_headers=True)
 
     def layout(self):
         cmake_layout(self)

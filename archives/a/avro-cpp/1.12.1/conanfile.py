@@ -1,7 +1,10 @@
+import os
+
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import get
+from conan.tools.cmake import CMakeDeps, CMakeToolchain
+from conan.tools.files import apply_conandata_patches, get, copy
+from conan.tools.layout import basic_layout
 
 
 class AvroCppConan(ConanFile):
@@ -17,6 +20,8 @@ class AvroCppConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
 
+    exports_sources = "patches/*"
+
     def config_options(self):
         if self.settings.os == "Windows":
             self.options.rm_safe("fPIC")
@@ -29,14 +34,14 @@ class AvroCppConan(ConanFile):
 
     def requirements(self):
         self.requires("boost/1.84.0")
-        self.requires("zlib/1.3.1.1")
-        self.requires("fmt/11.2.0-r1")
-
-    def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=False)
+        self.requires("zlib/1.3.1")
+        self.requires("fmt/8.1.1")
 
     def layout(self):
-        cmake_layout(self, src_folder="source/lang/c++")
+        basic_layout(self, src_folder=".")
+
+    def source(self):
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def generate(self):
         CMakeDeps(self).generate()
@@ -44,22 +49,36 @@ class AvroCppConan(ConanFile):
         tc.variables["AVRO_BUILD_STATIC"] = not self.options.shared
         tc.variables["AVRO_BUILD_SHARED"] = bool(self.options.shared)
         tc.variables["AVRO_BUILD_TESTS"] = True
-        tc.variables["AVRO_BUILD_EXECUTABLES"] = False
+        tc.variables["AVRO_BUILD_EXECUTABLES"] = True
         tc.variables["AVRO_USE_BOOST"] = True
         tc.variables["FETCHCONTENT_FULLY_DISCONNECTED"] = True
         tc.generate()
 
     def build(self):
-        cmake = CMake(self)
-        cmake.configure()
-        cmake.build()
-        cmake.test()
+        apply_conandata_patches(self)
+        src_dir = os.path.join(self.source_folder, "lang", "c++")
+        build_dir = os.path.join(self.build_folder, "build", "Release")
+        os.makedirs(build_dir, exist_ok=True)
+        self.run(f'cmake -G "Unix Makefiles" '
+                 f'-DCMAKE_TOOLCHAIN_FILE="{os.path.join(self.generators_folder, "conan_toolchain.cmake")}" '
+                 f'-DCMAKE_INSTALL_PREFIX="{self.package_folder}" '
+                 f'-DCMAKE_BUILD_TYPE="Release" '
+                 f'"{src_dir}"',
+                 cwd=build_dir)
+        self.run(f'cmake --build . -j1 --config Release', cwd=build_dir, env="conanrun")
+        self.run(f'ctest --output-on-failure', cwd=build_dir, env="conanrun")
 
     def package(self):
-        CMake(self).install()
+        build_dir = os.path.join(self.build_folder, "build", "Release")
+        self.run(f'cmake --install .', cwd=build_dir)
+        copy(self, "LICENSE.txt", src=os.path.join(self.source_folder, "lang", "c++"),
+             dst=os.path.join(self.package_folder, "licenses"))
 
     def package_info(self):
         self.cpp_info.libs = ["avrocpp_s"]
         self.cpp_info.set_property("cmake_file_name", "avrocpp")
         self.cpp_info.set_property("cmake_target_name", "avrocpp_s")
         self.cpp_info.set_property("pkg_config_name", "avro-cpp")
+        # avro's public headers (Exception.hh, ...) include <fmt/core.h>,
+        # <boost/...>, <zlib.h> directly, so these are transitive.
+        self.cpp_info.requires = ["boost::boost", "fmt::fmt", "zlib::zlib"]

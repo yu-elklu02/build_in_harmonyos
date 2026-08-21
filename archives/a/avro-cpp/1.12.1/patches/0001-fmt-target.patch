@@ -1,0 +1,11 @@
+--- a/lang/c++/CMakeLists.txt
++++ b/lang/c++/CMakeLists.txt
+@@ -149,7 +149,7 @@
+     endif ()
+     set_target_properties (${target} PROPERTIES VERSION ${AVRO_VERSION})
+     target_link_libraries (${target} PUBLIC
+-      $<BUILD_INTERFACE:fmt::fmt-header-only>
++      $<BUILD_INTERFACE:fmt::fmt>
+       $<BUILD_INTERFACE:ZLIB::ZLIB>
+       $<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:Snappy::snappy>>
+       $<$<BOOL:${zstd_FOUND}>:$<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:${ZSTD_TARGET}>>>
