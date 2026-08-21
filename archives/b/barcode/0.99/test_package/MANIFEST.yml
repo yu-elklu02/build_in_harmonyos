@@ -5,8 +5,8 @@ upstream_test_in_build: false
 upstream_tests: []
 
 test_package_tests:
-  - file: conanfile.py
+  - file: test_barcode.sh
     description: "Generate a Code 128 SVG and verify SVG markup plus input payload"
-    command: "barcode -S -b 1234567890 -e code128 -o barcode.svg"
+    command: "sh test_barcode.sh <barcode-binary>"
 
 assertion_count: 2
