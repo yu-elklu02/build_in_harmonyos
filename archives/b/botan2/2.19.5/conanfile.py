@@ -3,7 +3,7 @@ import sys
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.files import copy, get
+from conan.tools.files import apply_conandata_patches, copy, get
 from conan.tools.layout import basic_layout
 
 
@@ -21,6 +21,8 @@ class Botan2Conan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
 
+    exports_sources = "patches/*"
+
     def validate(self):
         if self.settings.os not in ("Linux", "OHOS"):
             raise ConanInvalidConfiguration(
@@ -37,7 +39,19 @@ class Botan2Conan(ConanFile):
         basic_layout(self)
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        try:
+            get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        except Exception:
+            # github.com is intermittently unreachable on OHOS devices;
+            # fall back to a local mirror of the upstream tarball.
+            import os, tarfile
+            mirror = os.path.expanduser(
+                "~/build_in_harmonyos/.botan2-mirror/botan-2.19.5.tar.gz"
+            )
+            if not os.path.isfile(mirror):
+                raise
+            with tarfile.open(mirror, "r:gz") as tf:
+                tf.extractall(self.source_folder)
 
     def _compiler(self):
         executables = self.conf.get(
@@ -46,6 +60,7 @@ class Botan2Conan(ConanFile):
         return executables.get("cpp", "c++")
 
     def build(self):
+        apply_conandata_patches(self)
         configure = (
             f'"{sys.executable}" "{os.path.join(self.source_folder, "configure.py")}" '
             f"--cc=clang --cc-bin=\"{self._compiler()}\" --os=linux --cpu=arm64 "
