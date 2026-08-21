@@ -9,9 +9,21 @@ The consumer test links the package and computes the SHA-256 digest of a fixed
 UTF-8 payload through `Botan::HashFunction`, providing a functional assertion
 beyond checking that the archive exists.
 
-The prior OHOS `armv8` run successfully built the library and passed the
-consumer SHA-256 assertion, but it only built `botan-test`; it did not execute
-the upstream test suite. Run the following command to complete validation:
+## HarmonyOS validation (2026-08-21)
+
+The OHOS `armv8` real-machine run completed successfully:
+
+- `conan create` exited with code 0.
+- `make -j1 check` completed 2,621,574 upstream Botan test assertions with
+  `all tests ok`.
+- The `botan2_sha256` consumer test passed through `ctest` (1/1).
+
+The `0001-tests-tmpdir.patch` redirects the upstream test runner's temporary
+file creation from read-only `/tmp` to `TMPDIR` (falling back to the current
+directory) only on OHOS. This fixes the upstream `DataSinkFlush` test without
+changing behavior on other platforms.
+
+Reproduce the validation with:
 
 ```bash
 conan create archives/b/botan2/2.19.5 \

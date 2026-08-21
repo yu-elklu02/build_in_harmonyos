@@ -1,6 +1,6 @@
 package: "botan2"
 version: "2.19.5"
-status: "draft"
+status: "passed"
 build_system: "custom"
 homepage: "https://botan.randombits.net/"
 license: "BSD-2-Clause"
@@ -15,21 +15,22 @@ build:
   command: "python configure.py --build-targets=static,tests && make -j1 && make -j1 check"
   dependencies: []
 
-patches_applied: []
+patches_applied:
+  - "patches/0001-tests-tmpdir.patch"
 
 tests:
   upstream:
     command: "make -j1 check"
-    cases: 93
-    passed: null
-    note: "Botan's generated botan-test executable covers 93 upstream test modules under src/tests. The real-machine run must execute make check and record its result."
+    cases: 2621574
+    passed: 2621574
+    note: "OHOS armv8 real-machine run: Tests complete ran 2621574 tests in 13.24 sec, all tests ok."
   test_package:
     command: "test_package/test_botan2.cpp"
     cases: 1
-    passed: null
+    passed: 1
     note: "SHA-256 digest assertion through Botan::HashFunction."
 
 platform:
   target_architecture: "OHOS/armv8"
   limitations:
-    - "The previous device run built botan-test but did not execute make check; upstream-test status remains pending until make check completes on OHOS."
+    - "Shared libraries are not packaged for this version."

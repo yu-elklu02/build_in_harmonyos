@@ -39,19 +39,7 @@ class Botan2Conan(ConanFile):
         basic_layout(self)
 
     def source(self):
-        try:
-            get(self, **self.conan_data["sources"][self.version], strip_root=True)
-        except Exception:
-            # github.com is intermittently unreachable on OHOS devices;
-            # fall back to a local mirror of the upstream tarball.
-            import os, tarfile
-            mirror = os.path.expanduser(
-                "~/build_in_harmonyos/.botan2-mirror/botan-2.19.5.tar.gz"
-            )
-            if not os.path.isfile(mirror):
-                raise
-            with tarfile.open(mirror, "r:gz") as tf:
-                tf.extractall(self.source_folder)
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def _compiler(self):
         executables = self.conf.get(

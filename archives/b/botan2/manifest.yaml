@@ -8,6 +8,6 @@ build_system: custom
 
 versions:
   "2.19.5":
-    status: draft
+    status: passed
     format: conan
-    note: "Pending OHOS armv8 device validation."
+    note: "OHOS armv8 validation passed: make check 2621574/2621574; test_package 1/1."
