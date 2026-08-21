@@ -18,5 +18,4 @@ class Botan2TestConan(ConanFile):
         cmake.build()
 
     def test(self):
-        cmake = CMake(self)
-        cmake.test()
+        self.run("ctest --output-on-failure", cwd=self.build_folder, env="conanrun")

@@ -37,19 +37,7 @@ class Botan2Conan(ConanFile):
         basic_layout(self)
 
     def source(self):
-        try:
-            get(self, **self.conan_data["sources"][self.version], strip_root=True)
-        except Exception:
-            # github.com is intermittently unreachable on OHOS devices;
-            # fall back to a local mirror of the upstream tarball.
-            import os, tarfile
-            mirror = os.path.expanduser(
-                "~/build_in_harmonyos/.botan2-mirror/botan-2.19.5.tar.gz"
-            )
-            if not os.path.isfile(mirror):
-                raise
-            with tarfile.open(mirror, "r:gz") as tf:
-                tf.extractall(self.source_folder)
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def _compiler(self):
         executables = self.conf.get(
@@ -65,7 +53,7 @@ class Botan2Conan(ConanFile):
         )
         self.run(configure, cwd=self.build_folder)
         self.run("make -j1", cwd=self.build_folder)
-        self.run("make -j1 tests", cwd=self.build_folder)
+        self.run("make -j1 check", cwd=self.build_folder)
         # Botan's Makefile invokes 'ar crs libbotan-2.a <all .o>' as a single
         # ~13 KB command line. OHOS toybox shell silently truncates it, so the
         # archive is never produced. Recreate it with a glob (short command).

@@ -12,17 +12,17 @@ source:
 
 build:
   system: "custom"
-  command: "python configure.py --build-targets=static,tests && make -j1 && make tests"
+  command: "python configure.py --build-targets=static,tests && make -j1 && make -j1 check"
   dependencies: []
 
 patches_applied: []
 
 tests:
   upstream:
-    command: "make tests"
+    command: "make -j1 check"
     cases: 93
     passed: null
-    note: "Botan's generated botan-test executable runs the 93 upstream test modules under src/tests; the runtime pass count is recorded after device validation."
+    note: "Botan's generated botan-test executable covers 93 upstream test modules under src/tests. The real-machine run must execute make check and record its result."
   test_package:
     command: "test_package/test_botan2.cpp"
     cases: 1
@@ -32,4 +32,4 @@ tests:
 platform:
   target_architecture: "OHOS/armv8"
   limitations:
-    - "Pending device validation; do not interpret draft status as a passed result."
+    - "The previous device run built botan-test but did not execute make check; upstream-test status remains pending until make check completes on OHOS."

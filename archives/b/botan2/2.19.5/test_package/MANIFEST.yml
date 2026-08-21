@@ -3,9 +3,9 @@ homepage: https://botan.randombits.net/
 
 upstream_test_in_build: true
 upstream_tests:
-  - command: "make tests"
+  - command: "make -j1 check"
     cases: 93
-    description: "Generated botan-test executable runs the 93 upstream test modules under src/tests"
+    description: "Generated botan-test executes the 93 upstream test modules under src/tests"
 
 test_package_tests:
   - file: test_botan2.cpp
