@@ -6,6 +6,7 @@
     // POSIX only calls for 6 'X' chars but OpenBSD allows arbitrary amount
 +   const char* tmpdir = std::getenv("TMPDIR");
 +   std::string mkstemp_basename = std::string(tmpdir && *tmpdir ? tmpdir : ".") + "/" + basename + ".XXXXXXXXXX";
+-   std::string mkstemp_basename = std::string("/tmp/") + basename + ".XXXXXXXXXX";
  
     int fd = ::mkstemp(&mkstemp_basename[0]);
  
