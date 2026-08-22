@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.15)
+project(test_audiowmark NONE)
+enable_testing()
+add_test(NAME audiowmark_version COMMAND audiowmark --version)
+set_tests_properties(audiowmark_version PROPERTIES PASS_REGULAR_EXPRESSION "0\\.6\\.5")
