@@ -10,4 +10,4 @@ versions:
   "1.12.1":
     status: passed
     format: conan
-    note: "OHOS armv8 build and test_package passed; upstream ctest pass count remains unclaimed pending full log."
+    note: "OHOS armv8 validation passed: upstream CTest 13/13 and test_package 1/1."
