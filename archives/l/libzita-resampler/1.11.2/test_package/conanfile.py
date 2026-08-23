@@ -36,11 +36,20 @@ class LibZitaResamplerTestConan(ConanFile):
     def test(self):
         binary = os.path.join(self.cpp.build.bindirs[0], "test_zita_resampler")
         if str(self.settings.os) == "OHOS":
-            files_dir = os.path.join(self.test_build_folder, "files")
+            files_dir = os.path.join(self.build_folder, "files")
             os.makedirs(files_dir, exist_ok=True)
             signed_binary = os.path.join(files_dir, "test_zita_resampler")
             shutil.copy2(binary, signed_binary)
             signer = "/data/service/hnp/bin/binary-sign-tool"
+            package_lib = os.path.join(
+                self.dependencies[self.tested_reference_str].package_folder,
+                "lib",
+                "libzita-resampler.so.1.11.2",
+            )
+            if os.path.isfile(package_lib):
+                shutil.copy2(package_lib, os.path.join(files_dir, "libzita-resampler.so.1.11.2"))
+                shutil.copy2(package_lib, os.path.join(files_dir, "libzita-resampler.so.1"))
+                shutil.copy2(package_lib, os.path.join(files_dir, "libzita-resampler.so"))
             if os.path.isfile(signer):
                 self.run(f'{signer} sign -inFile "{signed_binary}" -outFile "{signed_binary}.signed" -selfSign 1')
                 os.replace(signed_binary + ".signed", signed_binary)
