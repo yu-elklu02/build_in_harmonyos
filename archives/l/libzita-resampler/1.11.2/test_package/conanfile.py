@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import stat
 
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
@@ -46,13 +47,18 @@ class LibZitaResamplerTestConan(ConanFile):
                 "lib",
                 "libzita-resampler.so.1.11.2",
             )
+            runtime_files = []
             if os.path.isfile(package_lib):
-                shutil.copy2(package_lib, os.path.join(files_dir, "libzita-resampler.so.1.11.2"))
-                shutil.copy2(package_lib, os.path.join(files_dir, "libzita-resampler.so.1"))
-                shutil.copy2(package_lib, os.path.join(files_dir, "libzita-resampler.so"))
+                for name in ("libzita-resampler.so.1.11.2", "libzita-resampler.so.1", "libzita-resampler.so"):
+                    target = os.path.join(files_dir, name)
+                    shutil.copy2(package_lib, target)
+                    runtime_files.append(target)
             if os.path.isfile(signer):
-                self.run(f'{signer} sign -inFile "{signed_binary}" -outFile "{signed_binary}.signed" -selfSign 1')
-                os.replace(signed_binary + ".signed", signed_binary)
+                for target in [signed_binary] + runtime_files:
+                    signed = target + ".signed"
+                    self.run(f'{signer} sign -inFile "{target}" -outFile "{signed}" -selfSign 1')
+                    os.replace(signed, target)
+                    os.chmod(target, os.stat(target).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
             self.run(f'patchelf --set-rpath "$ORIGIN" "{signed_binary}"', ignore_errors=True)
             binary = signed_binary
         self.run(f'"{binary}"', env="conanrun")
