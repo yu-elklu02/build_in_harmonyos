@@ -1,0 +1,14 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,9 +16,12 @@
+ )
+ 
+ ADD_SUBDIRECTORY(libs/apto)
++OPTION(AVD_USE_TCMALLOC "Build the bundled tcmalloc allocator" ON)
+ IF(NOT WIN32)
+-  ADD_SUBDIRECTORY(libs/tcmalloc-1.4)
++  IF(AVD_USE_TCMALLOC)
++    ADD_SUBDIRECTORY(libs/tcmalloc-1.4)
++  ENDIF()
+ ENDIF(NOT WIN32)
+ ADD_SUBDIRECTORY(avida-core)

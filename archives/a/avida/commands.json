@@ -1,0 +1,12 @@
+{
+  "name": "avida",
+  "description": "Digital evolution research platform",
+  "homepage": "https://avida.devosoft.org/",
+  "type": "tool",
+  "versions": {
+    "2.12.4": {
+      "ref": "avida/2.12.4",
+      "binary": true
+    }
+  }
+}

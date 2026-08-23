@@ -1,0 +1,36 @@
+package: avida
+version: "2.12.4"
+status: draft
+build_system: cmake
+homepage: https://avida.devosoft.org/
+license: GPL-3.0-only
+
+source:
+  url: https://downloads.sourceforge.net/project/avida/avida-stable/2.12.4/avida-2.12.4-src.tar.gz
+  sha256: 70b4953cd7ab60c3331e7e5eb5d3c6953a72eec99ec6cb529bf638727ce39483
+  tar_format: tar.gz
+
+build:
+  system: cmake
+  command: cmake -DAVD_CMDLINE=ON -DAVD_GUI_NCURSES=OFF -DAVD_USE_TCMALLOC=OFF && cmake --build .
+  dependencies: []
+
+patches_applied:
+  - patches/0001-make-tcmalloc-optional.patch
+
+tests:
+  upstream:
+    command: ./run_tests
+    cases: 0
+    passed: 0
+    note: Not run before the first OHOS device validation.
+  test_package:
+    command: python test_avida.py <avida-path>
+    cases: 1
+    passed: null
+    note: Executes avida --help and verifies help output.
+
+platform:
+  target_architecture: OHOS/armv8
+  limitations:
+    - The bundled tcmalloc implementation is disabled because it contains x86-specific assembly.
