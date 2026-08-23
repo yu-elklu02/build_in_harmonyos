@@ -19,6 +19,10 @@ The migration also repairs the upstream testrunner's malformed
 `testrunner-name` long-option declaration so Python 3 `getopt` accepts the
 original runner option.
 
+When no consistency tests are selected, the upstream runner returns two
+counters while its caller expects success, disabled, and failure counters. The
+compatibility step normalizes that empty result to a three-counter tuple.
+
 Run device validation with:
 
 ```bash

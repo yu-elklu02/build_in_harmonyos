@@ -23,7 +23,7 @@ tests:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests
     cases: 0
     passed: null
-    note: Python 2 scripts are migrated with lib2to3; dircache listdir/annotate and getopt long-option compatibility are repaired before execution.
+    note: Python 2 scripts are migrated with lib2to3; dircache, getopt long-option, and empty consistency-test result compatibility are repaired before execution.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1

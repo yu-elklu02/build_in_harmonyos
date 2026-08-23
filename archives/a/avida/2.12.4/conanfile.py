@@ -90,6 +90,8 @@ class AvidaConan(ConanFile):
                 if path == runner:
                     content = content.replace("-testrunner-name=", "testrunner-name=")
                     content = content.replace("---testrunner-name", "--testrunner-name")
+                    content = content.replace("return 0, 0", "return 0, 0, 0")
+                    content = content.replace("return (0, 0)", "return (0, 0, 0)")
                 with open(path, "w", encoding="utf-8") as handle:
                     handle.write(content)
         self.run(f'python "{runner}" --testrunner-name=./run_tests', cwd=self.source_folder, env="conanrun")
