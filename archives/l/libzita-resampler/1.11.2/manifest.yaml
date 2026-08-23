@@ -1,6 +1,6 @@
 package: libzita-resampler
 version: "1.11.2"
-status: draft
+status: passed
 build_system: makefile
 homepage: https://kokkinizita.linuxaudio.org/linuxaudio/
 license: GPL-3.0-only
@@ -26,9 +26,10 @@ tests:
   test_package:
     command: "test_zita_resampler"
     cases: 1
-    passed: null
+    passed: 1
     note: "Consumer test configures Resampler, processes a buffer, and asserts output samples are produced."
 
 platform:
   target_architecture: OHOS/armv8
-  limitations: []
+  limitations:
+    - "OHOS armv8 test execution requires signed ELF binaries and Ninja generator on HMDFS."

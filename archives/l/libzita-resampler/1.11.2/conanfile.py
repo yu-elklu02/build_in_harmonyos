@@ -16,6 +16,8 @@ class LibZitaResamplerConan(ConanFile):
     homepage = "https://kokkinizita.linuxaudio.org/linuxaudio/"
     url = "https://gitcode.com/OpenHarmonyPCDeveloper/build_in_harmonyos"
     settings = "os", "arch", "compiler", "build_type"
+    options = {"shared": [True, False]}
+    default_options = {"shared": True}
 
     def validate(self):
         if self.settings.os not in ("Linux", "OHOS"):
@@ -38,10 +40,11 @@ class LibZitaResamplerConan(ConanFile):
             cppflags += " -DENABLE_NEON"
         else:
             cppflags += " -DENABLE_SSE2"
+        target = "libzita-resampler.so.1.11.2" if self.options.shared else "libzita-resampler.a"
         self.run(
             f'make -C "{source_dir}" CXX="{cxx}" '
             f'CXXFLAGS="{cxxflags}" CPPFLAGS="{cppflags}" '
-            "libzita-resampler.so.1.11.2",
+            f"{target}",
             env="conanbuild",
         )
 
@@ -50,12 +53,14 @@ class LibZitaResamplerConan(ConanFile):
         include_dir = os.path.join(self.package_folder, "include", "zita-resampler")
         lib_dir = os.path.join(self.package_folder, "lib")
         copy(self, "*.h", os.path.join(source_dir, "zita-resampler"), include_dir)
-        copy(self, "libzita-resampler.so.1.11.2", source_dir, lib_dir)
+        artifact = "libzita-resampler.so.1.11.2" if self.options.shared else "libzita-resampler.a"
+        copy(self, artifact, source_dir, lib_dir)
         os.makedirs(lib_dir, exist_ok=True)
-        for name in ("libzita-resampler.so", "libzita-resampler.so.1"):
-            src = os.path.join(lib_dir, "libzita-resampler.so.1.11.2")
-            dst = os.path.join(lib_dir, name)
-            shutil.copyfile(src, dst)
+        if self.options.shared:
+            for name in ("libzita-resampler.so", "libzita-resampler.so.1"):
+                src = os.path.join(lib_dir, artifact)
+                dst = os.path.join(lib_dir, name)
+                shutil.copyfile(src, dst)
         pc_dir = os.path.join(self.package_folder, "lib", "pkgconfig")
         os.makedirs(pc_dir, exist_ok=True)
         with open(os.path.join(pc_dir, "zita-resampler.pc"), "w", encoding="utf-8") as pc:
