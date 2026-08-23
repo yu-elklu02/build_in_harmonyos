@@ -1,0 +1,191 @@
+--- a/avida-core/CMakeLists.txt
++++ b/avida-core/CMakeLists.txt
+@@ -360,24 +360,30 @@ ENDIF(WIN32)
+ 
+ 
+ # Locate TCMalloc
+-IF(NOT TARGET tcmalloc-1.4)
+-  FIND_LIBRARY(TCMALLOC_LIBRARY tcmalloc-1.4 PATHS ${PROJECT_SOURCE_DIR}/../cbuild/lib ${PROJECT_SOURCE_DIR}/../libs/tcmalloc-1.4/cbuild/lib)
+-  ADD_LIBRARY(tcmalloc-1.4 STATIC IMPORTED)
+-  SET_PROPERTY(TARGET tcmalloc-1.4 PROPERTY IMPORTED_LOCATION "${TCMALLOC_LIBRARY}")
+-ENDIF(NOT TARGET tcmalloc-1.4)
++IF(AVD_USE_TCMALLOC)
++  IF(NOT TARGET tcmalloc-1.4)
++    FIND_LIBRARY(TCMALLOC_LIBRARY tcmalloc-1.4 PATHS ${PROJECT_SOURCE_DIR}/../cbuild/lib ${PROJECT_SOURCE_DIR}/../libs/tcmalloc-1.4/cbuild/lib)
++    ADD_LIBRARY(tcmalloc-1.4 STATIC IMPORTED)
++    SET_PROPERTY(TARGET tcmalloc-1.4 PROPERTY IMPORTED_LOCATION "${TCMALLOC_LIBRARY}")
++  ENDIF(NOT TARGET tcmalloc-1.4)
++ENDIF(AVD_USE_TCMALLOC)
+ 
+ 
+ # Handle the TCMalloc library
+ # ------------------------------------------------------------------------------
+-IF(UNIX)
+-  IF (CMAKE_CXX_COMPILER MATCHES ".*icpc.*")
++IF(AVD_USE_TCMALLOC)
++  IF(UNIX)
++    IF (CMAKE_CXX_COMPILER MATCHES ".*icpc.*")
++      SET(AVD_ENABLE_TCMALLOC FALSE)
++    ELSE (CMAKE_CXX_COMPILER MATCHES ".*icpc.*")
++      SET(AVD_ENABLE_TCMALLOC TRUE)
++    ENDIF (CMAKE_CXX_COMPILER MATCHES ".*icpc.*")
++  ELSE(UNIX)
+     SET(AVD_ENABLE_TCMALLOC FALSE)
+-  ELSE (CMAKE_CXX_COMPILER MATCHES ".*icpc.*")
+-    SET(AVD_ENABLE_TCMALLOC TRUE)
+-  ENDIF (CMAKE_CXX_COMPILER MATCHES ".*icpc.*")
+-ELSE(UNIX)
++  ENDIF(UNIX)
++ELSE(AVD_USE_TCMALLOC)
+   SET(AVD_ENABLE_TCMALLOC FALSE)
+-ENDIF(UNIX)
++ENDIF(AVD_USE_TCMALLOC)
+ IF(AVD_ENABLE_TCMALLOC)
+   # Locate TCMalloc
+   IF(NOT TARGET tcmalloc-1.4)
+--- a/avida-core/source/actions/PrintActions.cc
++++ b/avida-core/source/actions/PrintActions.cc
+@@ -3091,7 +3091,7 @@ protected:
+ 	//! Calculate the average edit distance of the given container of organisms.
+ 	double average_edit_distance(std::vector<cOrganism*> organisms, cAvidaContext& ctx) {
+ 		cRandomStdAdaptor rng(ctx.GetRandom());
+-		std::random_shuffle(organisms.begin(), organisms.end(), rng);
++		std::mt19937 _rng(static_cast<unsigned int>(rng(0))); std::shuffle(organisms.begin(), organisms.end(), _rng);
+ 		if(organisms.size() % 2) {
+ 			organisms.pop_back();
+ 		}
+--- a/avida-core/source/main/cGenomeUtil.cc
++++ b/avida-core/source/main/cGenomeUtil.cc
+@@ -216,7 +216,7 @@ void cGenomeUtil::RandomShuffle(cAvidaContext& ctx, Sequence& genome) {
+ 	std::vector<int> idx(static_cast<std::size_t>(genome.GetSize()));
+ 	std::iota(idx.begin(), idx.end(), 0);
+ 	cRandomStdAdaptor rng(ctx.GetRandom());
+-	std::random_shuffle(idx.begin(), idx.end(), rng);
++	std::mt19937 _rng(static_cast<unsigned int>(rng(0))); std::shuffle(idx.begin(), idx.end(), _rng);
+ 	Sequence shuffled(genome.GetSize());
+ 	for(int i=0; i<genome.GetSize(); ++i) {
+ 		shuffled[i] = genome[idx[i]];
+--- a/avida-core/source/main/cPopulation.cc
++++ b/avida-core/source/main/cPopulation.cc
+@@ -2913,7 +2913,7 @@ void cPopulation::ReplaceDemeFlaggedGermline(cDeme& source_deme, cDeme& target_d
+     
+     target_deme.AddFounder(organism->GetBioGroup("genotype"), &organism->GetPhenotype());
+ 
+-    track_founders.push_back(make_pair(organism->GetBioGroup("genotype")->GetID(), new_genome.AsString())); 
++    track_founders.push_back(make_pair(organism->GetBioGroup("genotype")->GetID(), std::string(new_genome.AsString()))); 
+     
+     DemePostInjection(target_deme, cell_array[cellid]);
+   }
+@@ -8393,7 +8393,7 @@ void cPopulation::MixPopulation(cAvidaContext& ctx)
+   
+   // Shuffle them:
+   cRandomStdAdaptor adapted_rng(m_world->GetRandom());
+-  std::random_shuffle(population.begin(), population.end(), adapted_rng);
++  std::mt19937 _rng(static_cast<unsigned int>(adapted_rng(0))); std::shuffle(population.begin(), population.end(), _rng);
+   
+   // Reset the organism pointers of all cells:
+   for(int i=0; i<cell_array.GetSize(); ++i) {
+--- a/avida-core/source/tools/cRandom.h
++++ b/avida-core/source/tools/cRandom.h
+@@ -15,6 +15,8 @@
+ #include "apto/platform.h"
+ 
+ #include <algorithm>
++#include <numeric>
++#include <random>
+ #include <ctime>
+ #include <climits>
+ #include <cmath>
+@@ -247,21 +249,6 @@ void sample_with_replacement(ForwardIterator first, ForwardIterator last, Output
+ }
+ 
+ 
+-#if !APTO_PLATFORM(WINDOWS)
+-/*! Convenience function to assign increasing values to a range.
+- */
+-namespace std {
+-  template <typename ForwardIterator, typename T>
+-  void iota(ForwardIterator first, ForwardIterator last, T value) {
+-	  while(first != last) {
+-		  *first = value;
+-		  ++first;
+-		  ++value;
+-	  }
+-  }
+-};
+-#endif
+-
+ /*! Draw a sample (without replacement) from an input range, copying to the output range.
+  */
+ template <typename ForwardIterator, typename OutputIterator, typename RNG>
+@@ -277,7 +264,7 @@ void sample_without_replacement(ForwardIterator first, ForwardIterator last, Out
+ 	
+ 	std::vector<std::size_t> rmap(range);
+ 	std::iota(rmap.begin(), rmap.end(), 0);
+-	std::random_shuffle(rmap.begin(), rmap.end());
++	std::mt19937 shuffle_rng(static_cast<unsigned int>(rng(0))); std::shuffle(rmap.begin(), rmap.end(), shuffle_rng);
+ 	
+ 	while(ofirst != olast) {
+ 		*ofirst = *(first + rmap.back());
+--- a/avida-core/source/tools/tArray.h
++++ b/avida-core/source/tools/tArray.h
+@@ -23,6 +23,8 @@
+ #ifndef tArray_h
+ #define tArray_h
+ 
++#include <cstdlib>
++#include <cstring>
+ #include <cassert>
+ 
+ #ifndef NULL
+--- a/libs/apto/include/apto/core/Atomic.h
++++ b/libs/apto/include/apto/core/Atomic.h
+@@ -90,25 +90,21 @@ inline void Apto::Atomic::Set(volatile int* atomic, int value)
+ 
+ #else
+ 
+-// Assuming x86
++// GCC/Clang atomic builtins (portable across x86, ARM, etc.)
+ inline int Apto::Atomic::Add(volatile int* atomic, int value)
+ {
+-  int temp = value;
+-  __asm__ __volatile__("lock; xaddl %0,%1"
+-                       : "+r" (temp), "+m" (*atomic)
+-                       : : "memory");
+-  return temp + value;
++  return __atomic_add_fetch(atomic, value, __ATOMIC_SEQ_CST) - value;
+ }
+ 
+ inline int Apto::Atomic::Get(volatile int* atomic)
+ {
+-  __asm__ __volatile__("" : : : "memory");
++  __atomic_thread_fence(__ATOMIC_SEQ_CST);
+   return *atomic;
+ }
+ 
+ inline void Apto::Atomic::Set(volatile int* atomic, int value)
+ {
+-  __asm__ __volatile__("mfence" : : : "memory");
++  __atomic_thread_fence(__ATOMIC_SEQ_CST);
+   *atomic = value;
+ }
+ 
+--- a/libs/apto/src/core/Thread.cc
++++ b/libs/apto/src/core/Thread.cc
+@@ -29,6 +29,7 @@
+  */
+ 
+ #include "apto/core/Thread.h"
++#include <signal.h>
+ 
+ #if APTO_PLATFORM(THREADS) && APTO_PLATFORM(UNIX)
+ 
+@@ -55,7 +56,7 @@ void Apto::Thread::Stop()
+ {
+   if (m_running) {
+     // Close and clean up thread, set running to false
+-    pthread_cancel(m_thread);
++    pthread_kill(m_thread, 0); // OHOS/musl: no pthread_cancel
+     pthread_join(m_thread, NULL);
+     m_running = false;
+   }
