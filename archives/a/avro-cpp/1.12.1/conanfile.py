@@ -56,7 +56,10 @@ class AvroCppConan(ConanFile):
         # the CI worker runtime. Apply the HNP linker to CMake try-compile,
         # test, and final link commands through the generated toolchain.
         if self.settings.os == "OHOS":
-            tc.extra_ldflags.append("-fuse-ld=/data/service/hnp/bin/ld")
+            hnp_ld = "-fuse-ld=/data/service/hnp/bin/ld"
+            tc.cache_variables["CMAKE_EXE_LINKER_FLAGS"] = hnp_ld
+            tc.cache_variables["CMAKE_SHARED_LINKER_FLAGS"] = hnp_ld
+            tc.cache_variables["CMAKE_MODULE_LINKER_FLAGS"] = hnp_ld
         tc.generate()
 
     def build(self):
