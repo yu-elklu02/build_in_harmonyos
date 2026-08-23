@@ -69,7 +69,14 @@ class AvidaConan(ConanFile):
             "class dircache:\n"
             "    @staticmethod\n"
             "    def listdir(path):\n"
-            "        return os.listdir(path)\n"
+            "        entries = os.listdir(path)\n"
+            "        entries.sort()\n"
+            "        return entries\n"
+            "    @staticmethod\n"
+            "    def annotate(head, entries):\n"
+            "        for index, entry in enumerate(entries):\n"
+            "            if os.path.isdir(os.path.join(head, entry)):\n"
+            "                entries[index] = entry + '/'\n"
         )
         for root, _, files in os.walk(tests):
             for filename in files:
