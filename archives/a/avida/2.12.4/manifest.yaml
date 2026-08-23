@@ -1,6 +1,6 @@
 package: avida
 version: "2.12.4"
-status: passed
+status: pending
 build_system: cmake
 homepage: https://avida.devosoft.org/
 license: GPL-3.0-only
@@ -21,10 +21,10 @@ patches_applied:
 
 tests:
   upstream:
-    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests
-    cases: 0
+    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --xml-report=<build>/avida-upstream-tests.xml
+    cases: 68
     passed: 0
-    note: All tests passed; the selected run reported no consistency tests and zero failures.
+    note: 68 consistency tests are discovered from test_list files with expected baselines. Pass count must be updated from the OHOS XML report after validation.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1

@@ -64,6 +64,14 @@ class AvidaConan(ConanFile):
         tests = os.path.join(self.source_folder, "avida-core", "tests")
         runner = os.path.join(tests, "_testrunner", "testrunner.py")
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
+        configparser_compat = (
+            "import configparser\n"
+            "_AvidaConfigParser = configparser.ConfigParser\n"
+            "class AvidaConfigParser(_AvidaConfigParser):\n"
+            "    def get(self, section, option, raw=False, vars=None, fallback=None):\n"
+            "        return super().get(section, option, raw=raw, vars=vars, fallback=fallback)\n"
+            "configparser.ConfigParser = AvidaConfigParser\n"
+        )
         dircache_compat = (
             "import os\n"
             "class dircache:\n"
@@ -88,13 +96,19 @@ class AvidaConan(ConanFile):
                 if "import dircache" in content:
                     content = content.replace("import dircache", dircache_compat)
                 if path == runner:
+                    content = content.replace("import configparser", configparser_compat)
                     content = content.replace("-testrunner-name=", "testrunner-name=")
                     content = content.replace("---testrunner-name", "--testrunner-name")
                     content = content.replace("return 0, 0", "return 0, 0, 0")
                     content = content.replace("return (0, 0)", "return (0, 0, 0)")
                 with open(path, "w", encoding="utf-8") as handle:
                     handle.write(content)
-        self.run(f'python "{runner}" --testrunner-name=./run_tests', cwd=self.source_folder, env="conanrun")
+        report = os.path.join(self.build_folder, "avida-upstream-tests.xml")
+        self.run(
+            f'python "{runner}" --testrunner-name=./run_tests --xml-report="{report}"',
+            cwd=self.source_folder,
+            env="conanrun",
+        )
 
     def package(self):
         copy(self, "avida", src=os.path.join(self.build_folder, "bin"), dst=os.path.join(self.package_folder, "bin"))

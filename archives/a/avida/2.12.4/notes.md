@@ -19,17 +19,22 @@ The migration also repairs the upstream testrunner's malformed
 `testrunner-name` long-option declaration so Python 3 `getopt` accepts the
 original runner option.
 
-When no consistency tests are selected, the upstream runner returns two
-counters while its caller expects success, disabled, and failure counters. The
-compatibility step normalizes that empty result to a three-counter tuple.
+Python 3's `configparser` makes `raw` and `vars` keyword-only, while Avida's
+Python 2 runner passes them positionally. The compatibility wrapper preserves
+the original call contract so each `test_list` is read rather than silently
+falling back to defaults. The runner writes an XML report so the test total,
+passed, failed, and disabled counts are recorded from actual execution.
 
 ## HarmonyOS validation (2026-08-24)
 
-The OHOS armv8 `conan create` completed with `EXIT=0`. The upstream runner
-completed with `All tests passed`; its selected consistency-test set was empty,
-so it reported zero failures and no countable consistency cases. The
-`test_package` compiled and executed `avida --help`, printing `avida help
-assertion passed`.
+The initial OHOS armv8 `conan create` completed with `EXIT=0`, but its Python 3
+migration did not preserve the legacy `ConfigParser.get()` positional API.
+That made the runner report an empty consistency-test selection, so the result
+cannot be used as the upstream test statistic. The corrected runner discovers
+68 upstream consistency tests and emits `avida-upstream-tests.xml`; the next
+OHOS validation must provide its actual pass/fail count before PR metadata is
+finalized. The existing `test_package` compiled and executed `avida --help`,
+printing `avida help assertion passed`.
 
 Run device validation with:
 
