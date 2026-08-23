@@ -17,30 +17,20 @@ build:
 
 patches_applied:
   - patches/0001-make-tcmalloc-optional.patch
-  - patches/0002-fix-cpp17-musl-compat.patch
 
 tests:
   upstream:
-    command: ./run_tests
+    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests
     cases: 0
-    passed: 0
-    note: >-
-      Cannot execute: run_tests is a /bin/sh script (OHOS has no /bin/sh)
-      and its testrunner.py uses Python 2 syntax (print statements without
-      parentheses), incompatible with Python 3.12 on OHOS.
+    passed: null
+    note: Python 2 test scripts are migrated with lib2to3 before execution; final case count is recorded from device output.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1
-    passed: 1
-    note: Executes avida --help and verifies help output containing "Avida".
+    passed: null
+    note: Executes avida --help and verifies help output.
 
 platform:
   target_architecture: OHOS/armv8
   limitations:
     - The bundled tcmalloc implementation is disabled because it contains x86-specific assembly.
-    - Atomic.h x86 inline assembly replaced with GCC/Clang __atomic builtins for aarch64.
-    - pthread_cancel replaced with pthread_kill(0) because musl does not provide it.
-    - std::random_shuffle replaced with std::shuffle + std::mt19937 for C++17 compatibility.
-    - Custom std::iota definition removed (C++ standard library provides it).
-    - CMAKE_C_COMPILER_WORKS/CMAKE_CXX_COMPILER_WORKS set to TRUE to skip CMake try-compile
-      (which fails because CMake clears MAKEFLAGS, causing make to use /bin/sh).
