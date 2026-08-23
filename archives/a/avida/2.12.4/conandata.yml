@@ -1,6 +1,9 @@
 sources:
   "2.12.4":
-    url: "https://downloads.sourceforge.net/project/avida/avida-stable/2.12.4/avida-2.12.4-src.tar.gz"
+    url:
+      - "https://downloads.sourceforge.net/project/avida/avida-stable/2.12.4/avida-2.12.4-src.tar.gz"
+      - "https://netix.dl.sourceforge.net/project/avida/avida-stable/2.12.4/avida-2.12.4-src.tar.gz"
+      - "https://netcologne.dl.sourceforge.net/project/avida/avida-stable/2.12.4/avida-2.12.4-src.tar.gz"
     sha256: "70b4953cd7ab60c3331e7e5eb5d3c6953a72eec99ec6cb529bf638727ce39483"
 
 patches:

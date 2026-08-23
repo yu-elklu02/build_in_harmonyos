@@ -79,8 +79,12 @@ class AvidaConan(ConanFile):
                 with open(path, "r", encoding="utf-8") as handle:
                     content = handle.read()
                 if "import dircache" in content:
-                    with open(path, "w", encoding="utf-8") as handle:
-                        handle.write(content.replace("import dircache", dircache_compat))
+                    content = content.replace("import dircache", dircache_compat)
+                if path == runner:
+                    content = content.replace("-testrunner-name=", "testrunner-name=")
+                    content = content.replace("---testrunner-name", "--testrunner-name")
+                with open(path, "w", encoding="utf-8") as handle:
+                    handle.write(content)
         self.run(f'python "{runner}" --testrunner-name=./run_tests', cwd=self.source_folder, env="conanrun")
 
     def package(self):

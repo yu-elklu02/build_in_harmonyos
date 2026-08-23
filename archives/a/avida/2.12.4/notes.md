@@ -15,6 +15,10 @@ wrapper. The removed Python 2 `dircache` module is replaced with an
 `os.listdir` compatibility shim. The device log is the source of truth for the
 final test count.
 
+The migration also repairs the upstream testrunner's malformed
+`testrunner-name` long-option declaration so Python 3 `getopt` accepts the
+original runner option.
+
 Run device validation with:
 
 ```bash
