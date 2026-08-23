@@ -6,6 +6,7 @@
      target_link_libraries (${target} PUBLIC
 -      $<BUILD_INTERFACE:fmt::fmt-header-only>
 +      $<BUILD_INTERFACE:fmt::fmt>
-       $<BUILD_INTERFACE:ZLIB::ZLIB>
+-      $<BUILD_INTERFACE:ZLIB::ZLIB>
++      $<BUILD_INTERFACE:zlib::zlib>
        $<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:Snappy::snappy>>
        $<$<BOOL:${zstd_FOUND}>:$<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:${ZSTD_TARGET}>>>
