@@ -52,6 +52,11 @@ class AvroCppConan(ConanFile):
         tc.variables["AVRO_BUILD_EXECUTABLES"] = True
         tc.variables["AVRO_USE_BOOST"] = True
         tc.variables["FETCHCONTENT_FULLY_DISCONNECTED"] = True
+        # The OHOS SDK lld depends on libxml2.so.16, which is unavailable in
+        # the CI worker runtime. Apply the HNP linker to CMake try-compile,
+        # test, and final link commands through the generated toolchain.
+        if self.settings.os == "OHOS":
+            tc.extra_ldflags.append("-fuse-ld=/data/service/hnp/bin/ld")
         tc.generate()
 
     def build(self):
