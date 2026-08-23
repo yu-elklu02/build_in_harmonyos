@@ -8,5 +8,14 @@
 +      $<BUILD_INTERFACE:fmt::fmt>
 -      $<BUILD_INTERFACE:ZLIB::ZLIB>
 +      $<BUILD_INTERFACE:zlib::zlib>
+@@ -154,7 +154,7 @@
        $<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:Snappy::snappy>>
        $<$<BOOL:${zstd_FOUND}>:$<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:${ZSTD_TARGET}>>>
+       $<BUILD_INTERFACE:$<TARGET_NAME_IF_EXISTS:Boost::system>>
+-      $<INSTALL_INTERFACE:ZLIB::ZLIB>
++      $<INSTALL_INTERFACE:zlib::zlib>
+@@ -227,7 +227,7 @@
+     macro (unittest name)
+         add_executable (${name} test/${name}.cc)
+-        target_link_libraries (${name} ${AVRO_LINK_LIB} Boost::system ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Snappy::snappy> $<$<BOOL:${zstd_FOUND}>:$<TARGET_NAME_IF_EXISTS:${ZSTD_TARGET}>>)
++        target_link_libraries (${name} ${AVRO_LINK_LIB} Boost::system zlib::zlib $<TARGET_NAME_IF_EXISTS:Snappy::snappy> $<$<BOOL:${zstd_FOUND}>:$<TARGET_NAME_IF_EXISTS:${ZSTD_TARGET}>>)
