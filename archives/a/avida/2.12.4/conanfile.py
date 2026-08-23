@@ -3,6 +3,7 @@ import os
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.env import Environment
 from conan.tools.files import apply_conandata_patches, copy, get
 
 
@@ -36,13 +37,30 @@ class AvidaConan(ConanFile):
         toolchain.variables["AVD_UNIT_TESTS"] = False
         toolchain.variables["APTO_UNIT_TESTS"] = False
         toolchain.variables["AVD_USE_TCMALLOC"] = False
+        toolchain.cache_variables["CMAKE_SYSTEM_NAME"] = "Linux"
+        toolchain.cache_variables["CMAKE_SYSTEM_PROCESSOR"] = "aarch64"
+        toolchain.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5"
+        toolchain.generator = "Unix Makefiles"
+        toolchain.cache_variables["CMAKE_C_COMPILER_WORKS"] = "TRUE"
+        toolchain.cache_variables["CMAKE_CXX_COMPILER_WORKS"] = "TRUE"
         toolchain.generate()
+        env = Environment()
+        env.define("MAKEFLAGS", "SHELL=/data/service/hnp/bin/bash -j1")
+        env.vars(self, scope="build").save_script("conanfixenv")
 
     def build(self):
         apply_conandata_patches(self)
+        conanbuild_sh = os.path.join(self.generators_folder, "conanbuild.sh")
+        if os.path.exists(conanbuild_sh):
+            with open(conanbuild_sh, "r", encoding="utf-8") as handle:
+                content = handle.read()
+            marker = "# Override MAKEFLAGS for OHOS"
+            if marker not in content:
+                with open(conanbuild_sh, "a", encoding="utf-8") as handle:
+                    handle.write("\n" + marker + "\nexport MAKEFLAGS=\"SHELL=/data/service/hnp/bin/bash -j1\"\n")
         cmake = CMake(self)
         cmake.configure()
-        cmake.build()
+        cmake.build(cli_args=["--parallel", "1"])
         tests = os.path.join(self.source_folder, "avida-core", "tests")
         runner = os.path.join(tests, "_testrunner", "testrunner.py")
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
