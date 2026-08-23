@@ -64,6 +64,23 @@ class AvidaConan(ConanFile):
         tests = os.path.join(self.source_folder, "avida-core", "tests")
         runner = os.path.join(tests, "_testrunner", "testrunner.py")
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
+        dircache_compat = (
+            "import os\n"
+            "class dircache:\n"
+            "    @staticmethod\n"
+            "    def listdir(path):\n"
+            "        return os.listdir(path)\n"
+        )
+        for root, _, files in os.walk(tests):
+            for filename in files:
+                if not filename.endswith(".py"):
+                    continue
+                path = os.path.join(root, filename)
+                with open(path, "r", encoding="utf-8") as handle:
+                    content = handle.read()
+                if "import dircache" in content:
+                    with open(path, "w", encoding="utf-8") as handle:
+                        handle.write(content.replace("import dircache", dircache_compat))
         self.run(f'python "{runner}" --testrunner-name=./run_tests', cwd=self.source_folder, env="conanrun")
 
     def package(self):

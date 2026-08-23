@@ -11,7 +11,9 @@ The upstream `run_tests` wrapper depends on `/bin/sh` and its Python 2 test
 scripts use obsolete syntax. The recipe runs Python 3 `lib2to3` over the
 `avida-core/tests` tree and invokes the original `testrunner.py` directly,
 preserving the upstream test discovery and result reporting without the shell
-wrapper. The device log is the source of truth for the final test count.
+wrapper. The removed Python 2 `dircache` module is replaced with an
+`os.listdir` compatibility shim. The device log is the source of truth for the
+final test count.
 
 Run device validation with:
 

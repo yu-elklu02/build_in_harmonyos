@@ -23,7 +23,7 @@ tests:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests
     cases: 0
     passed: null
-    note: Python 2 test scripts are migrated with lib2to3 before execution; final case count is recorded from device output.
+    note: Python 2 scripts are migrated with lib2to3; the removed dircache module is replaced with an os.listdir compatibility shim before execution.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1
