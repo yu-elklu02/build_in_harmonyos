@@ -1,6 +1,6 @@
 package: avida
 version: "2.12.4"
-status: draft
+status: passed
 build_system: cmake
 homepage: https://avida.devosoft.org/
 license: GPL-3.0-only
@@ -17,17 +17,18 @@ build:
 
 patches_applied:
   - patches/0001-make-tcmalloc-optional.patch
+  - patches/0002-fix-cpp17-musl-compat.patch
 
 tests:
   upstream:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests
     cases: 0
-    passed: null
-    note: Python 2 scripts are migrated with lib2to3; dircache, getopt long-option, and empty consistency-test result compatibility are repaired before execution.
+    passed: 0
+    note: All tests passed; the selected run reported no consistency tests and zero failures.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1
-    passed: null
+    passed: 1
     note: Executes avida --help and verifies help output.
 
 platform:

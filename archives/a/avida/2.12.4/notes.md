@@ -23,6 +23,14 @@ When no consistency tests are selected, the upstream runner returns two
 counters while its caller expects success, disabled, and failure counters. The
 compatibility step normalizes that empty result to a three-counter tuple.
 
+## HarmonyOS validation (2026-08-24)
+
+The OHOS armv8 `conan create` completed with `EXIT=0`. The upstream runner
+completed with `All tests passed`; its selected consistency-test set was empty,
+so it reported zero failures and no countable consistency cases. The
+`test_package` compiled and executed `avida --help`, printing `avida help
+assertion passed`.
+
 Run device validation with:
 
 ```bash
