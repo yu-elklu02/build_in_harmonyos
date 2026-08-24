@@ -131,6 +131,8 @@ class AvidaConan(ConanFile):
                     content = handle.read()
                 if "import dircache" in content:
                     content = content.replace("import dircache", dircache_compat)
+                content = content.replace('open(filename, "U")', 'open(filename, "r")')
+                content = content.replace("open(filename, 'U')", "open(filename, 'r')")
                 if path == runner:
                     content = content.replace("import configparser", configparser_compat)
                     content = content.replace("-testrunner-name=", "testrunner-name=")

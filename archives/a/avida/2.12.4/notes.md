@@ -51,6 +51,10 @@ missing-option exception behavior. This matters for the upstream
 `test_list`; the original runner catches the missing option and uses the
 default Avida executable.
 
+The Python 2 universal-newline mode `open(filename, "U")` is also rewritten to
+ordinary text mode `"r"`, which has universal-newline behavior by default in
+Python 3.
+
 Run device validation with:
 
 ```bash
