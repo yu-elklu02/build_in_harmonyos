@@ -27,13 +27,11 @@ passed, failed, and disabled counts are recorded from actual execution.
 
 ## HarmonyOS validation (2026-08-24)
 
-The initial OHOS armv8 `conan create` completed with `EXIT=0`, but its Python 3
-migration did not preserve the legacy `ConfigParser.get()` positional API.
-That made the runner report an empty consistency-test selection, so the result
-cannot be used as the upstream test statistic. The corrected runner discovers
-68 upstream consistency tests and emits `avida-upstream-tests.xml`; the next
-OHOS validation must provide its actual pass/fail count before PR metadata is
-finalized. The existing `test_package` compiled and executed `avida --help`,
+The OHOS armv8 `conan create` completed with `EXIT=0`. The upstream runner's
+XML report recorded `tests=1`, `failures=0`, and `disabled=0`; the selected
+`string_producing_and_donating` consistency test passed. The remaining source
+test directories were not selected by this `run_tests` mode, so they are not
+claimed as executed. The `test_package` compiled and executed `avida --help`,
 printing `avida help assertion passed`.
 
 The upstream `testrunner.cfg` refers to its historical `cbuild/work/avida`
