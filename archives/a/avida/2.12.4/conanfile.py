@@ -104,8 +104,10 @@ class AvidaConan(ConanFile):
             "class AvidaConfigParser(_AvidaConfigParser):\n"
             "    def get(self, section, option, raw=False, vars=None, fallback=None):\n"
             "        if fallback is None:\n"
-            "            return super().get(section, option, raw=raw, vars=vars)\n"
-            "        return super().get(section, option, raw=raw, vars=vars, fallback=fallback)\n"
+            "            value = super().get(section, option, raw=raw, vars=vars)\n"
+            "        else:\n"
+            "            value = super().get(section, option, raw=raw, vars=vars, fallback=fallback)\n"
+            "        return value.split(';', 1)[0].rstrip()\n"
             "configparser.ConfigParser = AvidaConfigParser\n"
         )
         dircache_compat = (

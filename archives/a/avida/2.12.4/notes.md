@@ -56,6 +56,10 @@ Python 3.
 The removed Python 2 `string.lstrip()` helper is rewritten to the equivalent
 `str.lstrip()` method in the test runner.
 
+The config parser wrapper strips inline `;` comments from every returned value,
+matching Python 2 `ConfigParser` semantics. This preserves `enabled = yes`
+and the other per-test flags in the upstream `test_list` files.
+
 Run device validation with:
 
 ```bash
