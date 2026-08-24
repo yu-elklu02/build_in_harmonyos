@@ -63,6 +63,7 @@ class AvidaConan(ConanFile):
         cmake.build(cli_args=["--parallel", "1"])
         tests = os.path.join(self.source_folder, "avida-core", "tests")
         runner = os.path.join(tests, "_testrunner", "testrunner.py")
+        artifact_root = os.path.join(self.build_folder, "avida-upstream-failures")
         test_config = os.path.join(tests, "_testrunner", "testrunner.cfg")
         executable = os.path.join(self.build_folder, "bin", "avida")
         with open(test_config, "r", encoding="utf-8") as handle:
@@ -143,6 +144,18 @@ class AvidaConan(ConanFile):
                 content = content.replace("open(filename, 'U')", "open(filename, 'r')")
                 if path == runner:
                     content = content.replace("string.lstrip(line)", "line.lstrip()")
+                    content = content.replace(
+                        "# Clean up test directory\n    try:\n      shutil.rmtree(rundir, True)",
+                        f"# Preserve failed OHOS output for platform baseline review\n"
+                        f"    if not self.success and os.path.isdir(rundir):\n"
+                        f"      failure_dir = os.path.join(r'{artifact_root}', self.name)\n"
+                        f"      try:\n"
+                        f"        os.makedirs(os.path.dirname(failure_dir), exist_ok=True)\n"
+                        f"        shutil.copytree(rundir, failure_dir, dirs_exist_ok=True)\n"
+                        f"      except (IOError, OSError, shutil.Error): pass\n"
+                        f"    # Clean up test directory\n    try:\n      shutil.rmtree(rundir, True)",
+                        1,
+                    )
                     content = content.replace("os.WEXITSTATUS(self.exitcode)", "self.exitcode if self.exitcode >= 0 else 0")
                     content = content.replace("os.WTERMSIG(self.exitcode)", "-self.exitcode if self.exitcode < 0 else 0")
                     content = content.replace(

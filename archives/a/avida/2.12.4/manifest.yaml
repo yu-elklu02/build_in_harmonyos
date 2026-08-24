@@ -25,7 +25,7 @@ tests:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml
     cases: 71
     passed: 0
-    note: The runner is configured for serial execution and includes long tests. Python 3 return-code handling and the intentional nonzero analyze_resize_max_batches assertion are adapted; final pass count must come from the OHOS XML report.
+    note: The runner is configured for serial execution and includes long tests. Python 3 return-code handling and the intentional nonzero analyze_resize_max_batches assertion are adapted. Failed OHOS outputs are preserved under avida-upstream-failures for review; final pass count must come from the OHOS XML report.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1

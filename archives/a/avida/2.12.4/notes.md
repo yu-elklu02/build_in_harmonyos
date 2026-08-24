@@ -75,6 +75,11 @@ direct `Popen.wait()` return code. The `analyze_resize_max_batches` fixture is
 an intentional nonzero test (its final command is documented as "Should fail"),
 so its migrated `test_list` uses `nonzeroexit = require`.
 
+When a consistency test has output variance, the migrated runner preserves its
+actual output under `avida-upstream-failures/<test-name>` in the build folder.
+These artifacts are required before adding any OHOS-specific baseline; the
+recipe does not silently replace upstream expected files.
+
 Run device validation with:
 
 ```bash
