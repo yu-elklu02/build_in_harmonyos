@@ -137,6 +137,10 @@ class AvidaConan(ConanFile):
                 content = content.replace("open(filename, 'U')", "open(filename, 'r')")
                 if path == runner:
                     content = content.replace("string.lstrip(line)", "line.lstrip()")
+                    content = content.replace(
+                        'subprocess.PIPE, close_fds=True)',
+                        'subprocess.PIPE, close_fds=True, executable="/data/service/hnp/bin/bash")',
+                    )
                     content = content.replace("import configparser", configparser_compat)
                     content = content.replace("-testrunner-name=", "testrunner-name=")
                     content = content.replace("---testrunner-name", "--testrunner-name")
@@ -146,7 +150,7 @@ class AvidaConan(ConanFile):
                     handle.write(content)
         report = os.path.join(self.build_folder, "avida-upstream-tests.xml")
         self.run(
-            f'python "{runner}" --testrunner-name=./run_tests --long-tests -j 1 --xml-report="{report}"',
+            f'python "{runner}" --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report="{report}"',
             cwd=self.source_folder,
             env="conanrun",
         )

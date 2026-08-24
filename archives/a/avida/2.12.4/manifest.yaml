@@ -21,7 +21,7 @@ patches_applied:
 
 tests:
   upstream:
-    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --xml-report=<build>/avida-upstream-tests.xml
+    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml
     cases: 71
     passed: 0
     note: The runner is configured for serial execution and includes long tests. Final pass count must come from the OHOS XML report; prior validation had 58/64 pass and 6 failures.

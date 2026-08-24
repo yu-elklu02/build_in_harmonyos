@@ -60,7 +60,9 @@ The config parser wrapper strips inline `;` comments from every returned value,
 matching Python 2 `ConfigParser` semantics. This preserves `enabled = yes`
 and the other per-test flags in the upstream `test_list` files.
 
-The upstream runner is invoked with `-j 1 --long-tests` on OHOS. Serial
+The upstream runner is invoked with `-j 1 --long-tests --verbose` on OHOS. Its
+test subprocess shell is explicitly set to `/data/service/hnp/bin/bash`
+instead of the unavailable `/bin/sh`. Serial
 execution avoids concurrent Avida processes competing for the device sandbox,
 and `--long-tests` includes the seven tests normally skipped by default.
 
