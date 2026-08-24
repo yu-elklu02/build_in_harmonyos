@@ -146,7 +146,7 @@ class AvidaConan(ConanFile):
                     handle.write(content)
         report = os.path.join(self.build_folder, "avida-upstream-tests.xml")
         self.run(
-            f'python "{runner}" --testrunner-name=./run_tests --xml-report="{report}"',
+            f'python "{runner}" --testrunner-name=./run_tests --long-tests -j 1 --xml-report="{report}"',
             cwd=self.source_folder,
             env="conanrun",
         )

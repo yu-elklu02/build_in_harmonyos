@@ -1,6 +1,6 @@
 package: avida
 version: "2.12.4"
-status: passed
+status: pending
 build_system: cmake
 homepage: https://avida.devosoft.org/
 license: GPL-3.0-only
@@ -21,10 +21,10 @@ patches_applied:
 
 tests:
   upstream:
-    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --xml-report=<build>/avida-upstream-tests.xml
-    cases: 1
-    passed: 1
-    note: OHOS XML report: tests=1, failures=0, disabled=0. The runner selected and passed string_producing_and_donating; the remaining source test directories were not selected by this upstream runner mode.
+    command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --xml-report=<build>/avida-upstream-tests.xml
+    cases: 71
+    passed: 0
+    note: The runner is configured for serial execution and includes long tests. Final pass count must come from the OHOS XML report; prior validation had 58/64 pass and 6 failures.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1
