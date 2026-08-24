@@ -134,6 +134,7 @@ class AvidaConan(ConanFile):
                 content = content.replace('open(filename, "U")', 'open(filename, "r")')
                 content = content.replace("open(filename, 'U')", "open(filename, 'r')")
                 if path == runner:
+                    content = content.replace("string.lstrip(line)", "line.lstrip()")
                     content = content.replace("import configparser", configparser_compat)
                     content = content.replace("-testrunner-name=", "testrunner-name=")
                     content = content.replace("---testrunner-name", "--testrunner-name")

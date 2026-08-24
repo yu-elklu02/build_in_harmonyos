@@ -55,6 +55,9 @@ The Python 2 universal-newline mode `open(filename, "U")` is also rewritten to
 ordinary text mode `"r"`, which has universal-newline behavior by default in
 Python 3.
 
+The removed Python 2 `string.lstrip()` helper is rewritten to the equivalent
+`str.lstrip()` method in the test runner.
+
 Run device validation with:
 
 ```bash
