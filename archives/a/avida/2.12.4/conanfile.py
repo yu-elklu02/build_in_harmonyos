@@ -71,7 +71,13 @@ class AvidaConan(ConanFile):
         if upstream_app not in content:
             raise ConanInvalidConfiguration("Unexpected Avida test runner application setting")
         with open(test_config, "w", encoding="utf-8") as handle:
-            handle.write(content.replace(upstream_app, f"app = {executable}"))
+            lines = []
+            for line in content.splitlines():
+                if line.startswith("app = "):
+                    lines.append(f"app = {executable}")
+                else:
+                    lines.append(line)
+            handle.write("\n".join(lines) + "\n")
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
         configparser_compat = (
             "import configparser\n"
