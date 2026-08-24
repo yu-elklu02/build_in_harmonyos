@@ -40,6 +40,11 @@ The upstream `testrunner.cfg` refers to its historical `cbuild/work/avida`
 location. Before executing tests, the recipe rewrites only that configuration
 value to Conan's current `build/bin/avida` output path.
 
+Several upstream `test_list` files also carry Python 2 era inline comments or
+placeholder typos on their `app =` lines. The recipe strips those comments and
+normalizes the known `%(app)s` / `%(defailt_app)s` cases so the runner can
+discover and execute the full consistency-test set.
+
 Run device validation with:
 
 ```bash

@@ -78,6 +78,25 @@ class AvidaConan(ConanFile):
                 else:
                     lines.append(line)
             handle.write("\n".join(lines) + "\n")
+        for root, _, files in os.walk(tests):
+            for filename in files:
+                if filename != "test_list":
+                    continue
+                path = os.path.join(root, filename)
+                with open(path, "r", encoding="utf-8") as handle:
+                    content = handle.read()
+                updated = []
+                for line in content.splitlines():
+                    if not line.startswith("app = "):
+                        updated.append(line)
+                        continue
+                    value = line.split("=", 1)[1].strip()
+                    value = value.split(";", 1)[0].strip()
+                    if value == "%(app)s" or value == "%(defailt_app)s":
+                        value = "%(default_app)s"
+                    updated.append(f"app = {value}")
+                with open(path, "w", encoding="utf-8") as handle:
+                    handle.write("\n".join(updated) + "\n")
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
         configparser_compat = (
             "import configparser\n"
