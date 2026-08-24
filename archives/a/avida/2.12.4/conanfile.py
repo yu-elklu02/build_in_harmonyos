@@ -95,6 +95,12 @@ class AvidaConan(ConanFile):
                     if value == "%(app)s" or value == "%(defailt_app)s":
                         value = "%(default_app)s"
                     updated.append(f"app = {value}")
+                if os.path.basename(os.path.dirname(path)) == "analyze_resize_max_batches":
+                    updated = [
+                        line.replace("nonzeroexit = disallow", "nonzeroexit = require")
+                        if line.startswith("nonzeroexit = disallow") else line
+                        for line in updated
+                    ]
                 with open(path, "w", encoding="utf-8") as handle:
                     handle.write("\n".join(updated) + "\n")
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
@@ -137,6 +143,8 @@ class AvidaConan(ConanFile):
                 content = content.replace("open(filename, 'U')", "open(filename, 'r')")
                 if path == runner:
                     content = content.replace("string.lstrip(line)", "line.lstrip()")
+                    content = content.replace("os.WEXITSTATUS(self.exitcode)", "self.exitcode if self.exitcode >= 0 else 0")
+                    content = content.replace("os.WTERMSIG(self.exitcode)", "-self.exitcode if self.exitcode < 0 else 0")
                     content = content.replace(
                         'subprocess.PIPE, close_fds=True)',
                         'subprocess.PIPE, close_fds=True, executable="/data/service/hnp/bin/bash")',

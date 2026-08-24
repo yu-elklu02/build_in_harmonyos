@@ -70,6 +70,11 @@ Patch `0003-analyze-child-library-path.patch` preserves the OHOS runtime
 library path before analyze scripts invoke child Avida processes through
 `system()`.
 
+The runner's Python 2 wait-status decoding is also adapted for Python 3's
+direct `Popen.wait()` return code. The `analyze_resize_max_batches` fixture is
+an intentional nonzero test (its final command is documented as "Should fail"),
+so its migrated `test_list` uses `nonzeroexit = require`.
+
 Run device validation with:
 
 ```bash
