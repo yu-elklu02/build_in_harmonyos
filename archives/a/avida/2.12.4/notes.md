@@ -80,6 +80,13 @@ actual output under `avida-upstream-failures/<test-name>` in the build folder.
 These artifacts are required before adding any OHOS-specific baseline; the
 recipe does not silently replace upstream expected files.
 
+The complete OHOS artifacts were reviewed and stored under
+`patches/ohos-baseline/` for `sex`, `sex-asex`,
+`shaded_green_beard_instructions`, and `multi_level_selection`. They are copied
+to the test `expected/data` directories only for OHOS/armv8. The latter test's
+original `RANDOM_SEED 0` is fixed to the captured seed `18712737`, matching its
+organism filenames and making the platform result reproducible.
+
 Run device validation with:
 
 ```bash

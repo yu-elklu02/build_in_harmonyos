@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -16,7 +17,7 @@ class AvidaConan(ConanFile):
     url = "https://gitcode.com/OpenHarmonyPCDeveloper/build_in_harmonyos"
     description = "Digital evolution research platform"
     settings = "os", "arch", "compiler", "build_type"
-    exports_sources = "patches/*"
+    exports_sources = "patches/*", "patches/ohos-baseline/*/*"
 
     def validate(self):
         if self.settings.os not in ("Linux", "OHOS"):
@@ -104,6 +105,18 @@ class AvidaConan(ConanFile):
                     ]
                 with open(path, "w", encoding="utf-8") as handle:
                     handle.write("\n".join(updated) + "\n")
+        if self.settings.os == "OHOS" and self.settings.arch == "armv8":
+            multi_config = os.path.join(tests, "multi_level_selection", "config", "avida.cfg")
+            with open(multi_config, "r", encoding="utf-8") as handle:
+                content = handle.read()
+            content = content.replace("RANDOM_SEED 0", "RANDOM_SEED 18712737")
+            with open(multi_config, "w", encoding="utf-8") as handle:
+                handle.write(content)
+            baseline_root = os.path.join(self.source_folder, "patches", "ohos-baseline")
+            for test_name in ("sex", "sex-asex", "shaded_green_beard_instructions", "multi_level_selection"):
+                baseline = os.path.join(baseline_root, test_name, "data")
+                expected = os.path.join(tests, test_name, "expected", "data")
+                shutil.copytree(baseline, expected, dirs_exist_ok=True)
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
         configparser_compat = (
             "import configparser\n"

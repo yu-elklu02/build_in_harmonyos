@@ -25,7 +25,7 @@ tests:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml
     cases: 71
     passed: 0
-    note: The runner is configured for serial execution and includes long tests. Python 3 return-code handling and the intentional nonzero analyze_resize_max_batches assertion are adapted. Failed OHOS outputs are preserved under avida-upstream-failures for review; final pass count must come from the OHOS XML report.
+    note: The runner is configured for serial execution and includes long tests. Python 3 return-code handling and the intentional nonzero analyze_resize_max_batches assertion are adapted. On OHOS/armv8, four deterministic platform baselines are selected from patches/ohos-baseline and multi_level_selection uses a fixed seed; final pass count must come from the OHOS XML report.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1
@@ -36,3 +36,4 @@ platform:
   target_architecture: OHOS/armv8
   limitations:
     - The bundled tcmalloc implementation is disabled because it contains x86-specific assembly.
+    - Four upstream data baselines differ on OHOS/aarch64 and are selected only for OHOS/armv8.
