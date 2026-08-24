@@ -36,6 +36,10 @@ OHOS validation must provide its actual pass/fail count before PR metadata is
 finalized. The existing `test_package` compiled and executed `avida --help`,
 printing `avida help assertion passed`.
 
+The upstream `testrunner.cfg` refers to its historical `cbuild/work/avida`
+location. Before executing tests, the recipe rewrites only that configuration
+value to Conan's current `build/bin/avida` output path.
+
 Run device validation with:
 
 ```bash

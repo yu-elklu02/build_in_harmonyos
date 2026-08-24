@@ -63,6 +63,15 @@ class AvidaConan(ConanFile):
         cmake.build(cli_args=["--parallel", "1"])
         tests = os.path.join(self.source_folder, "avida-core", "tests")
         runner = os.path.join(tests, "_testrunner", "testrunner.py")
+        test_config = os.path.join(tests, "_testrunner", "testrunner.cfg")
+        executable = os.path.join(self.build_folder, "bin", "avida")
+        with open(test_config, "r", encoding="utf-8") as handle:
+            content = handle.read()
+        upstream_app = "app = %(builddir)s/work/avida"
+        if upstream_app not in content:
+            raise ConanInvalidConfiguration("Unexpected Avida test runner application setting")
+        with open(test_config, "w", encoding="utf-8") as handle:
+            handle.write(content.replace(upstream_app, f"app = {executable}"))
         self.run(f'python -m lib2to3 -w "{tests}"', env="conanbuild")
         configparser_compat = (
             "import configparser\n"
