@@ -45,6 +45,12 @@ placeholder typos on their `app =` lines. The recipe strips those comments and
 normalizes the known `%(app)s` / `%(defailt_app)s` cases so the runner can
 discover and execute the full consistency-test set.
 
+The compatibility `ConfigParser.get()` wrapper also preserves Python 2's
+missing-option exception behavior. This matters for the upstream
+`string_producing_and_donating` directory, which has a config directory but no
+`test_list`; the original runner catches the missing option and uses the
+default Avida executable.
+
 Run device validation with:
 
 ```bash
