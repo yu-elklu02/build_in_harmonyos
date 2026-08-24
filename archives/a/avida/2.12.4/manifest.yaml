@@ -23,7 +23,7 @@ patches_applied:
 tests:
   upstream:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml
-    cases: 71
+    cases: 64
     passed: 0
     note: The runner is configured for serial execution and includes long tests. Python 3 return-code handling and the intentional nonzero analyze_resize_max_batches assertion are adapted. On OHOS/armv8, four deterministic platform baselines are selected from patches/ohos-baseline and multi_level_selection uses a fixed seed; final pass count must come from the OHOS XML report.
   test_package:
