@@ -66,6 +66,10 @@ instead of the unavailable `/bin/sh`. Serial
 execution avoids concurrent Avida processes competing for the device sandbox,
 and `--long-tests` includes the seven tests normally skipped by default.
 
+Patch `0003-analyze-child-library-path.patch` preserves the OHOS runtime
+library path before analyze scripts invoke child Avida processes through
+`system()`.
+
 Run device validation with:
 
 ```bash

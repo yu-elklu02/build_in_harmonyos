@@ -12,3 +12,5 @@ patches:
       patch_description: "Allow embedded x86-specific tcmalloc to be disabled on OHOS armv8."
     - patch_file: "patches/0002-fix-cpp17-musl-compat.patch"
       patch_description: "Fix C++17/musl/aarch64 compatibility: replace x86 asm atomics, pthread_cancel, std::random_shuffle, add missing includes, remove duplicate std::iota."
+    - patch_file: "patches/0003-analyze-child-library-path.patch"
+      patch_description: "Preserve the runtime library search path for analyze child processes launched through system()."

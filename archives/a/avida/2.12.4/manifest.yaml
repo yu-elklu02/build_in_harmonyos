@@ -18,6 +18,7 @@ build:
 patches_applied:
   - patches/0001-make-tcmalloc-optional.patch
   - patches/0002-fix-cpp17-musl-compat.patch
+  - patches/0003-analyze-child-library-path.patch
 
 tests:
   upstream:

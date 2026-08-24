@@ -1,0 +1,27 @@
+--- a/avida-core/source/analyze/cAnalyze.cc
++++ b/avida-core/source/analyze/cAnalyze.cc
+@@ -73,6 +73,7 @@
+ #include <string>
+ #include <queue>
+ #include <stack>
++#include <cstdlib>
+ 
+ #include <cerrno>
+ extern "C" {
+@@ -8754,6 +8754,15 @@ void cAnalyze::CommandSystem(cString cur_string)
+   }
+   
+   cout << "Running System Command: " << cur_string << endl;
+   
+-  system(cur_string);
++  // Preserve the runtime library search path for Avida children launched by
++  // analyze scripts through system() on OHOS.
++  const char* inherited_path = getenv("LD_LIBRARY_PATH");
++  std::string child_path = "/system/lib64:/data/service/hnp/bin";
++  if (inherited_path != NULL && inherited_path[0] != '\0') {
++    child_path += ":";
++    child_path += inherited_path;
++  }
++  setenv("LD_LIBRARY_PATH", child_path.c_str(), 1);
++  system(cur_string);
+ }
