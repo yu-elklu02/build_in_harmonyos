@@ -32,6 +32,12 @@ class AudiowmarkConan(ConanFile):
         self.requires("libgcrypt/1.11.0")
         self.requires("mpg123/1.33.5")
 
+    def build_requirements(self):
+        # autoreconf needs these tools; do not depend on a system automake/libtool
+        # installation, which is absent on the OHOS validation worker.
+        self.tool_requires("automake/1.18")
+        self.tool_requires("libtool/2.5.4")
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
