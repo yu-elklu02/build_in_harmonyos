@@ -1,10 +1,11 @@
 import os
+import shlex
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
-from conan.tools.files import get, replace_in_file
+from conan.tools.files import get
 from conan.tools.gnu import PkgConfigDeps
 
 
@@ -30,6 +31,7 @@ class AudiowmarkConan(ConanFile):
         self.requires("fftw/3.3.10")
         self.requires("libsndfile/1.2.2")
         self.requires("libgcrypt/1.11.0")
+        self.requires("libzita-resampler/1.11.2")
         self.requires("mpg123/1.33.5")
 
     def build_requirements(self):
@@ -50,21 +52,31 @@ class AudiowmarkConan(ConanFile):
 
     def build(self):
         self.run("autoreconf -fi", cwd=self.source_folder)
+        autotools = Autotools(self)
         if self.settings.os == "OHOS":
-            # Autoconf emits a /bin/sh shebang. That path is unavailable to
-            # subprocesses on OHOS, so run the generated script with the shell
-            # supplied by the profile instead.
+            # OHOS does not execute scripts through their shebang, so configure
+            # must be passed explicitly to the shell supplied by the profile.
             config_shell = os.environ.get(
                 "CONFIG_SHELL", "/data/service/hnp/bin/bash"
             )
-            replace_in_file(
-                self,
-                os.path.join(self.source_folder, "configure"),
-                "#! /bin/sh",
-                f"#! {config_shell}",
+            configure_args = (
+                "--prefix=/ "
+                "'--bindir=${prefix}/bin' "
+                "'--sbindir=${prefix}/bin' "
+                "'--libdir=${prefix}/lib' "
+                "'--includedir=${prefix}/include' "
+                "'--oldincludedir=${prefix}/include' "
+                "--with-ffmpeg=no --with-docs=no"
             )
-        autotools = Autotools(self)
-        autotools.configure(args=["--with-ffmpeg=no", "--with-docs=no"])
+            self.run(
+                f"{shlex.quote(config_shell)} "
+                f"{shlex.quote(os.path.join(self.source_folder, 'configure'))} "
+                f"{configure_args}",
+                cwd=self.build_folder,
+                env="conanbuild",
+            )
+        else:
+            autotools.configure(args=["--with-ffmpeg=no", "--with-docs=no"])
         autotools.make()
         self.run("make check", cwd=self.build_folder, env="conanbuild")
 

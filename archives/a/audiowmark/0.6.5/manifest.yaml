@@ -12,8 +12,9 @@ source:
 
 build:
   system: "autotools"
-  command: "autoreconf -fi && ./configure --with-ffmpeg=no --with-docs=no && make && make check"
-  dependencies: ["fftw/3.3.10", "libsndfile/1.2.2", "libgcrypt/1.11.0", "mpg123/1.33.5"]
+  command: "autoreconf -fi && $CONFIG_SHELL ./configure --with-ffmpeg=no --with-docs=no && make && make check"
+  dependencies: ["fftw/3.3.10", "libsndfile/1.2.2", "libgcrypt/1.11.0", "libzita-resampler/1.11.2", "mpg123/1.33.5"]
+  build_requirements: ["automake/1.18", "libtool/2.5.4"]
 
 patches_applied: []
 
@@ -24,10 +25,10 @@ tests:
     passed: null
     note: "Upstream tests/Makefile.am defines 14 checks with FFmpeg/HLS disabled; pass count is recorded after OHOS armv8 validation."
   test_package:
-    command: "audiowmark --version"
+    command: "ctest --output-on-failure"
     cases: 1
     passed: null
-    note: "Installed CLI version output assertion."
+    note: "Installed CLI version assertion; functional watermark round-trip is pending implementation."
 
 platform:
   target_architecture: "OHOS/armv8"
