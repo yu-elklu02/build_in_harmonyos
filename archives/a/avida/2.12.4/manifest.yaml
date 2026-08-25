@@ -1,6 +1,6 @@
 package: avida
 version: "2.12.4"
-status: pending
+status: passed
 build_system: cmake
 homepage: https://avida.devosoft.org/
 license: GPL-3.0-only
@@ -24,8 +24,8 @@ tests:
   upstream:
     command: python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml
     cases: 64
-    passed: 0
-    note: The runner is configured for serial execution and includes long tests. Python 3 return-code handling and the intentional nonzero analyze_resize_max_batches assertion are adapted. On OHOS/armv8, four deterministic platform baselines are selected from patches/ohos-baseline and multi_level_selection uses a fixed seed; final pass count must come from the OHOS XML report.
+    passed: 64
+    note: OHOS XML report: tests=64, failures=0, disabled=0. Four deterministic OHOS/armv8 platform baselines are selected from patches/ohos-baseline and multi_level_selection uses a fixed seed.
   test_package:
     command: python test_avida.py <avida-path>
     cases: 1

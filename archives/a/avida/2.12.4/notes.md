@@ -89,6 +89,16 @@ organism filenames and making the platform result reproducible.
 
 Run device validation with:
 
+## Final HarmonyOS validation (2026-08-25)
+
+The OHOS/aarch64 `conan create` completed with `EXIT=0`. The upstream XML
+report recorded `tests=64`, `failures=0`, `disabled=0`; all 64 consistency
+tests passed. The consumer `test_package` also compiled and ran successfully,
+printing `avida help assertion passed`.
+
+The four OHOS/aarch64 data-difference tests now use the reviewed platform
+baselines, and the complete upstream plus consumer validation is passed.
+
 ```bash
 conan create archives/a/avida/2.12.4 \
   -pr:h ci/conan/profiles/ohos-aarch64 \
