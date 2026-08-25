@@ -7,7 +7,8 @@ are supplied by Conan. Automake and Libtool are Conan build requirements for
 
 On OHOS, the generated `configure` script must be explicitly invoked with the
 profile-provided `CONFIG_SHELL`, because the kernel does not execute scripts
-through their shebang.
+through their shebang. The explicit `aarch64-unknown-linux-ohos` build triplet
+also bypasses `config.guess`, which does not recognize HarmonyOS.
 
 OHOS armv8 validation is pending:
 

@@ -66,6 +66,7 @@ class AudiowmarkConan(ConanFile):
                 "'--libdir=${prefix}/lib' "
                 "'--includedir=${prefix}/include' "
                 "'--oldincludedir=${prefix}/include' "
+                "--build=aarch64-unknown-linux-ohos "
                 "--with-ffmpeg=no --with-docs=no"
             )
             self.run(
