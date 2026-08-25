@@ -1,0 +1,50 @@
+id: E337
+title: OHOS/aarch64 上 Python 2 上游测试框架迁移与子进程运行时适配
+draft: true
+contributor_id: elklu02
+software: avida
+version: 2.12.4
+trigger_tool: python|cmake|conan|testrunner
+phase: build|testing|runtime
+severity: 2
+category: python2-migration|ohos|aarch64|testing|runtime
+
+error_signature: ModuleNotFoundError.*dircache|invalid mode.*U|string.*lstrip|ConfigParser|Application.*not found|libc++_shared.so|SIGHUP
+match_keywords: Python2, Python3, dircache, ConfigParser, open(U), string.lstrip, OHOS, aarch64, system, LD_LIBRARY_PATH, subprocess, test baseline, random seed
+
+root_cause: Legacy Python 2 test runner depends on removed Python 2 standard-library APIs and Python 2 ConfigParser semantics. On OHOS/aarch64, child processes launched through system() may not inherit a usable shared-library search environment, and floating-point/randomized output can differ from the upstream Linux baseline.
+affected_scope: Third-party C/C++ packages containing Python 2 test runners, configuration-driven tests, child-process execution, shared-library runtime dependencies, or architecture-sensitive golden output.
+verification_cmd: conan create archives/a/avida/2.12.4 -pr:h ci/conan/profiles/ohos-aarch64 -pr:b ci/conan/profiles/ohos-aarch64 -r=ohpcd --build=missing
+
+rec_priority: 1
+rec_approach: python2-runner-migration-and-ohos-runtime-baseline
+rec_description: Run lib2to3 over the legacy test tree, provide narrow compatibility shims for removed Python 2 APIs and ConfigParser behavior, invoke the upstream runner directly with an available OHOS shell, preserve the runtime library path for child processes, and store reviewed OHOS/aarch64 expected outputs with a reproducible random seed.
+rec_command: Execute the upstream runner with --long-tests -j 1 --verbose, require XML tests=64 failures=0 disabled=0, then run the consumer test_package.
+rec_auto_fix: false
+rec_impl: recipe-adaptation
+
+fallback_priority: 2
+fallback_approach: preserve-platform-failure-artifacts
+fallback_description: Preserve actual failed output under the build directory before introducing a platform baseline. Do not silently replace upstream expected files without reviewing the complete diff.
+fallback_command: Save failed test output, review all generated data files, and add only reviewed OHOS/aarch64 baselines.
+fallback_auto_fix: false
+fallback_impl: manual-review
+
+forbid_1_pattern: skip.*upstream|disabled.*all|test_package.*version only
+forbid_1_reason: The upstream test suite must remain executable and its actual result must be recorded.
+forbid_1_consequence: A successful build could be incorrectly reported as a successful test validation.
+
+principles: P005,P013
+causes: []
+caused_by: []
+similar_to: []
+conflicts_with: []
+prerequisite_of: []
+
+doc_file: drafts/E337-draft-elklu02.md
+last_updated: 2026-08-25
+source_event: avida-2.12.4 OHOS/aarch64 validation
+metrics_success_count: 1
+metrics_fail_count: 0
+metrics_confidence: 0.9
+metrics_last_used: 2026-08-25
