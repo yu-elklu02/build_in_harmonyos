@@ -10,6 +10,10 @@ profile-provided `CONFIG_SHELL`, because the kernel does not execute scripts
 through their shebang. The explicit `aarch64-unknown-linux-ohos` build triplet
 also bypasses `config.guess`, which does not recognize HarmonyOS.
 
+The `mpg123` Conan package publishes `mpg123.pc`, while audiowmark's
+`configure.ac` requires `libmpg123`. The recipe copies the generated file to
+`libmpg123.pc` in Conan's generator directory before configure runs.
+
 OHOS armv8 validation is pending:
 
 ```bash

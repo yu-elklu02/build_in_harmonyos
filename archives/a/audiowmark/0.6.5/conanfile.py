@@ -1,5 +1,6 @@
 import os
 import shlex
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -48,6 +49,13 @@ class AudiowmarkConan(ConanFile):
 
     def generate(self):
         PkgConfigDeps(self).generate()
+        # Audiowmark's configure.ac requires libmpg123, while the Conan package
+        # publishes mpg123.pc. Keep an alias in the generator directory so the
+        # generated PKG_CONFIG_PATH resolves the upstream dependency name.
+        mpg123_pc = os.path.join(self.generators_folder, "mpg123.pc")
+        libmpg123_pc = os.path.join(self.generators_folder, "libmpg123.pc")
+        if os.path.isfile(mpg123_pc) and not os.path.exists(libmpg123_pc):
+            shutil.copyfile(mpg123_pc, libmpg123_pc)
         AutotoolsToolchain(self).generate()
 
     def build(self):
