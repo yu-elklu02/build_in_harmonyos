@@ -1,6 +1,16 @@
 package: avida/2.12.4
+homepage: https://avida.devosoft.org/
+
+upstream_check_command: "python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml"
 upstream_test_in_build: true
-upstream_tests: []
+upstream_test_command: "python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose --xml-report=<build>/avida-upstream-tests.xml"
+
+upstream_tests:
+  - file: avida-core/tests/_testrunner/testrunner.py
+    source: avida-2.12.4/avida-core/tests/_testrunner/testrunner.py
+    description: "Avida upstream consistency test runner; 64 tests executed on OHOS/aarch64"
+    command: "python avida-core/tests/_testrunner/testrunner.py --testrunner-name=./run_tests --long-tests -j 1 --verbose"
+    cases: 64
 test_package_tests:
   - file: test_avida.py
     description: Execute avida --help and assert its help banner.
