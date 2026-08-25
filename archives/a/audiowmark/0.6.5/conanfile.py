@@ -4,7 +4,7 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
-from conan.tools.files import get
+from conan.tools.files import get, replace_in_file
 from conan.tools.gnu import PkgConfigDeps
 
 
@@ -50,6 +50,19 @@ class AudiowmarkConan(ConanFile):
 
     def build(self):
         self.run("autoreconf -fi", cwd=self.source_folder)
+        if self.settings.os == "OHOS":
+            # Autoconf emits a /bin/sh shebang. That path is unavailable to
+            # subprocesses on OHOS, so run the generated script with the shell
+            # supplied by the profile instead.
+            config_shell = os.environ.get(
+                "CONFIG_SHELL", "/data/service/hnp/bin/bash"
+            )
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "configure"),
+                "#! /bin/sh",
+                f"#! {config_shell}",
+            )
         autotools = Autotools(self)
         autotools.configure(args=["--with-ffmpeg=no", "--with-docs=no"])
         autotools.make()
