@@ -12,5 +12,10 @@ class AudiowmarkTestConan(ConanFile):
     def layout(self):
         cmake_layout(self)
 
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
+
     def test(self):
         self.run("ctest --output-on-failure", cwd=self.build_folder, env="conanrun")
