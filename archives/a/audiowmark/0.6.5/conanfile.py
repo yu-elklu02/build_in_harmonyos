@@ -161,11 +161,7 @@ class AudiowmarkConan(ConanFile):
             ],
             "wav-subformat-test.sh": [
                 (
-                    "cat $FMT_WAV | audiowmark_add - $MARK_WAV $TEST_MSG --test-no-limiter",
-                    "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
-                ),
-                (
-                    "audiowmark_add $FMT_WAV - $TEST_MSG --test-no-limiter > $MARK_WAV",
+                    "cat $FMT_WAV | audiowmark_add - - $TEST_MSG --test-no-limiter --format wav-pipe > $MARK_WAV",
                     "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
                 ),
                 (
@@ -173,7 +169,11 @@ class AudiowmarkConan(ConanFile):
                     "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
                 ),
                 (
-                    "cat $FMT_WAV | audiowmark_add - - $TEST_MSG --test-no-limiter --format wav-pipe > $MARK_WAV",
+                    "audiowmark_add $FMT_WAV - $TEST_MSG --test-no-limiter > $MARK_WAV",
+                    "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
+                ),
+                (
+                    "cat $FMT_WAV | audiowmark_add - $MARK_WAV $TEST_MSG --test-no-limiter",
                     "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
                 ),
             ],
