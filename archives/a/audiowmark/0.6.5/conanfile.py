@@ -109,6 +109,18 @@ class AudiowmarkConan(ConanFile):
                         f"#!{config_shell}",
                     )
 
+    def _patch_tests_makefile(self):
+        """Invoke OHOS test scripts through make's shell explicitly."""
+        tests_makefile = os.path.join(self.build_folder, "tests", "Makefile")
+        if not os.path.isfile(tests_makefile):
+            return
+        replace_in_file(
+            self,
+            tests_makefile,
+            "Q=1 $(top_srcdir)/tests/",
+            "Q=1 $(SHELL) $(top_srcdir)/tests/",
+        )
+
     def build(self):
         if self.settings.os == "OHOS":
             # Autoconf's config.status creates temporary files with umask 077.
@@ -162,6 +174,7 @@ class AudiowmarkConan(ConanFile):
             self._patch_test_script_shebangs(
                 os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
             )
+            self._patch_tests_makefile()
         self.run("make check", cwd=self.build_folder, env="conanbuild")
 
     def package(self):
