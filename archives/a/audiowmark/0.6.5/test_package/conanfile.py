@@ -1,3 +1,5 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, cmake_layout
 
@@ -13,6 +15,12 @@ class AudiowmarkTestConan(ConanFile):
         cmake_layout(self)
 
     def build(self):
+        if self.settings.os == "OHOS":
+            config_shell = os.environ.get(
+                "CONFIG_SHELL", "/data/service/hnp/bin/bash"
+            )
+            os.environ["SHELL"] = config_shell
+            os.environ["CONFIG_SHELL"] = config_shell
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
