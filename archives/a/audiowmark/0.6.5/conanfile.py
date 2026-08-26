@@ -135,8 +135,8 @@ class AudiowmarkConan(ConanFile):
         """Skip tests that require pipe stdin rejected by the OHOS sandbox."""
         self.run(
             "sed -i "
-            "-e '/^CHECKS = /s/ pipe-test//g' "
-            "-e '/^CHECKS = /s/ wav-pipe-test//g' "
+            "-e 's/ pipe-test//g' "
+            "-e 's/ wav-pipe-test//g' "
             "tests/Makefile",
             cwd=self.build_folder,
         )
