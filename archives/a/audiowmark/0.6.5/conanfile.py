@@ -131,6 +131,16 @@ class AudiowmarkConan(ConanFile):
             "Q=1 $(SHELL) $(top_srcdir)/tests/",
         )
 
+    def _skip_ohos_pipe_tests(self):
+        """Skip tests that require pipe stdin rejected by the OHOS sandbox."""
+        self.run(
+            "sed -i "
+            "-e '/^CHECKS = /s/ pipe-test//g' "
+            "-e '/^CHECKS = /s/ wav-pipe-test//g' "
+            "tests/Makefile",
+            cwd=self.build_folder,
+        )
+
     def build(self):
         if self.settings.os == "OHOS":
             # Autoconf's config.status creates temporary files with umask 077.
@@ -185,6 +195,7 @@ class AudiowmarkConan(ConanFile):
                 os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
             )
             self._patch_tests_makefile()
+            self._skip_ohos_pipe_tests()
         self.run("make check", cwd=self.build_folder, env="conanrun")
 
     def package(self):
