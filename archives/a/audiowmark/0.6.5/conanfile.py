@@ -57,7 +57,15 @@ class AudiowmarkConan(ConanFile):
         libmpg123_pc = os.path.join(self.generators_folder, "libmpg123.pc")
         if os.path.isfile(mpg123_pc) and not os.path.exists(libmpg123_pc):
             shutil.copyfile(mpg123_pc, libmpg123_pc)
-        AutotoolsToolchain(self).generate()
+        toolchain = AutotoolsToolchain(self)
+        if self.settings.os == "OHOS":
+            # OHOS resolves shared libraries from ELF RUNPATH and ignores
+            # LD_LIBRARY_PATH, so add the pkg-config-linked FFTW directory.
+            fftw3f_libdir = os.path.join(
+                self.dependencies["fftw3f"].package_folder, "lib"
+            )
+            toolchain.extra_ldflags.append(f"-Wl,-rpath,{fftw3f_libdir}")
+        toolchain.generate()
         VirtualRunEnv(self).generate()
 
     def _repair_libtool_dependency_paths(self):
