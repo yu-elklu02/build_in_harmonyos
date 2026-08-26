@@ -6,7 +6,7 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
-from conan.tools.files import get
+from conan.tools.files import get, replace_in_file
 from conan.tools.gnu import PkgConfigDeps
 
 
@@ -59,10 +59,20 @@ class AudiowmarkConan(ConanFile):
         AutotoolsToolchain(self).generate()
 
     def build(self):
+        if self.settings.os == "OHOS":
+            # Autoconf's config.status creates temporary files with umask 077.
+            # On OHOS shared build storage rejects its later writes to them.
+            os.umask(0)
         self.run("autoreconf -fi", cwd=self.source_folder)
         autotools = Autotools(self)
         zita_prefix = self.dependencies["libzita-resampler"].package_folder
         if self.settings.os == "OHOS":
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "configure"),
+                "umask 077",
+                "umask 000",
+            )
             # OHOS does not execute scripts through their shebang, so configure
             # must be passed explicitly to the shell supplied by the profile.
             config_shell = os.environ.get(

@@ -23,6 +23,10 @@ Audiowmark requires the single-precision FFTW API (`fftw3f` and `fftwf_*`
 symbols), so it depends on `fftw3f/3.3.10` rather than the double-precision
 `fftw` package.
 
+On OHOS shared build storage, Autoconf's generated `config.status` cannot
+write files created with `umask 077`. The recipe regenerates with umask `000`
+and replaces that generated temporary-file umask with `000` before configure.
+
 OHOS armv8 validation is pending:
 
 ```bash
