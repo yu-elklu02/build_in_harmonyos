@@ -61,6 +61,7 @@ class AudiowmarkConan(ConanFile):
     def build(self):
         self.run("autoreconf -fi", cwd=self.source_folder)
         autotools = Autotools(self)
+        zita_prefix = self.dependencies["libzita-resampler"].package_folder
         if self.settings.os == "OHOS":
             # OHOS does not execute scripts through their shebang, so configure
             # must be passed explicitly to the shell supplied by the profile.
@@ -75,6 +76,7 @@ class AudiowmarkConan(ConanFile):
                 "'--includedir=${prefix}/include' "
                 "'--oldincludedir=${prefix}/include' "
                 "--build=aarch64-unknown-linux-ohos "
+                f"{shlex.quote(f'--with-libzita-resampler-prefix={zita_prefix}')} "
                 "--with-ffmpeg=no --with-docs=no"
             )
             self.run(
@@ -85,7 +87,13 @@ class AudiowmarkConan(ConanFile):
                 env="conanbuild",
             )
         else:
-            autotools.configure(args=["--with-ffmpeg=no", "--with-docs=no"])
+            autotools.configure(
+                args=[
+                    f"--with-libzita-resampler-prefix={zita_prefix}",
+                    "--with-ffmpeg=no",
+                    "--with-docs=no",
+                ]
+            )
         autotools.make()
         self.run("make check", cwd=self.build_folder, env="conanbuild")
 
