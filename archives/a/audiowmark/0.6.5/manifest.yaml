@@ -1,6 +1,7 @@
 package: "audiowmark"
 version: "0.6.5"
 status: "built"
+build_date: "2026-08-26"
 build_system: "autotools"
 homepage: "https://github.com/swesterfeld/audiowmark"
 license: "GPL-3.0-or-later"
@@ -27,9 +28,9 @@ tests:
     note: "OHOS armv8: 8 tests passed. pipe-test, wav-pipe-test, and wav-subformat-test were removed because the OHOS sandbox rejects pipe stdin with EACCES."
   test_package:
     command: "ctest --output-on-failure"
-    cases: 1
-    passed: 1
-    note: "CMake configure/build completed and audiowmark --version matched 0.6.5."
+    cases: 2
+    passed: null
+    note: "CMake configure/build runs a version assertion and a file-based watermark round-trip; the enhanced test package requires the next OHOS validation run."
 
 platform:
   target_architecture: "OHOS/armv8"

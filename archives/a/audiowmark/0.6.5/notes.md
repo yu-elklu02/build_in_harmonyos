@@ -30,7 +30,9 @@ and replaces that generated temporary-file umask with `000` before configure.
 OHOS armv8 validation completed successfully. `conan create` exited 0;
 eight supported upstream checks passed, three pipe-based checks were skipped
 because the OHOS sandbox rejects pipe stdin, and the test package's
-`audiowmark --version` assertion passed.
+`audiowmark --version` assertion passed. The test package now also includes
+a file-based watermark round-trip assertion; it must be rerun on OHOS before
+the final test count is recorded.
 
 ```bash
 conan create archives/a/audiowmark/0.6.5 \
