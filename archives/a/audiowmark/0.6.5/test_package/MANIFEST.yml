@@ -12,7 +12,7 @@ test_package_tests:
     description: "Run installed audiowmark and assert the 0.6.5 version"
     command: "ctest --output-on-failure"
   - file: roundtrip.c
-    description: "Generate WAV audio, add a watermark, and verify it with audiowmark get"
+    description: "Generate WAV audio, add a watermark, and verify it with audiowmark cmp"
     command: "ctest --output-on-failure"
 
 assertion_count: 2

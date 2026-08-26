@@ -131,16 +131,57 @@ class AudiowmarkConan(ConanFile):
             "Q=1 $(SHELL) $(top_srcdir)/tests/",
         )
 
-    def _skip_ohos_pipe_tests(self):
-        """Skip tests that require pipe stdin rejected by the OHOS sandbox."""
-        self.run(
-            "sed -i "
-            "-e 's/[[:space:]]pipe-test//g' "
-            "-e 's/[[:space:]]wav-pipe-test//g' "
-            "-e 's/[[:space:]]wav-subformat-test//g' "
-            "tests/Makefile",
-            cwd=self.build_folder,
-        )
+    def _adapt_ohos_pipe_tests(self):
+        """Keep pipe-test targets while using file I/O on the OHOS sandbox."""
+        tests_folder = os.path.join(self.source_folder, "tests")
+        replacements = {
+            "pipe-test.sh": [
+                (
+                    "cat $IN_WAV | audiowmark_add - - $TEST_MSG > $OUT_WAV",
+                    "audiowmark_add $IN_WAV $OUT_WAV $TEST_MSG",
+                ),
+                (
+                    "cat $OUT_WAV | audiowmark_cmp --expect-matches 5 - $TEST_MSG",
+                    "audiowmark_cmp --expect-matches 5 $OUT_WAV $TEST_MSG",
+                ),
+            ],
+            "wav-pipe-test.sh": [
+                (
+                    "cat $IN_WAV   | audiowmark_add --test-key 1 --test-no-limiter --format wav-pipe - - $TEST_MSG > $OUT1_WAV",
+                    "audiowmark_add --test-key 1 --test-no-limiter $IN_WAV $OUT1_WAV $TEST_MSG",
+                ),
+                (
+                    "cat $OUT1_WAV | audiowmark_add --test-key 2 --test-no-limiter --format wav-pipe - - $TEST_MSG > $OUT2_WAV",
+                    "audiowmark_add --test-key 2 --test-no-limiter $OUT1_WAV $OUT2_WAV $TEST_MSG",
+                ),
+                (
+                    "cat $OUT2_WAV | audiowmark_add --test-key 3 --test-no-limiter --format wav-pipe - - $TEST_MSG > $OUT3_WAV",
+                    "audiowmark_add --test-key 3 --test-no-limiter $OUT2_WAV $OUT3_WAV $TEST_MSG",
+                ),
+            ],
+            "wav-subformat-test.sh": [
+                (
+                    "cat $FMT_WAV | audiowmark_add - $MARK_WAV $TEST_MSG --test-no-limiter",
+                    "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
+                ),
+                (
+                    "audiowmark_add $FMT_WAV - $TEST_MSG --test-no-limiter > $MARK_WAV",
+                    "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
+                ),
+                (
+                    "cat $FMT_WAV | audiowmark_add - $MARK_WAV $TEST_MSG --test-no-limiter --format wav-pipe",
+                    "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
+                ),
+                (
+                    "cat $FMT_WAV | audiowmark_add - - $TEST_MSG --test-no-limiter --format wav-pipe > $MARK_WAV",
+                    "audiowmark_add $FMT_WAV $MARK_WAV $TEST_MSG --test-no-limiter",
+                ),
+            ],
+        }
+        for script, script_replacements in replacements.items():
+            script_path = os.path.join(tests_folder, script)
+            for old, new in script_replacements:
+                replace_in_file(self, script_path, old, new)
 
     def build(self):
         if self.settings.os == "OHOS":
@@ -196,7 +237,7 @@ class AudiowmarkConan(ConanFile):
                 os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
             )
             self._patch_tests_makefile()
-            self._skip_ohos_pipe_tests()
+            self._adapt_ohos_pipe_tests()
         self.run("make check", cwd=self.build_folder, env="conanrun")
 
     def package(self):

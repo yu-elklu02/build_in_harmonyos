@@ -27,12 +27,11 @@ On OHOS shared build storage, Autoconf's generated `config.status` cannot
 write files created with `umask 077`. The recipe regenerates with umask `000`
 and replaces that generated temporary-file umask with `000` before configure.
 
-OHOS armv8 validation completed successfully. `conan create` exited 0;
-eight supported upstream checks passed, three pipe-based checks were skipped
-because the OHOS sandbox rejects pipe stdin, and the test package's
-`audiowmark --version` assertion passed. The test package now also includes
-a file-based watermark round-trip assertion; it must be rerun on OHOS before
-the final test count is recorded.
+OHOS armv8 validation previously completed with eight upstream checks passing.
+For full upstream coverage, the OHOS recipe now rewrites pipe-based commands
+in the three affected test scripts to equivalent file-based commands while
+retaining all 14 test targets. This adapted suite and the enhanced test package
+must be rerun on OHOS before final results are recorded.
 
 ```bash
 conan create archives/a/audiowmark/0.6.5 \
