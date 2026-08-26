@@ -94,6 +94,21 @@ class AudiowmarkConan(ConanFile):
             [("libdir='//lib'", f"libdir='{gpg_error_libdir}'")],
         )
 
+    def _patch_test_script_shebangs(self, config_shell):
+        """Use the profile shell for OHOS test scripts."""
+        tests_folder = os.path.join(self.source_folder, "tests")
+        if not os.path.isdir(tests_folder):
+            return
+        for root, _, filenames in os.walk(tests_folder):
+            for filename in filenames:
+                if filename.endswith(".sh"):
+                    replace_in_file(
+                        self,
+                        os.path.join(root, filename),
+                        "#!/bin/bash",
+                        f"#!{config_shell}",
+                    )
+
     def build(self):
         if self.settings.os == "OHOS":
             # Autoconf's config.status creates temporary files with umask 077.
@@ -143,6 +158,10 @@ class AudiowmarkConan(ConanFile):
         if self.settings.os == "OHOS":
             self._repair_libtool_dependency_paths()
         autotools.make()
+        if self.settings.os == "OHOS":
+            self._patch_test_script_shebangs(
+                os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+            )
         self.run("make check", cwd=self.build_folder, env="conanbuild")
 
     def package(self):
