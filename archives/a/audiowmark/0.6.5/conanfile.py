@@ -8,6 +8,7 @@ from conan.tools.gnu import Autotools, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 from conan.tools.files import get, replace_in_file
 from conan.tools.gnu import PkgConfigDeps
+from conan.tools.env import VirtualRunEnv
 
 
 class AudiowmarkConan(ConanFile):
@@ -57,6 +58,7 @@ class AudiowmarkConan(ConanFile):
         if os.path.isfile(mpg123_pc) and not os.path.exists(libmpg123_pc):
             shutil.copyfile(mpg123_pc, libmpg123_pc)
         AutotoolsToolchain(self).generate()
+        VirtualRunEnv(self).generate()
 
     def _repair_libtool_dependency_paths(self):
         """Repair stale //lib paths emitted by the OHOS dependency packages."""
@@ -175,7 +177,7 @@ class AudiowmarkConan(ConanFile):
                 os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
             )
             self._patch_tests_makefile()
-        self.run("make check", cwd=self.build_folder, env="conanbuild")
+        self.run("make check", cwd=self.build_folder, env="conanrun")
 
     def package(self):
         Autotools(self).install()
