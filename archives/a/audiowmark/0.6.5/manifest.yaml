@@ -24,15 +24,15 @@ tests:
   upstream:
     command: "make check"
     cases: 14
-    passed: null
-    note: "OHOS armv8 keeps all 14 upstream targets; pipe-based commands are rewritten to equivalent file-based commands because the OHOS sandbox rejects pipe stdin with EACCES. Results require the next device run."
+    passed: 14
+    note: "OHOS armv8: all 14 upstream targets passed. Pipe-based commands in three scripts were adapted to equivalent file-based commands because the OHOS sandbox rejects pipe stdin with EACCES."
   test_package:
     command: "ctest --output-on-failure"
     cases: 2
-    passed: null
-    note: "CMake configure/build runs a version assertion and a file-based watermark round-trip; the enhanced test package requires the next OHOS validation run."
+    passed: 2
+    note: "CMake configure/build completed; version assertion and file-based watermark round-trip both passed."
 
-  platform:
-    target_architecture: "OHOS/armv8"
+platform:
+  target_architecture: "OHOS/armv8"
   limitations:
     - "OHOS sandbox rejects pipe stdin; three pipe-based test scenarios are adapted to file I/O while retaining their test targets."
