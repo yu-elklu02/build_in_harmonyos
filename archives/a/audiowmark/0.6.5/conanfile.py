@@ -58,6 +58,42 @@ class AudiowmarkConan(ConanFile):
             shutil.copyfile(mpg123_pc, libmpg123_pc)
         AutotoolsToolchain(self).generate()
 
+    def _repair_libtool_dependency_paths(self):
+        """Repair stale //lib paths emitted by the OHOS dependency packages."""
+        gcrypt_libdir = os.path.join(
+            self.dependencies["libgcrypt"].package_folder, "lib"
+        )
+        gpg_error_libdir = os.path.join(
+            self.dependencies["libgpg-error"].package_folder, "lib"
+        )
+        gcrypt_la = os.path.join(gcrypt_libdir, "libgcrypt.la")
+        gpg_error_la = os.path.join(gpg_error_libdir, "libgpg-error.la")
+
+        def rewrite(path, replacements):
+            if not os.path.isfile(path):
+                return
+            with open(path, encoding="utf-8") as la_file:
+                contents = la_file.read()
+            repaired = contents
+            for old, new in replacements:
+                repaired = repaired.replace(old, new)
+            if repaired != contents:
+                with open(path, "w", encoding="utf-8", newline="") as la_file:
+                    la_file.write(repaired)
+
+        rewrite(
+            gcrypt_la,
+            [
+                ("libdir='//lib'", f"libdir='{gcrypt_libdir}'"),
+                ("-L//lib", f"-L{gpg_error_libdir}"),
+                ("//lib/libgpg-error.la", gpg_error_la),
+            ],
+        )
+        rewrite(
+            gpg_error_la,
+            [("libdir='//lib'", f"libdir='{gpg_error_libdir}'")],
+        )
+
     def build(self):
         if self.settings.os == "OHOS":
             # Autoconf's config.status creates temporary files with umask 077.
@@ -104,6 +140,8 @@ class AudiowmarkConan(ConanFile):
                     "--with-docs=no",
                 ]
             )
+        if self.settings.os == "OHOS":
+            self._repair_libtool_dependency_paths()
         autotools.make()
         self.run("make check", cwd=self.build_folder, env="conanbuild")
 
