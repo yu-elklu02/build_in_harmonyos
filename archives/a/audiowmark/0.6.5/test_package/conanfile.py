@@ -2,12 +2,12 @@ import os
 from glob import glob
 
 from conan import ConanFile
-from conan.tools.cmake import CMake, cmake_layout
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.env import VirtualRunEnv
 
 
 class AudiowmarkTestConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
-    generators = "VirtualRunEnv", "CMakeToolchain"
 
     def requirements(self):
         self.requires(self.tested_reference_str)
@@ -15,8 +15,12 @@ class AudiowmarkTestConan(ConanFile):
     def layout(self):
         cmake_layout(self)
 
+    def generate(self):
+        CMakeToolchain(self, generator="Ninja").generate()
+        VirtualRunEnv(self).generate()
+
     def build(self):
-        cmake = CMake(self, generator="Ninja")
+        cmake = CMake(self)
         cmake.configure()
         cmake.build()
 
