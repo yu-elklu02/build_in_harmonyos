@@ -29,7 +29,7 @@ class AudiowmarkConan(ConanFile):
             raise ConanInvalidConfiguration("audiowmark OHOS validation requires armv8")
 
     def requirements(self):
-        self.requires("fftw/3.3.10")
+        self.requires("fftw3f/3.3.10")
         self.requires("libsndfile/1.2.2")
         self.requires("libgcrypt/1.11.0")
         self.requires("libzita-resampler/1.11.2")
