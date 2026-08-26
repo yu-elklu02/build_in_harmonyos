@@ -137,6 +137,7 @@ class AudiowmarkConan(ConanFile):
             "sed -i "
             "-e 's/[[:space:]]pipe-test//g' "
             "-e 's/[[:space:]]wav-pipe-test//g' "
+            "-e 's/[[:space:]]wav-subformat-test//g' "
             "tests/Makefile",
             cwd=self.build_folder,
         )
