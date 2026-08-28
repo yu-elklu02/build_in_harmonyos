@@ -43,3 +43,10 @@ obsolete linker argument there for the published OHOS Boost packages.
 The release contains no automated upstream test target. The Conan test package
 therefore performs two real CLI assertions: `vina --version` and `vina --help`
 (matching the upstream help's `Input:` section).
+
+## Final real-device validation
+
+- `conan create`: passed (OHOS 6.0 / armv8 / clang 15 / Release)
+- `test_package`: 2/2 passed
+- `vina --version`: passed
+- `vina --help`: passed

@@ -16,7 +16,7 @@ build:
   cc: clang
   cxx: clang++
 validation:
-  status: pending
+  status: passed
   upstream_tests:
     command: "make -C build/linux/release"
     cases: 0
@@ -25,7 +25,8 @@ validation:
   test_package:
     command: "ctest --output-on-failure"
     cases: 2
-    passed: 0
-    note: "Version and CLI help assertions are defined; the help assertion matches the upstream v1.2.7 Input: section."
+    passed: 2
+    note: "OHOS armv8 real-device validation passed: vina_version and vina_help both passed."
 platform:
   target_architecture: "OHOS/armv8"
+  validation: "OHOS 6.0, armv8, clang 15, Release"
