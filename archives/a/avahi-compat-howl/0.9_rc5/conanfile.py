@@ -104,6 +104,8 @@ class AvahiCompatHowlConan(ConanFile):
                 "--disable-gtk",
                 "--disable-gtk3",
                 "--disable-python",
+                "--disable-mono",
+                "--disable-monodoc",
                 "--disable-gdbm",
                 "--disable-libdaemon",
                 "--disable-autoipd",
