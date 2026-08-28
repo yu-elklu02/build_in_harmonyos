@@ -64,6 +64,17 @@ class AvahiCompatHowlConan(ConanFile):
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
             configure = os.path.join(self.source_folder, "configure")
+            # Avahi's gettext bootstrap invokes autopoint.  OHOS workers ship
+            # the matching gettext templates outside the Conan environment.
+            gettext_root = os.environ.get(
+                "GETTEXT_ROOT", "/data/service/hnp/gettext.org/gettext_0.26"
+            )
+            gettext_bin = os.path.join(gettext_root, "bin")
+            gettext_data = os.path.join(gettext_root, "share", "gettext")
+            os.environ["PATH"] = (
+                gettext_bin + os.pathsep + os.environ.get("PATH", "")
+            )
+            os.environ["gettext_datadir"] = gettext_data
             self.run(f'"{shell}" -c "umask 000; autoreconf -fi"', cwd=self.source_folder, env="conanbuild")
             self.run(
                 "sed -i 's/umask 077/umask 000/g' configure",
