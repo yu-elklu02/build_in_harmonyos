@@ -24,5 +24,9 @@ references from `boost/core/detail/sp_thread_sleep.hpp`. The recipe adds
 Boost's official `BOOST_SP_NO_PTHREAD_SETCANCELSTATE` compile-time switch on
 OHOS to select the portable sleep path.
 
+Boost.System is header-only since Boost 1.69. The upstream Makefile still
+lists `-l boost_system`, so the recipe removes that obsolete linker argument
+for the published OHOS Boost packages.
+
 The release contains no automated upstream test target. The Conan test package
 therefore performs two real CLI assertions: `vina --version` and `vina --help`.

@@ -78,6 +78,9 @@ class AutodockVinaConan(ConanFile):
         content = content.replace("C_OPTIONS= -O3 -DNDEBUG -std=c++11", options)
         content = content.replace("LDFLAGS = -L$(BASE)/lib -L.",
                                   f"LDFLAGS = -L$(BASE)/lib -L. -Wl,-rpath,{boost}/lib")
+        # Boost.System became header-only in Boost 1.69; the published OHOS
+        # packages consequently do not ship libboost_system.
+        content = content.replace("-l boost_system", "")
         with open(makefile, "w", encoding="utf-8") as handle:
             handle.write(content)
 
