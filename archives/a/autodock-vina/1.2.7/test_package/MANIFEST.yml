@@ -12,4 +12,3 @@ test_package_tests:
     description: "Validate the installed vina command accepts --help."
     command: "ctest -R vina_help --output-on-failure"
 assertion_count: 2
-
