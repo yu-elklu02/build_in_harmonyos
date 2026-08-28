@@ -69,7 +69,6 @@ class AutodockVinaConan(ConanFile):
             "BOOST_INCLUDE = $(BASE)/include",
             f"BOOST_INCLUDE = {boost}/include {boost_headers}/include",
         )
-        content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
         content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
         content = content.replace("GPP=g++", f"GPP={self._compiler()}")
         options = "C_OPTIONS= -O3 -DNDEBUG -std=c++14"

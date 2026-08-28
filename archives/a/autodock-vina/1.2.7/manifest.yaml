@@ -1,6 +1,8 @@
 software: autodock-vina
 version: "1.2.7"
 status: built
+homepage: "https://github.com/ccsb-scripps/AutoDock-Vina"
+license: Apache-2.0
 build_date: "2026-08-28"
 build_system: makefile
 source:
