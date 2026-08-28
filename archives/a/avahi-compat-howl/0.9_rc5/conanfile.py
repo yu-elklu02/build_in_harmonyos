@@ -140,6 +140,16 @@ class AvahiCompatHowlConan(ConanFile):
     def package(self):
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+            # Even with manpages disabled, Avahi's man/Makefile retains an
+            # unconditional install rule for these generated aliases.
+            # Provide empty placeholders so `make install` can complete;
+            # no manpage content is enabled or packaged by this recipe.
+            man_dir = os.path.join(self.build_folder, "man")
+            os.makedirs(man_dir, exist_ok=True)
+            for manpage in ("avahi-resolve.1", "avahi-browse.1", "avahi-publish.1"):
+                placeholder = os.path.join(man_dir, manpage)
+                if not os.path.exists(placeholder):
+                    open(placeholder, "w", encoding="utf-8").close()
             self.run(
                 f'make install DESTDIR="{self.package_folder}" SHELL="{shell}"',
                 cwd=self.build_folder,
