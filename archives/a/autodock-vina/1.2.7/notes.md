@@ -27,6 +27,10 @@ raised to C++14; Vina's C++11 source remains source-compatible.
 The shared include flags are defined in `build/makefile_common`; the recipe
 patches that file directly so both Boost include directories receive `-I`.
 
+The upstream `LDFLAGS` definition is also in `build/makefile_common`. The recipe
+adds the Boost library RUNPATH there because OHOS does not honor
+`LD_LIBRARY_PATH` for these binaries.
+
 OHOS musl does not declare `pthread_setcancelstate`, which Boost 1.84.0
 references from `boost/core/detail/sp_thread_sleep.hpp`. The recipe adds
 Boost's official `BOOST_SP_NO_PTHREAD_SETCANCELSTATE` compile-time switch on
