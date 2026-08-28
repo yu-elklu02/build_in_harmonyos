@@ -27,10 +27,15 @@ class AutodockVinaConan(ConanFile):
             raise ConanInvalidConfiguration("OHOS builds currently support armv8 only")
 
     def requirements(self):
-        # Boost 1.90.0.1 trims header-only components required by Vina
-        # (boost::ptr_container and Boost.Log). The published OHOS Boost
-        # 1.84.0 package contains the complete header set and required libs.
-        self.requires("boost/1.84.0")
+        # Boost 1.90.0.1 supplies the compiled libraries; its package omits
+        # two header-only directories required by Vina.
+        self.requires("boost/1.90.0.1")
+
+    def build_requirements(self):
+        # The published 1.84.0 package retains the complete Boost header set.
+        # Use it only as a build-context header provider; link against the
+        # 1.90.0.1 host libraries above.
+        self.tool_requires("boost/1.84.0")
 
     def layout(self):
         self.folders.source = "src"
@@ -52,6 +57,7 @@ class AutodockVinaConan(ConanFile):
     def build(self):
         makefile = os.path.join(self.source_folder, "build", "linux", "release", "Makefile")
         boost = self.dependencies["boost"].package_folder
+        boost_headers = self.dependencies.build["boost"].package_folder
         shell = os.environ.get("CONFIG_SHELL", "/bin/sh")
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
@@ -59,6 +65,8 @@ class AutodockVinaConan(ConanFile):
         with open(makefile, "r", encoding="utf-8") as handle:
             content = handle.read()
         content = content.replace("BASE=/usr", f"BASE={boost}")
+        content = content.replace("BOOST_INCLUDE = $(BASE)/include",
+                                  f"BOOST_INCLUDE = {boost_headers}/include")
         content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
         content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
         content = content.replace("GPP=g++", f"GPP={self._compiler()}")
