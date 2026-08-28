@@ -111,6 +111,7 @@ class AvahiCompatHowlConan(ConanFile):
                 "--disable-xmltoman",
                 "--with-xml=none",
                 "--enable-tests",
+                "--disable-libsystemd",
                 "--with-systemdsystemunitdir=no",
                 "--with-dbus-sys=no",
                 "--with-distro=none",
