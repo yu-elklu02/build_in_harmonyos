@@ -2,7 +2,6 @@
 """Conan recipe for AutoDock Vina 1.2.7."""
 
 import os
-import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -59,18 +58,6 @@ class AutodockVinaConan(ConanFile):
         makefile = os.path.join(self.source_folder, "build", "linux", "release", "Makefile")
         boost = self.dependencies["boost"].package_folder
         boost_headers = self.dependencies.build["boost"].package_folder
-        overlay = os.path.join(self.build_folder, "boost-include")
-        shutil.copytree(
-            os.path.join(boost, "include"),
-            overlay,
-            dirs_exist_ok=True,
-        )
-        for component in ("log", "ptr_container"):
-            shutil.copytree(
-                os.path.join(boost_headers, "include", "boost", component),
-                os.path.join(overlay, "boost", component),
-                dirs_exist_ok=True,
-            )
         shell = os.environ.get("CONFIG_SHELL", "/bin/sh")
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
@@ -78,12 +65,18 @@ class AutodockVinaConan(ConanFile):
         with open(makefile, "r", encoding="utf-8") as handle:
             content = handle.read()
         content = content.replace("BASE=/usr", f"BASE={boost}")
-        content = content.replace("BOOST_INCLUDE = $(BASE)/include",
-                                  f"BOOST_INCLUDE = {overlay}")
+        content = content.replace(
+            "BOOST_INCLUDE = $(BASE)/include",
+            f"BOOST_INCLUDE = {boost}/include {boost_headers}/include",
+        )
+        content = content.replace(
+            "INCFLAGS = -I $(BOOST_INCLUDE)",
+            f"INCFLAGS = -I{boost}/include -I{boost_headers}/include",
+        )
         content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
         content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
         content = content.replace("GPP=g++", f"GPP={self._compiler()}")
-        options = "C_OPTIONS= -O3 -DNDEBUG -std=c++11"
+        options = "C_OPTIONS= -O3 -DNDEBUG -std=c++14"
         if self.settings.os == "OHOS":
             # OHOS musl does not expose pthread cancellation APIs used by
             # Boost.Thread's default sleep implementation.

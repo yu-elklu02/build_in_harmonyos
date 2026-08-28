@@ -17,9 +17,12 @@ Boost 1.90.0.1 supplies the compiled libraries, but its published OHOS package
 omits the `boost/log` and `boost/ptr_container` headers required by Vina. The
 published OHOS Boost 1.84.0 package contains both components, so the recipe
 uses it as a build-context header provider while retaining 1.90.0.1 for host
-link libraries. To avoid ABI mismatches, the recipe uses the 1.90.0.1 headers
-as the base and overlays only the missing `log` and `ptr_container` directories
-from 1.84.0.
+link libraries. To avoid ABI mismatches, the recipe puts the 1.90.0.1 include
+directory first and the complete 1.84.0 include directory second as a
+fallback, so all headers resolve while filesystem uses the matching 1.90 ABI.
+
+Boost 1.90.0.1 headers use C++14 type traits, so the upstream C++11 flag is
+raised to C++14; Vina's C++11 source remains source-compatible.
 
 OHOS musl does not declare `pthread_setcancelstate`, which Boost 1.84.0
 references from `boost/core/detail/sp_thread_sleep.hpp`. The recipe adds
