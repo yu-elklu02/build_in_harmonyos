@@ -2,6 +2,7 @@
 """Conan recipe for AutoDock Vina 1.2.7."""
 
 import os
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -58,6 +59,18 @@ class AutodockVinaConan(ConanFile):
         makefile = os.path.join(self.source_folder, "build", "linux", "release", "Makefile")
         boost = self.dependencies["boost"].package_folder
         boost_headers = self.dependencies.build["boost"].package_folder
+        overlay = os.path.join(self.build_folder, "boost-include")
+        shutil.copytree(
+            os.path.join(boost, "include"),
+            overlay,
+            dirs_exist_ok=True,
+        )
+        for component in ("log", "ptr_container"):
+            shutil.copytree(
+                os.path.join(boost_headers, "include", "boost", component),
+                os.path.join(overlay, "boost", component),
+                dirs_exist_ok=True,
+            )
         shell = os.environ.get("CONFIG_SHELL", "/bin/sh")
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
@@ -66,7 +79,7 @@ class AutodockVinaConan(ConanFile):
             content = handle.read()
         content = content.replace("BASE=/usr", f"BASE={boost}")
         content = content.replace("BOOST_INCLUDE = $(BASE)/include",
-                                  f"BOOST_INCLUDE = {boost_headers}/include")
+                                  f"BOOST_INCLUDE = {overlay}")
         content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
         content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
         content = content.replace("GPP=g++", f"GPP={self._compiler()}")
