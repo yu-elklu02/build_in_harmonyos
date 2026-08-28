@@ -41,4 +41,5 @@ lists `-l boost_system` in `build/makefile_common`, so the recipe removes that
 obsolete linker argument there for the published OHOS Boost packages.
 
 The release contains no automated upstream test target. The Conan test package
-therefore performs two real CLI assertions: `vina --version` and `vina --help`.
+therefore performs two real CLI assertions: `vina --version` and `vina --help`
+(matching the upstream help's `Input:` section).

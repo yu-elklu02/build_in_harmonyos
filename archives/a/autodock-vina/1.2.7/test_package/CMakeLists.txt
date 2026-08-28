@@ -13,4 +13,4 @@ set_tests_properties(vina_version PROPERTIES
 
 add_test(NAME vina_help COMMAND "${VINA_EXECUTABLE}" --help)
 set_tests_properties(vina_help PROPERTIES
-    PASS_REGULAR_EXPRESSION "Usage: vina")
+    PASS_REGULAR_EXPRESSION "Input:")

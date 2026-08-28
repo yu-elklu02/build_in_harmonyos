@@ -26,6 +26,6 @@ validation:
     command: "ctest --output-on-failure"
     cases: 2
     passed: 0
-    note: "Version and CLI help assertions are defined and require real OHOS execution."
+    note: "Version and CLI help assertions are defined; the help assertion matches the upstream v1.2.7 Input: section."
 platform:
   target_architecture: "OHOS/armv8"
