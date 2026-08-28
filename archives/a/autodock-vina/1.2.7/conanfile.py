@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""Conan recipe for AutoDock Vina 1.2.7."""
+
+import os
+
+from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
+from conan.tools.files import copy, get
+from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
+
+
+class AutodockVinaConan(ConanFile):
+    name = "autodock-vina"
+    version = "1.2.7"
+    description = "Molecular docking and virtual screening engine"
+    license = "Apache-2.0"
+    homepage = "https://github.com/ccsb-scripps/AutoDock-Vina"
+    url = "https://github.com/ccsb-scripps/AutoDock-Vina"
+    package_type = "application"
+
+    settings = "os", "arch", "compiler", "build_type"
+
+    def validate(self):
+        if self.settings.os not in ("Linux", "OHOS"):
+            raise ConanInvalidConfiguration("AutoDock Vina supports Linux and OHOS")
+        if self.settings.os == "OHOS" and self.settings.arch != "armv8":
+            raise ConanInvalidConfiguration("OHOS builds currently support armv8 only")
+
+    def requirements(self):
+        self.requires("boost/1.90.0.1")
+
+    def layout(self):
+        self.folders.source = "src"
+        self.folders.build = "build"
+
+    def generate(self):
+        VirtualBuildEnv(self).generate()
+        VirtualRunEnv(self).generate()
+
+    def source(self):
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+
+    def _compiler(self):
+        executables = self.conf.get(
+            "tools.build:compiler_executables", default={}, check_type=dict
+        ) or {}
+        return executables.get("cpp") or os.environ.get("CXX") or "c++"
+
+    def build(self):
+        makefile = os.path.join(self.source_folder, "build", "linux", "release", "Makefile")
+        boost = self.dependencies["boost"].package_folder
+        shell = os.environ.get("CONFIG_SHELL", "/bin/sh")
+        if self.settings.os == "OHOS":
+            shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+
+        with open(makefile, "r", encoding="utf-8") as handle:
+            content = handle.read()
+        content = content.replace("BASE=/usr", f"BASE={boost}")
+        content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
+        content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
+        content = content.replace("GPP=g++", f"GPP={self._compiler()}")
+        content = content.replace("C_OPTIONS= -O3 -DNDEBUG -std=c++11",
+                                  "C_OPTIONS= -O3 -DNDEBUG -std=c++11")
+        content = content.replace("LDFLAGS = -L$(BASE)/lib -L.",
+                                  f"LDFLAGS = -L$(BASE)/lib -L. -Wl,-rpath,{boost}/lib")
+        with open(makefile, "w", encoding="utf-8") as handle:
+            handle.write(content)
+
+        build_dir = os.path.dirname(makefile)
+        command = f'make -C "{build_dir}" -j2 SHELL="{shell}"'
+        self.run(command, env="conanbuild")
+
+    def package(self):
+        release_dir = os.path.join(self.source_folder, "build", "linux", "release")
+        copy(self, "vina", src=release_dir, dst=os.path.join(self.package_folder, "bin"))
+        copy(self, "vina_split", src=release_dir, dst=os.path.join(self.package_folder, "bin"))
+        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+
+    def package_info(self):
+        self.cpp_info.bindirs = ["bin"]
+        self.runenv_info.prepend_path("PATH", os.path.join(self.package_folder, "bin"))
