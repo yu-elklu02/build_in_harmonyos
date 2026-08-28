@@ -8,7 +8,7 @@ if(NOT VINA_EXECUTABLE)
 endif()
 
 add_executable(vina_test_source test_source.cpp)
-add_test(NAME vina_test_source COMMAND vina_test_source)
+add_test(NAME vina_test_source COMMAND vina_test_source "${VINA_EXECUTABLE}")
 
 add_test(NAME vina_version COMMAND "${VINA_EXECUTABLE}" --version)
 set_tests_properties(vina_version PROPERTIES
