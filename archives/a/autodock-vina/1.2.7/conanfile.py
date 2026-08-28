@@ -27,7 +27,10 @@ class AutodockVinaConan(ConanFile):
             raise ConanInvalidConfiguration("OHOS builds currently support armv8 only")
 
     def requirements(self):
-        self.requires("boost/1.90.0.1")
+        # Boost 1.90.0.1 trims header-only components required by Vina
+        # (boost::ptr_container and Boost.Log). The published OHOS Boost
+        # 1.84.0 package contains the complete header set and required libs.
+        self.requires("boost/1.84.0")
 
     def layout(self):
         self.folders.source = "src"

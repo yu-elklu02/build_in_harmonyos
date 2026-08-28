@@ -10,7 +10,7 @@ source:
 build:
   system: makefile
   dependencies:
-    - "boost/1.90.0.1"
+    - "boost/1.84.0"
   cc: clang
   cxx: clang++
 validation:
