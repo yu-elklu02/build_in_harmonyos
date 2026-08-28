@@ -2,6 +2,7 @@
 """Conan recipe for Avahi's HOWL compatibility library."""
 
 import os
+import shutil
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -54,6 +55,13 @@ class AvahiCompatHowlConan(ConanFile):
 
     def generate(self):
         PkgConfigDeps(self).generate()
+        # Avahi asks pkg-config for dbus-1, while Conan's package name
+        # generates dbus.pc.  Provide the upstream-compatible alias.
+        dbus_pc = os.path.join(self.generators_folder, "dbus.pc")
+        dbus_1_pc = os.path.join(self.generators_folder, "dbus-1.pc")
+        if os.path.isfile(dbus_pc) and not os.path.exists(dbus_1_pc):
+            shutil.copy2(dbus_pc, dbus_1_pc)
+        self.buildenv_info.append_path("PKG_CONFIG_PATH", self.generators_folder)
         tc = AutotoolsToolchain(self)
         tc.generate()
         VirtualBuildEnv(self).generate()
