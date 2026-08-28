@@ -105,6 +105,7 @@ class AvahiCompatHowlConan(ConanFile):
                 "--enable-tests",
                 "--with-systemdsystemunitdir=no",
                 "--with-dbus-sys=no",
+                "--with-distro=none",
                 "--build=aarch64-unknown-linux-ohos",
             ]
             self.run(
