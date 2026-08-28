@@ -63,6 +63,11 @@ class AvahiCompatHowlConan(ConanFile):
             shutil.copy2(dbus_pc, dbus_1_pc)
         self.buildenv_info.append_path("PKG_CONFIG_PATH", self.generators_folder)
         tc = AutotoolsToolchain(self)
+        if self.settings.os == "OHOS":
+            # OHOS exposes BSD integer aliases from sys/types.h only when
+            # feature-test macros are enabled; compat-howl uses those aliases
+            # under strict C99 compilation.
+            tc.extra_cflags.append("-D_GNU_SOURCE")
         tc.generate()
         VirtualBuildEnv(self).generate()
         VirtualRunEnv(self).generate()
