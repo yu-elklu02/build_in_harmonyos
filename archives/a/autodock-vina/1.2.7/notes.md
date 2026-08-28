@@ -24,6 +24,9 @@ fallback, so all headers resolve while filesystem uses the matching 1.90 ABI.
 Boost 1.90.0.1 headers use C++14 type traits, so the upstream C++11 flag is
 raised to C++14; Vina's C++11 source remains source-compatible.
 
+The shared include flags are defined in `build/makefile_common`; the recipe
+patches that file directly so both Boost include directories receive `-I`.
+
 OHOS musl does not declare `pthread_setcancelstate`, which Boost 1.84.0
 references from `boost/core/detail/sp_thread_sleep.hpp`. The recipe adds
 Boost's official `BOOST_SP_NO_PTHREAD_SETCANCELSTATE` compile-time switch on

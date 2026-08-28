@@ -69,10 +69,6 @@ class AutodockVinaConan(ConanFile):
             "BOOST_INCLUDE = $(BASE)/include",
             f"BOOST_INCLUDE = {boost}/include {boost_headers}/include",
         )
-        content = content.replace(
-            "INCFLAGS = -I $(BOOST_INCLUDE)",
-            f"INCFLAGS = -I{boost}/include -I{boost_headers}/include",
-        )
         content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
         content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
         content = content.replace("GPP=g++", f"GPP={self._compiler()}")
@@ -97,6 +93,10 @@ class AutodockVinaConan(ConanFile):
         )
         common_content = common_content.replace(
             "${BASE}/lib/libboost_system${BOOST_LIB_VERSION}.a ", ""
+        )
+        common_content = common_content.replace(
+            "INCFLAGS = -I $(BOOST_INCLUDE)",
+            f"INCFLAGS = -I{boost}/include -I{boost_headers}/include",
         )
         with open(common, "w", encoding="utf-8") as handle:
             handle.write(common_content)
