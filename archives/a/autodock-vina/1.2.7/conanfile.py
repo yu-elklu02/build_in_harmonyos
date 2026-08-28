@@ -62,8 +62,12 @@ class AutodockVinaConan(ConanFile):
         content = content.replace("BOOST_INCLUDE = $(BASE)/include", "BOOST_INCLUDE = $(BASE)/include")
         content = content.replace("C_PLATFORM=-static -pthread", "C_PLATFORM=-pthread")
         content = content.replace("GPP=g++", f"GPP={self._compiler()}")
-        content = content.replace("C_OPTIONS= -O3 -DNDEBUG -std=c++11",
-                                  "C_OPTIONS= -O3 -DNDEBUG -std=c++11")
+        options = "C_OPTIONS= -O3 -DNDEBUG -std=c++11"
+        if self.settings.os == "OHOS":
+            # OHOS musl does not expose pthread cancellation APIs used by
+            # Boost.Thread's default sleep implementation.
+            options += " -DBOOST_SP_NO_PTHREAD_SETCANCELSTATE"
+        content = content.replace("C_OPTIONS= -O3 -DNDEBUG -std=c++11", options)
         content = content.replace("LDFLAGS = -L$(BASE)/lib -L.",
                                   f"LDFLAGS = -L$(BASE)/lib -L. -Wl,-rpath,{boost}/lib")
         with open(makefile, "w", encoding="utf-8") as handle:

@@ -17,5 +17,10 @@ Boost 1.90.0.1 was checked first but its published OHOS package omits the
 `boost/log` and `boost/ptr_container` headers required by Vina. The published
 OHOS Boost 1.84.0 package contains both components and is used instead.
 
+OHOS musl does not declare `pthread_setcancelstate`, which Boost 1.84.0
+references from `boost/core/detail/sp_thread_sleep.hpp`. The recipe adds
+Boost's official `BOOST_SP_NO_PTHREAD_SETCANCELSTATE` compile-time switch on
+OHOS to select the portable sleep path.
+
 The release contains no automated upstream test target. The Conan test package
 therefore performs two real CLI assertions: `vina --version` and `vina --help`.
