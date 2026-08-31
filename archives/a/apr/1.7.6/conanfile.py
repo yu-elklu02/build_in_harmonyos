@@ -49,13 +49,14 @@ class AprConan(ConanFile):
         apply_conandata_patches(self)
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+            configure = os.path.join(self.source_folder, "configure")
             args = [
                 "--enable-static" if not self.options.shared else "--disable-static",
                 "--enable-shared" if self.options.shared else "--disable-shared",
                 "--build=aarch64-unknown-linux-ohos",
             ]
             self.run(
-                f'"{shell}" configure ' + " ".join(args),
+                f'"{shell}" "{configure}" ' + " ".join(args),
                 cwd=self.build_folder,
                 env="conanbuild",
             )
