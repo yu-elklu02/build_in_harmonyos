@@ -47,13 +47,30 @@ class AprConan(ConanFile):
 
     def build(self):
         apply_conandata_patches(self)
-        autotools = Autotools(self)
-        autotools.configure()
-        autotools.make()
+        if self.settings.os == "OHOS":
+            shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+            args = [
+                "--enable-static" if not self.options.shared else "--disable-static",
+                "--enable-shared" if self.options.shared else "--disable-shared",
+                "--build=aarch64-unknown-linux-ohos",
+            ]
+            self.run(
+                f'"{shell}" configure ' + " ".join(args),
+                cwd=self.build_folder,
+                env="conanbuild",
+            )
+            self.run(f'make -j2 SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
+        else:
+            autotools = Autotools(self)
+            autotools.configure()
+            autotools.make()
 
     def package(self):
-        autotools = Autotools(self)
-        autotools.install()
+        if self.settings.os == "OHOS":
+            shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+            self.run(f'make install SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
+        else:
+            Autotools(self).install()
         copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
 
     def package_info(self):
