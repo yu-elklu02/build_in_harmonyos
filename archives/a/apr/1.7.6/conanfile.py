@@ -60,6 +60,21 @@ class AprConan(ConanFile):
                 cwd=self.build_folder,
                 env="conanbuild",
             )
+            scripts = [
+                "build/mkdir.sh",
+                "build/get-version.sh",
+                "build/ltmain.sh",
+                "build/install.sh",
+                "build/buildcheck.sh",
+                "build/config.guess",
+                "build/PrintPath",
+            ]
+            script_list = " ".join(f'"{os.path.join(self.source_folder, item)}"' for item in scripts)
+            self.run(
+                f'sed -i "s|^#! */bin/sh|#!{shell}|" {script_list}',
+                cwd=self.source_folder,
+                env="conanbuild",
+            )
             self.run(f'make -j2 SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
         else:
             autotools = Autotools(self)
