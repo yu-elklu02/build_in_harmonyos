@@ -71,7 +71,7 @@ class AprConan(ConanFile):
             ]
             script_list = " ".join(f'"{os.path.join(self.source_folder, item)}"' for item in scripts)
             self.run(
-                f'sed -i "s|^#! */bin/sh|#!{shell}|" {script_list}',
+                f"sed -i '1d' {script_list}",
                 cwd=self.source_folder,
                 env="conanbuild",
             )
