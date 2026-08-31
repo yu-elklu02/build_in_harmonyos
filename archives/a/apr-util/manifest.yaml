@@ -1,0 +1,11 @@
+software: apr-util
+display: "Apache APR-util"
+description: "Apache Portable Runtime utility library"
+category: system
+homepage: "https://apr.apache.org/"
+license: Apache-2.0
+build_system: autotools
+versions:
+  "1.6.3":
+    status: built
+    format: conan
