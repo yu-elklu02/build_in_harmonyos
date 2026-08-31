@@ -75,6 +75,17 @@ class AprConan(ConanFile):
                 cwd=self.source_folder,
                 env="conanbuild",
             )
+            with open(configure, "r", encoding="utf-8") as handle:
+                configure_content = handle.read()
+            configure_content = configure_content.replace(
+                'get_version="$apr_builders/get-version.sh"',
+                f'get_version="{shell} $apr_builders/get-version.sh"',
+            ).replace(
+                'mkdir_p="$apr_builders/mkdir.sh"',
+                f'mkdir_p="{shell} $apr_builders/mkdir.sh"',
+            )
+            with open(configure, "w", encoding="utf-8") as handle:
+                handle.write(configure_content)
             self.run(f'make -j2 SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
         else:
             autotools = Autotools(self)
