@@ -4,6 +4,6 @@ sources:
     sha256: "2b74d8932703826862ca305b094eef2983c27b39d5c9414442e9976a9acf1983"
 patches:
   "1.6.3":
-    - patch_file: "0001-configure.patch"
-    - patch_file: "0002-config.guess.patch"
-    - patch_file: "0003-config.sub.patch"
+    - patch_file: "patches/0001-configure.patch"
+    - patch_file: "patches/0002-config.guess.patch"
+    - patch_file: "patches/0003-config.sub.patch"
