@@ -55,11 +55,6 @@ class AprConan(ConanFile):
                 "--enable-shared" if self.options.shared else "--disable-shared",
                 "--build=aarch64-unknown-linux-ohos",
             ]
-            self.run(
-                f'"{shell}" "{configure}" ' + " ".join(args),
-                cwd=self.build_folder,
-                env="conanbuild",
-            )
             scripts = [
                 "build/mkdir.sh",
                 "build/get-version.sh",
@@ -86,6 +81,11 @@ class AprConan(ConanFile):
             )
             with open(configure, "w", encoding="utf-8") as handle:
                 handle.write(configure_content)
+            self.run(
+                f'"{shell}" "{configure}" ' + " ".join(args),
+                cwd=self.build_folder,
+                env="conanbuild",
+            )
             self.run(f'make -j2 SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
         else:
             autotools = Autotools(self)
