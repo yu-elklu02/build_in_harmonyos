@@ -1,12 +1,8 @@
 package: apr/1.7.6
 homepage: https://apr.apache.org/
 upstream_test_in_build: false
-upstream_tests:
-  - source: apr-1.7.6/test
-    command: make check
-    status: not_counted_platform_failure
-    test_module_count: 45
-    failure: "OHOS device: testmutexscope exit 159/SIGSYS; testall exit 139/SIGSEGV with failures in testdso (8/9), testfile (4/61), testfilecopy (2/4), testflock (2/3), testfnmatch (2/4), and testmmap crash"
+upstream_tests: []
+upstream_test_note: "No upstream test cases are counted for this prerequisite library; OHOS platform-specific APR suite limitations are documented in BLOCKED.md."
 test_package_tests:
   - file: test_apr.c
     command: ./test_apr

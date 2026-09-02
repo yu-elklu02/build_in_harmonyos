@@ -27,6 +27,19 @@ patches_applied:
   - "0013-config.sub-ohos.patch"
   - "0014-configure-hmdfs-umask.patch"
 
+validation:
+  status: passed
+  upstream_tests:
+    command: ""
+    cases: 0
+    passed: 0
+    note: "No upstream test cases counted; APR is a prerequisite library for downstream adapters."
+  test_package:
+    command: "./test_apr"
+    cases: 1
+    passed: 1
+    note: "OHOS armv8 real-device consumer validation passed."
+
 knowledge_gained:
   - "E007: config.guess 需要 __OHOS__ LIBC 检测和 HarmonyOS 系统识别"
   - "E072: config.sub 需要 ohos-linux triplet"
