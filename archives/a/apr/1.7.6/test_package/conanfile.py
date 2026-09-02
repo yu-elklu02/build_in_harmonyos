@@ -15,7 +15,8 @@ class AprTestConan(ConanFile):
 
     def generate(self):
         CMakeDeps(self).generate()
-        CMakeToolchain(self).generate()
+        generator = "Ninja" if self.settings.os == "OHOS" else None
+        CMakeToolchain(self, generator=generator).generate()
 
     def build(self):
         cmake = CMake(self)
