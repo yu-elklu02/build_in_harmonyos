@@ -35,7 +35,7 @@ APR 的目的是创建和维护一个软件库，为底层平台特定的实现�
 ## 使用方式
 ```bash
 # 链接 APR
-gcc myapp.c -I/path/to/apr/include/apr-1 -L/path/to/apr/lib -lapr-1
+gcc myapp.c -I<apr-prefix>/include/apr-1 -L<apr-prefix>/lib -lapr-1
 
 # 使用 pkg-config
 gcc myapp.c $(pkg-config --cflags --libs apr-1)
