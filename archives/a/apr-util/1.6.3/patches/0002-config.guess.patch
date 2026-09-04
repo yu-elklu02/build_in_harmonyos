@@ -1,10 +1,14 @@
 --- a/build/config.guess
 +++ b/build/config.guess
-@@ -155,7 +155,9 @@
- 	set_cc_for_build
- 	cat <<-EOF > "$dummy.c"
- 	#include <features.h>
-+	#if defined(__OHOS__)
+@@ -966,6 +966,11 @@
+     *:Minix:*:*)
+ 	GUESS=$UNAME_MACHINE-unknown-minix
+ 	;;
++    aarch64:HarmonyOS:*:*)
++	# OHOS uname -s returns HarmonyOS.
 +	LIBC=ohos
-+	#elif defined(__UCLIBC__)
--	#if defined(__UCLIBC__)
++	GUESS=$UNAME_MACHINE-unknown-linux-$LIBC
++	;;
+     aarch64:Linux:*:*)
+ 	GUESS=$UNAME_MACHINE-unknown-linux-$LIBC
+ 	;;

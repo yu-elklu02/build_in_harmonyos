@@ -17,18 +17,19 @@ class AprUtilConan(ConanFile):
     license = "Apache-2.0"
     homepage = "https://apr.apache.org/"
     url = "https://apr.apache.org/"
-    package_type = "library"
+    # Always static: see note below on the legacy buildconf build system.
+    package_type = "static-library"
 
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {"shared": True, "fPIC": True}
+    options = {"fPIC": [True, False]}
+    default_options = {"fPIC": True}
+
+    # APR-util 1.6.3 uses the legacy buildconf build system, which does not
+    # understand --enable-shared/--disable-static and always produces the
+    # static libaprutil-1.a. So this package is static (matching apr).
 
     def config_options(self):
         if self.settings.os == "Windows":
-            self.options.rm_safe("fPIC")
-
-    def configure(self):
-        if self.options.shared:
             self.options.rm_safe("fPIC")
 
     def validate(self):
@@ -38,7 +39,10 @@ class AprUtilConan(ConanFile):
             raise ConanInvalidConfiguration("OHOS builds currently support armv8 only")
 
     def requirements(self):
-        self.requires("apr/1.7.6")
+        # apr-util's public headers include APR core headers (apr_pools.h,
+        # apr_general.h, ...) and consumers link libapr-1 via the static
+        # aprutil, so apr's headers (and libs) must be transitive.
+        self.requires("apr/1.7.6", transitive_headers=True)
         self.requires("expat/2.8.2")
 
     def layout(self):
@@ -69,13 +73,15 @@ class AprUtilConan(ConanFile):
             "--without-ldap",
             "--without-crypto",
             "--disable-debug",
-            "--enable-shared" if self.options.shared else "--disable-shared",
-            "--enable-static" if not self.options.shared else "--disable-static",
+            # NB: the legacy buildconf configure does not accept
+            # --enable-shared/--disable-static (it warns "unrecognized
+            # options" and always builds the static libaprutil-1.a).
         ]
         if self.settings.os == "OHOS":
             shell = os.environ.get("CONFIG_SHELL", "/data/service/hnp/bin/bash")
+            configure = os.path.join(self.source_folder, "configure")
             self.run(
-                f'"{shell}" configure ' + " ".join(args),
+                f'"{shell}" "{configure}" ' + " ".join(args),
                 cwd=self.build_folder,
                 env="conanbuild",
             )
@@ -85,7 +91,19 @@ class AprUtilConan(ConanFile):
             autotools.configure(args=args)
             autotools.make()
         if self.settings.os == "OHOS":
-            self.run(f'make check SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
+            # make check runs the freshly built test binaries, which need the
+            # shared deps (expat) at runtime; the build env alone has no
+            # LD_LIBRARY_PATH.
+            dep_libs = ":".join(
+                os.path.join(dep.package_folder, "lib")
+                for dep in (self.dependencies["expat"], self.dependencies["apr"])
+                if os.path.isdir(os.path.join(dep.package_folder, "lib"))
+            )
+            self.run(
+                f'"{shell}" -c "LD_LIBRARY_PATH={dep_libs}${{LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}} make check SHELL={shell}"',
+                cwd=self.build_folder,
+                env="conanbuild",
+            )
         else:
             self.run("make check", cwd=self.build_folder)
 
@@ -103,6 +121,9 @@ class AprUtilConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["aprutil-1"]
+        # apr-util public headers live in include/apr-1/ (apr_general.h,
+        # apr_pools.h, apr_xml.h, ...), not directly under include/.
+        self.cpp_info.includedirs = ["include/apr-1"]
         self.cpp_info.set_property("pkg_config_name", "apu-1")
         self.cpp_info.set_property("cmake_file_name", "apr-util")
         self.cpp_info.set_property("cmake_target_name", "apr-util::apr-util")
