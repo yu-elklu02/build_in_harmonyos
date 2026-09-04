@@ -7,4 +7,3 @@ target_link_libraries(howl_text_record PRIVATE avahi-compat-howl::avahi-compat-h
 
 enable_testing()
 add_test(NAME howl_text_record COMMAND howl_text_record)
-

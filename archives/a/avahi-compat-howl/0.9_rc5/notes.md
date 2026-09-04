@@ -5,4 +5,3 @@ Avahi client/common dependencies and D-Bus support. Unrelated Avahi frontends,
 daemons, language bindings, XML, and GUI integrations are disabled.
 
 OHOS uses the profile shell explicitly for Autotools configure and make.
-

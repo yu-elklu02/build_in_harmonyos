@@ -12,4 +12,3 @@ int main(void) {
     puts("HOWL text record test passed");
     return 0;
 }
-
