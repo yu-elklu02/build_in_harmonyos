@@ -134,8 +134,13 @@ class AvahiCompatHowlConan(ConanFile):
             autotools.configure()
         if self.settings.os == "OHOS":
             self.run(f'make -j2 SHELL="{shell}"', cwd=self.build_folder, env="conanbuild")
+            # Execute Avahi's upstream tests on the target.  Keep the same
+            # profile shell used for the build because OHOS does not permit
+            # direct shebang execution of test helpers.
+            self.run(f'make check SHELL="{shell}"', cwd=self.build_folder, env="conanrun")
         else:
             autotools.make()
+            autotools.test()
 
     def package(self):
         if self.settings.os == "OHOS":
