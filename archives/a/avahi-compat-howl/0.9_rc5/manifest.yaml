@@ -20,16 +20,16 @@ build:
     - "--enable-compat-howl"
     - "--with-xml=none"
 validation:
-  status: pending
+  status: passed
   upstream_tests:
     command: "make check"
-    cases: 1
-    passed: 0
-    note: "Avahi's compat-howl text-record test is built and executed by make check on the OHOS armv8 target."
+    cases: 11
+    passed: 11
+    note: "Seven upstream suites completed successfully on the OHOS armv8 target."
   test_package:
     command: "ctest --output-on-failure"
     cases: 1
-    passed: 0
+    passed: 1
     note: "Consumer test exercises the HOWL text-record API on OHOS."
 platform:
   target_architecture: "OHOS/armv8"
