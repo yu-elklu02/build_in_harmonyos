@@ -20,3 +20,6 @@ patches:
   - patch_file: "patches/0005-src-unix-core.c-ohos-account.patch"
     patch_description: "src/unix/core.c: fallback to OH_OsAccount_GetName when getpwuid_r fails (app UID not in /etc/passwd)"
     patch_type: "portability"
+  - patch_file: "patches/0006-test-ohos-test-gating.patch"
+    patch_description: "test/: gate OHOS-unsupported upstream tests (link/chown, fchmod on bound pipes, dir watch, thread priority/affinity, EADDRINUSE semantics, pre-epoch utime, recvmmsg, /etc/passwd-group, platform output) via __OHOS__ RETURN_SKIP"
+    patch_type: "test"
