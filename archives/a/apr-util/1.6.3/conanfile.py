@@ -42,7 +42,7 @@ class AprUtilConan(ConanFile):
         # apr-util's public headers include APR core headers (apr_pools.h,
         # apr_general.h, ...) and consumers link libapr-1 via the static
         # aprutil, so apr's headers (and libs) must be transitive.
-        self.requires("apr/1.7.6", transitive_headers=True)
+        self.requires("apr/1.7.6.1", transitive_headers=True)
         self.requires("expat/2.8.2")
 
     def layout(self):

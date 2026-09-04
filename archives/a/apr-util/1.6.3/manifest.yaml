@@ -16,7 +16,7 @@ build:
     - "--with-apr=/storage/Users/currentUser/usr/local"
     - "--with-expat=/storage/Users/currentUser/usr/local"
   dependencies:
-    - "apr/1.7.6"
+    - "apr/1.7.6.1"
     - "expat/2.8.2"
   cc: clang
   cxx: clang++
