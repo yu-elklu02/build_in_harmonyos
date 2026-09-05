@@ -17,6 +17,22 @@ patches_applied:
   - "0002-src-unix-core.c.patch"
   - "0003-src-unix-internal.h.patch"
   - "0004-src-unix-udp.c.patch"
+  - "0006-test-ohos-test-gating.patch"
+
+validation:
+  status: passed
+  upstream_tests:
+    command: "uv_run_tests_a (manual OHOS armv8 validation)"
+    cases: 507
+    passed: 484
+    skipped: 23
+    failed: 0
+    note: "OHOS platform limitations are explicitly gated; no test failures were observed."
+  test_package:
+    command: "./test_libuv"
+    cases: 1
+    passed: 1
+    note: "Consumer test exercises libuv version, event loop, timer and account APIs."
 
 knowledge_gained:
   - "OHOS lacks Linux-specific CPU affinity APIs (CPU_SETSIZE, cpu_set_t, sched_getaffinity, CPU_COUNT)"
