@@ -1,0 +1,19 @@
+package: boost1.84-filesystem/1.84.0
+version: "1.84.0"
+homepage: "https://www.boost.org/libs/filesystem/"
+license: BSL-1.0
+status: built
+build_system: manual-cpp
+source:
+  url: "https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz"
+  sha256: "a5800f405508f5df8114558ca9855d2640a2de8f0445f051fa1c7c3383045724"
+validation:
+  status: pending
+  upstream_tests:
+    command: "Boost.Build is unavailable on OHOS; consumer test validates the compiled filesystem library."
+    cases: 0
+    passed: 0
+  test_package:
+    command: "ctest --output-on-failure"
+    cases: 1
+    passed: 0

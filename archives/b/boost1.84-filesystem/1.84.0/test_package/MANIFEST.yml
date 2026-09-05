@@ -1,0 +1,9 @@
+package: boost1.84-filesystem/1.84.0
+upstream_test_in_build: false
+upstream_tests: []
+upstream_test_note: "Boost.Build cannot run on OHOS; the package builds upstream filesystem sources directly."
+test_package_tests:
+  - file: test_filesystem.cpp
+    command: ./boost_filesystem_test
+    description: "Create, write, inspect, iterate and remove a directory with Boost.Filesystem."
+assertion_count: 5
