@@ -60,6 +60,9 @@ class BoostFilesystemConan(ConanFile):
             "-DBOOST_SYSTEM_NO_DEPRECATED",
             "-DBOOST_ALL_NO_LIB",
             "-DBOOST_SP_NO_PTHREAD_SETCANCELSTATE",
+            # OHOS libc++ (Clang 15) does not provide std::atomic_ref (C++20);
+            # force the boost::atomic::atomic_ref fallback path.
+            "-DBOOST_FILESYSTEM_NO_CXX20_ATOMIC_REF",
         ]
         flags = " ".join(flag for flag in flags if flag)
         objects = []
