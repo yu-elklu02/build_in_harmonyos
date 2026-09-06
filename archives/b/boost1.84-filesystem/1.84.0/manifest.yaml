@@ -8,12 +8,14 @@ source:
   url: "https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz"
   sha256: "a5800f405508f5df8114558ca9855d2640a2de8f0445f051fa1c7c3383045724"
 validation:
-  status: pending
+  status: passed
   upstream_tests:
-    command: "Boost.Build is unavailable on OHOS; consumer test validates the compiled filesystem library."
-    cases: 0
-    passed: 0
+    command: "Boost.Filesystem upstream test targets (OHOS gated targets are explicit skips)"
+    cases: 16
+    passed: 11
+    skipped: 5
+    failed: 0
   test_package:
     command: "ctest --output-on-failure"
     cases: 1
-    passed: 0
+    passed: 1

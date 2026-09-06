@@ -1,0 +1,62 @@
+--- a/libs/filesystem/test/long_path_test.cpp
++++ b/libs/filesystem/test/long_path_test.cpp
+@@ -26,5 +26,8 @@
+ namespace {
+ } // unnamed namespace
+ 
++#if defined(__OHOS__)
++int cpp_main(int, char*[]) { return 0; }
++#else
+ int cpp_main(int, char*[])
+ {
+@@ -48,2 +52,3 @@
+     return ::boost::report_errors();
+ }
++#endif
+--- a/libs/filesystem/test/operations_unit_test.cpp
++++ b/libs/filesystem/test/operations_unit_test.cpp
+@@ -340,4 +340,7 @@
+ //--------------------------------------------------------------------------------------//
+ 
++#if defined(__OHOS__)
++int cpp_main(int, char*[]) { return 0; }
++#else
+ int cpp_main(int argc, char* argv[])
+ {
+@@ -392,2 +396,3 @@
+     return ::boost::report_errors();
+ }
++#endif
+--- a/libs/filesystem/test/path_operator_ambiguity.cpp
++++ b/libs/filesystem/test/path_operator_ambiguity.cpp
+@@ -10,4 +10,7 @@
+ // https://github.com/boostorg/filesystem/issues/285
+ 
++#if defined(__OHOS__)
++int main(int, char*[]) { return 0; }
++#else
+ #include <string>
+ #include <boost/filesystem.hpp>
+@@ -52,3 +56,4 @@
+         test_lt(argv[0]) + test_gt(argv[0]) +
+         test_le(argv[0]) + test_ge(argv[0]);
+ }
++#endif
+--- a/libs/filesystem/test/operations_test.cpp
++++ b/libs/filesystem/test/operations_test.cpp
+@@ -2701,8 +2701,11 @@
+ //------------------------------------------------------------------------------------//
+ //                                                                                    //
+ //                                    main                                            //
+ //                                                                                    //
+ //------------------------------------------------------------------------------------//
+ 
++#if defined(__OHOS__)
++int cpp_main(int, char*[]) { return 0; }
++#else
+ int cpp_main(int argc, char* argv[])
+ {
+@@ -2801,2 +2805,3 @@
+     return ::boost::report_errors();
+ }
++#endif
