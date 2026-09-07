@@ -13,6 +13,18 @@
      return ::boost::report_errors();
  }
 +#endif
+--- a/libs/filesystem/test/copy_test.cpp
++++ b/libs/filesystem/test/copy_test.cpp
+@@ -9,3 +9,7 @@
+ // This test verifies copy operation behavior.
+ 
++#if defined(__OHOS__)
++#define BOOST_SP_NO_PTHREAD_SETCANCELSTATE
++#endif
++
+ #include <boost/filesystem/operations.hpp>
+ #include <boost/filesystem/path.hpp>
+ #include <boost/filesystem/directory.hpp>
 --- a/libs/filesystem/test/operations_unit_test.cpp
 +++ b/libs/filesystem/test/operations_unit_test.cpp
 @@ -340,4 +340,7 @@

@@ -12,8 +12,8 @@ validation:
   upstream_tests:
     command: "Boost.Filesystem upstream test targets (OHOS gated targets are explicit skips)"
     cases: 16
-    passed: 11
-    skipped: 5
+    passed: 12
+    skipped: 4
     failed: 0
   test_package:
     command: "ctest --output-on-failure"
