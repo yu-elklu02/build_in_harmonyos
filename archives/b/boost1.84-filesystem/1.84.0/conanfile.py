@@ -2,7 +2,12 @@ import os
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.files import apply_conandata_patches, copy, get
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+)
 from conan.tools.layout import basic_layout
 
 
@@ -27,6 +32,9 @@ class BoostFilesystemConan(ConanFile):
 
     def layout(self):
         basic_layout(self)
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def source(self):
         get(self, **self.conan_data["sources"], strip_root=True)
