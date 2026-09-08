@@ -10,7 +10,7 @@ source:
 validation:
   status: passed
   upstream_tests:
-    command: "Boost.Filesystem upstream test targets (OHOS gated targets are explicit skips)"
+    command: "Boost.Filesystem upstream test targets (independent OHOS validation)"
     cases: 16
     passed: 12
     skipped: 4
