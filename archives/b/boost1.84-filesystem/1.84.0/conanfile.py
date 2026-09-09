@@ -59,8 +59,13 @@ class BoostFilesystemConan(ConanFile):
             "-O0" if self.settings.build_type == "Debug" else "-O2",
             "-fPIC" if self.options.fPIC else "",
             f'-I"{self.source_folder}"',
-            f'-I"{os.path.join(self.source_folder, "libs", "filesystem", "include")}"',
-            f'-I"{os.path.join(self.source_folder, "libs", "config", "include")}"',
+        ]
+        # Auto-discover all Boost sub-module include directories.
+        # Boost 1.84.0 splits headers across many libs/*/include paths.
+        import glob as _glob
+        for inc_dir in sorted(_glob.glob(os.path.join(self.source_folder, "libs", "*", "include"))):
+            flags.append(f'-I"{inc_dir}"')
+        flags += [
             "-DBOOST_FILESYSTEM_SOURCE",
             "-DBOOST_SYSTEM_NO_DEPRECATED",
             "-DBOOST_ALL_NO_LIB",
@@ -98,6 +103,10 @@ class BoostFilesystemConan(ConanFile):
             src=os.path.join(self.source_folder, "libs", "config", "include", "boost"),
             dst=os.path.join(self.package_folder, "include", "boost"),
         )
+        # Auto-copy all Boost sub-module headers for downstream consumers.
+        import glob as _glob
+        for inc_dir in _glob.glob(os.path.join(self.source_folder, "libs", "*", "include", "boost")):
+            copy(self, "*", src=inc_dir, dst=os.path.join(self.package_folder, "include", "boost"))
         copy(self, "libboost_filesystem.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"))
         copy(self, "LICENSE_1_0.txt", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
 
