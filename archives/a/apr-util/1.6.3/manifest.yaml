@@ -1,7 +1,6 @@
 software: apr-util
 version: "1.6.3"
 status: built
-build_date: "2026-05-26"
 build_system: autotools
 
 source:
@@ -12,9 +11,9 @@ source:
 build:
   system: autotools
   configure_options:
-    - "--prefix=/storage/Users/currentUser/usr/local"
-    - "--with-apr=/storage/Users/currentUser/usr/local"
-    - "--with-expat=/storage/Users/currentUser/usr/local"
+    - "--prefix={package_folder}"
+    - "--with-apr={apr_package_folder}"
+    - "--with-expat={expat_package_folder}"
   dependencies:
     - "apr/1.7.6.1"
     - "expat/2.8.2"
@@ -22,12 +21,22 @@ build:
   cxx: clang++
 
 patches_applied:
-  - "0001-configure.patch"
   - "0002-config.guess.patch"
   - "0003-config.sub.patch"
+  - "0004-testxlate-iconv-support.patch"
 
 knowledge_gained:
   - "E007: config.guess 需要 __OHOS__ LIBC 检测，添加 #elif defined(__OHOS__) LIBC=ohos"
   - "E072: config.sub 需要 ohos-linux triplet 解析，添加 basic_machine=$field1-unknown basic_os=linux-ohos"
   - "E011: configure 的 umask 077 需改为 umask 022 解决 HMDFS 权限问题"
   - "apr-util 需要 expat 库支持 XML 解析，使用 --with-expat 指定路径"
+validation:
+  status: passed
+  upstream_tests:
+    command: "make check"
+    status: executed
+    note: "The OHOS recipe executes the upstream make check target during build; platform-specific iconv cases are guarded by 0004-testxlate-iconv-support.patch."
+  test_package:
+    command: "ctest --output-on-failure"
+    cases: 1
+    passed: 1
