@@ -60,6 +60,7 @@ class BoostFilesystemConan(ConanFile):
             "-fPIC" if self.options.fPIC else "",
             f'-I"{self.source_folder}"',
             f'-I"{os.path.join(self.source_folder, "libs", "filesystem", "include")}"',
+            f'-I"{os.path.join(self.source_folder, "libs", "config", "include")}"',
             "-DBOOST_FILESYSTEM_SOURCE",
             "-DBOOST_SYSTEM_NO_DEPRECATED",
             "-DBOOST_ALL_NO_LIB",
@@ -89,6 +90,12 @@ class BoostFilesystemConan(ConanFile):
             self,
             "*",
             src=os.path.join(self.source_folder, "libs", "filesystem", "include", "boost"),
+            dst=os.path.join(self.package_folder, "include", "boost"),
+        )
+        copy(
+            self,
+            "*",
+            src=os.path.join(self.source_folder, "libs", "config", "include", "boost"),
             dst=os.path.join(self.package_folder, "include", "boost"),
         )
         copy(self, "libboost_filesystem.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"))
