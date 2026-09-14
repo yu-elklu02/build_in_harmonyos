@@ -21,6 +21,7 @@ build:
   cxx: clang++
 
 patches_applied:
+  - "0001-configure.patch"
   - "0002-config.guess.patch"
   - "0003-config.sub.patch"
   - "0004-testxlate-iconv-support.patch"
