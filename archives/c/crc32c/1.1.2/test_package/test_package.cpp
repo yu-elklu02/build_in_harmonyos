@@ -13,11 +13,23 @@ int main() {
     // Test 1: Compute CRC32C of a known buffer
     const uint8_t buffer[] = {0x12, 0x34, 0x56, 0x78};
     uint32_t result = crc32c::Crc32c(buffer, sizeof(buffer));
-    std::printf("CRC32C of {0x12,0x34,0x56,0x78} = %u\n", result);
+    constexpr uint32_t expected_buffer_crc = 0x4300918A;
+    if (result != expected_buffer_crc) {
+        std::fprintf(stderr, "ERROR: known-vector mismatch: 0x%08X != 0x%08X\n",
+                     result, expected_buffer_crc);
+        return 1;
+    }
+    std::printf("CRC32C of {0x12,0x34,0x56,0x78} = 0x%08X\n", result);
 
-    // The CRC32C of 4 zero bytes is 0x92F8C30F (known value from RFC 3720)
+    // Fixed CRC32C vector for four zero bytes.
     const uint8_t zeros[] = {0, 0, 0, 0};
     uint32_t zeros_crc = crc32c::Crc32c(zeros, sizeof(zeros));
+    constexpr uint32_t expected_zeros_crc = 0x48674BC7;
+    if (zeros_crc != expected_zeros_crc) {
+        std::fprintf(stderr, "ERROR: zero-vector mismatch: 0x%08X != 0x%08X\n",
+                     zeros_crc, expected_zeros_crc);
+        return 1;
+    }
     std::printf("CRC32C of 4 zero bytes = 0x%08X\n", zeros_crc);
 
     // Test 2: Extend a CRC with additional data
