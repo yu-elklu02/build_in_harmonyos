@@ -1,5 +1,35 @@
 version: 1
+package: crc32c/1.1.2
+homepage: "https://github.com/google/crc32c"
+
+upstream_tests_exist: true
+upstream_test_audit:
+  source_tag: "1.1.2"
+  source_submodules:
+    - "googletest @ 3b49be0"
+    - "glog"
+    - "benchmark"
+  build_options:
+    - "CRC32C_BUILD_TESTS=ON"
+    - "CRC32C_USE_GLOG=OFF"
+    - "CRC32C_BUILD_BENCHMARKS=OFF"
+  command: "ctest --output-on-failure"
+  result: "100% tests passed, 0 failed out of 2"
+  upstream_test_count: 20
+  upstream_test_passed: 20
+  upstream_test_suites: 7
+  details: "crc32c_tests: 20/20 tests passed across 7 suites; crc32c_capi_tests: all tests passed; exit 0 on OHOS arm64 hardware"
+  execution_environment: "Independent OHOS arm64 workspace using Conan-generated clang 15 + libc++ toolchain"
+
+upstream_check_command: "cmake --build build --target crc32c_tests crc32c_capi_tests && ctest --output-on-failure"
+upstream_test_in_build: false
+upstream_test_command: "Independent device audit; release recipe disables upstream test targets because the source tarball does not contain the pinned submodules"
+
 tests:
   - name: crc32c-api-smoke-test
     type: cmake
     description: "Compile and run a C++ consumer that calls crc32c::Crc32c, crc32c::Extend, and crc32c_value APIs, verifying consistency between partial/extend and C/C++ interfaces"
+
+test_package_assertions:
+  count: 4
+  result: "4/4 passed in the consumer executable"
