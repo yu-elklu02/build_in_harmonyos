@@ -1,0 +1,32 @@
+version: "1.84.0"
+software: boost1.84-unit_test_framework
+status: built
+build_date: "2026-09-18"
+build_system: manual-clang
+
+source:
+  url: "https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz"
+  sha256: "a5800f405508f5df8114558ca9855d2640a2de8f0445f051fa1c7c3383045724"
+  tar_format: tar.gz
+
+build:
+  system: manual-clang
+  configure_options: []
+  dependencies: []
+  cc: clang
+  cxx: clang++
+
+patches_applied: []
+
+knowledge_gained:
+  - "Boost.Build 在 OHOS 上不可用，因此按 libs/test/build/CMakeLists.txt 的 19 个 UTF 源文件手动编译。"
+  - "完整 boost/ 头文件树随组件打包，以满足 Boost.Test 的内部头文件依赖。"
+  - "导出 Boost::unit_test_framework，消费者可使用 BOOST_TEST_MODULE 和 boost/test/unit_test.hpp。"
+
+test_summary:
+  upstream_tests_total: 1
+  upstream_tests_run: 1
+  upstream_tests_passed: 1
+  upstream_tests_result: "PASS (test_tools_test.cpp)"
+  test_package_tests: 1
+  test_package_result: "待 OHOS 真机 conan create 验证"

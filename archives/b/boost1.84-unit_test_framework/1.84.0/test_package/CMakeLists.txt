@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.15)
+project(test_boost_unit_test_framework LANGUAGES CXX)
+
+find_package(Boost CONFIG REQUIRED COMPONENTS unit_test_framework)
+
+add_executable(test_boost_unit_test_framework test_boost_unit_test_framework.cpp)
+target_compile_features(test_boost_unit_test_framework PRIVATE cxx_std_17)
+target_link_libraries(test_boost_unit_test_framework PRIVATE Boost::unit_test_framework)
+
+enable_testing()
+add_test(NAME boost_unit_test_framework_test COMMAND test_boost_unit_test_framework)

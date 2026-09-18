@@ -1,0 +1,10 @@
+software: boost1.84-unit_test_framework
+display: "Boost.Test unit_test_framework 1.84.0"
+homepage: "https://www.boost.org/doc/libs/1_84_0/libs/test/"
+license: BSL-1.0
+build_system: manual-clang
+
+versions:
+  "1.84.0":
+    status: built
+    build_system: manual-clang
