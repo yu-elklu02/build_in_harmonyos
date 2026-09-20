@@ -2,17 +2,18 @@ package: boost1.84-unit_test_framework/1.84.0
 homepage: "https://www.boost.org/doc/libs/1_84_0/libs/test/"
 
 upstream_test_in_build: true
-upstream_check_command: "clang++ libs/test/test/test_tools_test.cpp -lboost_unit_test_framework && ./upstream_test_tools_test"
-upstream_test_command: "conan create: build() compiles and runs test_tools_test.cpp"
+upstream_check_command: "clang++ libs/test/test/writing-test-ts/test_tools-test.cpp -lboost_unit_test_framework && (cd libs/test/test && ../../../../build/upstream_test_tools_test)"
+upstream_test_command: "conan create: build() compiles and runs writing-test-ts/test_tools-test.cpp from libs/test/test"
 upstream_tests:
-  - file: libs/test/test/test_tools_test.cpp
-    description: "Boost.Test upstream test_tools assertions"
-    command: "./upstream_test_tools_test"
-    result: "not executed in the current workspace; required on the OHOS device"
+  - file: libs/test/test/writing-test-ts/test_tools-test.cpp
+    description: "Boost.Test upstream test_tools test; 32 cases with baseline output comparison"
+    command: "cd libs/test/test && ./upstream_test_tools_test"
+    result: passed
 
 test_package_tests:
   - file: test_boost_unit_test_framework.cpp
     description: "Consumer links Boost::unit_test_framework and runs string and arithmetic assertions"
     command: "./test_boost_unit_test_framework"
+    result: "passed (3/3 assertions, exit 0)"
 
 assertion_count: 3
