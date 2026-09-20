@@ -52,6 +52,10 @@ class Crc32cConan(ConanFile):
             raise ConanInvalidConfiguration(
                 f"crc32c does not support OS: {self.settings.os}"
             )
+        if str(self.settings.os) == "OHOS" and str(self.settings.arch) != "armv8":
+            raise ConanInvalidConfiguration(
+                "crc32c OHOS packages are currently supported on armv8 only"
+            )
         if self.settings.compiler.get_safe("cppstd"):
             check_min_cppstd(self, self._min_cppstd)
 
@@ -69,6 +73,11 @@ class Crc32cConan(ConanFile):
         # Disable tests and benchmarks (require googletest/benchmark submodules)
         tc.variables["CRC32C_BUILD_TESTS"] = False
         tc.variables["CRC32C_BUILD_BENCHMARKS"] = False
+        if str(self.settings.os) == "OHOS":
+            # Keep the target identity explicit and prevent configure-time host probes.
+            tc.cache_variables["CMAKE_SYSTEM_NAME"] = "OHOS"
+            tc.cache_variables["CMAKE_SYSTEM_PROCESSOR"] = "aarch64"
+            tc.cache_variables["CMAKE_TRY_COMPILE_TARGET_TYPE"] = "STATIC_LIBRARY"
         # Enable install targets
         tc.variables["CRC32C_INSTALL"] = True
         tc.variables["CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS"] = True

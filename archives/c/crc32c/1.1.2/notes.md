@@ -52,6 +52,7 @@ make install DESTDIR=$TEST_PREFIX
 - 无 requires（无依赖）
 - settings.os 支持检查使用 in ("Linux", "OHOS", ...) 而非 == "Linux" (R32)
 - test_package 实质调用 crc32c API (R34)
+- OHOS 适配范围为 armv8；配方显式设置 CMAKE_SYSTEM_NAME=OHOS、CMAKE_SYSTEM_PROCESSOR=aarch64，并禁用 configure 阶段目标程序试运行
 ---
 
 **编译结束**: 2026-08-27 23:22

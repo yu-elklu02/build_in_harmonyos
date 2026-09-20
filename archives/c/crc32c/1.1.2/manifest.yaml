@@ -12,6 +12,9 @@ configure_options:
   - "-DCRC32C_BUILD_BENCHMARKS=OFF"
   - "-DCRC32C_INSTALL=ON"
   - "-DCRC32C_USE_GLOG=OFF"
+  - "-DCMAKE_SYSTEM_NAME=OHOS (OHOS/armv8 only)"
+  - "-DCMAKE_SYSTEM_PROCESSOR=aarch64 (OHOS/armv8 only)"
+  - "-DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY (OHOS only)"
 knowledge_gained:
   - no_external_deps: "crc32c has no external dependencies; CRC32C_USE_GLOG=OFF disables optional glog"
   - cmake_version_compatibility: "CMake 4.x needs CMAKE_POLICY_VERSION_MINIMUM=3.5 for cmake_minimum_required(VERSION 3.1)"
