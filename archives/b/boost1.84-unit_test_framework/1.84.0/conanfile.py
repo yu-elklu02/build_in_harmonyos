@@ -4,7 +4,7 @@
 import os
 
 from conan import ConanFile
-from conan.tools.files import apply_conandata_patches, copy, get
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get
 
 
 class BoostUnitTestFrameworkConan(ConanFile):
@@ -17,6 +17,9 @@ class BoostUnitTestFrameworkConan(ConanFile):
     package_type = "static-library"
     settings = "os", "compiler", "build_type", "arch"
     no_copy_source = True
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     _sources = (
         "compiler_log_formatter", "debug", "decorator", "execution_monitor",
@@ -45,7 +48,8 @@ class BoostUnitTestFrameworkConan(ConanFile):
         opt = "-O0 -g" if str(self.settings.build_type) == "Debug" else "-O2 -DNDEBUG"
         flags = (
             f"-std=c++17 -stdlib=libc++ {opt} -fPIC "
-            f"-I{self.source_folder} -DBOOST_ALL_NO_LIB -DBOOST_TEST_NO_LIB"
+            f"-I{self.source_folder} -DBOOST_ALL_NO_LIB -DBOOST_TEST_NO_LIB "
+            f"-DBOOST_SP_NO_PTHREAD_SETCANCELSTATE"
         )
         obj_dir = os.path.join(self.build_folder, "obj")
         os.makedirs(obj_dir, exist_ok=True)
@@ -62,15 +66,22 @@ class BoostUnitTestFrameworkConan(ConanFile):
 
         # Run one official Boost.Test source during the package build. This keeps
         # the upstream test boundary real even though b2 itself is unavailable.
+        # 1.84 layout: the Test Tools upstream test lives in writing-test-ts/.
         upstream_test = os.path.join(
-            self.source_folder, "libs", "test", "test", "test_tools_test.cpp"
+            self.source_folder, "libs", "test", "test", "writing-test-ts", "test_tools-test.cpp"
         )
         test_bin = os.path.join(self.build_folder, "upstream_test_tools_test")
         self.run(
             f'"{cxx}" {flags} "{upstream_test}" -L"{lib_dir}" '
             f"-lboost_unit_test_framework -o \"{test_bin}\""
         )
-        self.run(f'"{test_bin}"')
+        # test_tools-test reads its expected-output pattern via the relative
+        # path ./baseline-outputs/test_tools-test.pattern, so it must run with
+        # cwd at libs/test/test (where baseline-outputs/ lives).
+        self.run(
+            f'"{test_bin}"',
+            cwd=os.path.join(self.source_folder, "libs", "test", "test"),
+        )
 
     def package(self):
         copy(self, "boost/*", src=self.source_folder,
@@ -90,4 +101,11 @@ class BoostUnitTestFrameworkConan(ConanFile):
         component.libs = ["boost_unit_test_framework"]
         component.set_property("cmake_target_name", "Boost::unit_test_framework")
         component.set_property("pkg_config_name", "libboost_unit_test_framework")
-        component.defines = ["BOOST_TEST_DYN_LINK=0"]
+        # Same guard the other boost1.84 split recipes expose: the packaged
+        # header tree (boost/thread, boost/smart_ptr) references
+        # pthread_setcancelstate, which OHOS musl does not provide.
+        # NOTE: do NOT define BOOST_TEST_DYN_LINK (even =0) for consumers —
+        # config.hpp gates BOOST_TEST_ALTERNATIVE_INIT_API on `defined()`,
+        # so `=0` still flips the unit_test_main signature and breaks the
+        # link against this static lib.
+        component.defines = ["BOOST_SP_NO_PTHREAD_SETCANCELSTATE"]
