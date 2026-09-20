@@ -1,4 +1,4 @@
-// test_package.cpp - crc32c 1.1.2 smoke test
+// test_package.cpp - crc32c 1.1.2.1 smoke test
 // Calls crc32c::Crc32c and crc32c::Extend APIs to verify the library
 // is correctly built and linked.
 

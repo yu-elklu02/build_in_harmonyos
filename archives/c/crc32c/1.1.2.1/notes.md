@@ -1,4 +1,4 @@
-# crc32c 1.1.2 适配笔记
+# crc32c 1.1.2.1 适配笔记（上游版本 1.1.2）
 
 ## 编译环境
 - 构建系统: cmake
@@ -8,7 +8,7 @@
 
 ## 编译步骤
 ```bash
-source .build-context-crc32c-1.1.2
+source .build-context-crc32c-1.1.2.1
 cd $BUILD_SRC_DIR
 mkdir -p build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$DEFAULT_PREFIX \

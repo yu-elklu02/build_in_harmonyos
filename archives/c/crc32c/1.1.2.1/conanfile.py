@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Conan recipe - crc32c 1.1.2."""
+"""Conan recipe - crc32c 1.1.2.1."""
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -11,7 +11,7 @@ import os
 
 class Crc32cConan(ConanFile):
     name = "crc32c"
-    version = "1.1.2"
+    version = "1.1.2.1"
     description = "CRC32C implementation with support for CPU-specific acceleration instructions"
     license = "BSD-3-Clause"
     homepage = "https://github.com/google/crc32c"

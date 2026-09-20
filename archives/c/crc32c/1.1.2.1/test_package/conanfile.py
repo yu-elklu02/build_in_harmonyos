@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Conan test_package - crc32c 1.1.2 consumer smoke test."""
+"""Conan test_package - crc32c 1.1.2.1 consumer smoke test."""
 
 from conan import ConanFile
 from conan.tools.build import can_run
