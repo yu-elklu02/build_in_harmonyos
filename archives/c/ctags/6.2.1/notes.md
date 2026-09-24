@@ -9,7 +9,7 @@
 ## 编译步骤
 
 1. 源码为官方 release tarball（含预生成的 configure），无需 autoreconf
-2. `./configure --prefix=$DEFAULT_PREFIX`（参数最少化，R1）
+2. `./configure --build=aarch64-unknown-linux-ohos --host=aarch64-unknown-linux-ohos --prefix=$DEFAULT_PREFIX`（OHOS 交叉编译）
 3. `make -j1`
 4. `make install DESTDIR=$TEST_PREFIX`
 5. `make check`（部分测试失败，均为平台相关）
@@ -18,15 +18,13 @@
 
 | # | 问题 | 根因 | 解决方案 |
 |---|------|------|----------|
-| 1 | autoreconf 失败：`must install pkg-config 0.18 or later` | aclocal 找不到 pkg.m4 宏文件 | 从 `/data/service/hnp/pkg-config.org/pkg-config_0.29.2/share/aclocal/pkg.m4` 复制到 `/storage/Users/currentUser/usr/local/share/aclocal/pkg.m4` |
-| 2 | config.status 失败：`can't create ./confXXXXXX/subs1.awk: Permission denied` | HMDFS 创建文件 owner 为 20001006（file_manager 服务账户），当前用户 20020101 通过 group 1006 访问。autoconf 的 config.status 使用 `umask 077` 创建临时目录，剥离了 group 权限，导致当前用户无法写入 | 修改 config.status 中 `umask 077` → `umask 007`（保留 group 权限）。这是平台级问题，影响所有使用 autoconf 的软件 |
-| 3 | SSL 证书验证失败，无法下载源码 | OpenHarmony 环境缺少 CA 证书 | 使用 `curl -k`（忽略证书）下载到 $HOME/tmp，然后手动放置到 build 目录 |
-| 4 | /tmp 只读（E002） | OpenHarmony 平台限制 | 使用 $HOME/tmp 替代 |
+| 1 | Autotools 无法识别 OHOS target | 发行包内 config.guess 版本不识别 `aarch64-unknown-linux-ohos` | 应用 config.guess portability patch，并在 Conan toolchain 中显式传入 build/host triplet；官方 config.sub 保持不修改 |
+| 2 | HMDFS 下 Autoconf 临时目录权限不足 | configure 生成的 config.status 使用 `umask 077` 创建临时目录 | 通过 configure patch 将该模板改为 `umask 000` |
 
 ## 源码修改
 
-- config.status: `umask 077` → `umask 007`（生成文件，探索阶段直接修改+记录，R3）
-- configure shebang: `#! /bin/sh` → `#! /data/service/hnp/bin/bash`（/bin/sh 为 musl sh，部分功能不兼容）
+- `config.guess`: 增加 `aarch64-unknown-linux-ohos` 识别，并将 config.guess 临时目录 umask 调整为 `000`
+- `configure`: 将 config.status 模板的 `umask 077` 调整为 `umask 000`，避免 HMDFS 上生成不可访问的 0700 临时目录
 
 ## make check 结果
 
@@ -65,9 +63,8 @@ Optional compiled features: +wildcards, +regex, +gnulib_regex, +iconv, +option-d
 
 ## 注意事项
 
-- HMDFS umask 077 问题是平台级问题，影响所有 autoconf 软件。conanfile.py 需要在 build() 中处理此问题
-- /bin/sh 为 musl sh，部分 autoconf 功能不兼容，建议使用 /data/service/hnp/bin/bash
-- pkg.m4 需要手动安装到 aclocal 目录
+- HMDFS umask 问题分别在 config.guess 和 configure 的 portability patch 中处理，配方不依赖本机绝对路径
+- OHOS 构建使用 Conan profile 提供的 clang 工具链和 `aarch64-unknown-linux-ohos` target
 ---
 
 **编译结束**: 2026-07-06 12:41

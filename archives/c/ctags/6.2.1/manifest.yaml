@@ -26,10 +26,10 @@ conan_ref: "ctags/6.2.1"
 
 source:
   # 源码下载 URL
-  url: "https://github.com/universal-ctags/ctags/archive/refs/tags/v6.2.1.tar.gz"
+  url: "https://github.com/universal-ctags/ctags/releases/download/v6.2.1/universal-ctags-6.2.1.tar.gz"
 
   # 源码校验和
-  sha256: "f56829e9a576025e98955597ee967099a871987b3476fbd8dbbc2b9dc921f824"
+  sha256: "2c63efe9e0e083dc50e6fdd8c5414781cc8873d8c8940cf553c01870ed962f8c"
 
   # 压缩格式
   # tar.gz | tar.xz | tar.bz2 | zip
@@ -45,7 +45,9 @@ build:
   system: autotools
 
   # 配置选项列表
-  configure_options: []
+  configure_options:
+    - "--build=aarch64-unknown-linux-ohos (OHOS only)"
+    - "--host=aarch64-unknown-linux-ohos (OHOS only)"
   # 例如:
   # - "-DCMAKE_BUILD_TYPE=Release"
   # - "-DCMAKE_SYSTEM_NAME=OHOS"
@@ -65,7 +67,9 @@ build:
 # ============================================================
 
 # 应用的补丁列表
-patches_applied: []
+patches_applied:
+  - "0001-config.guess.patch"
+  - "0002-configure-tmpdir-perm.patch"
 # 例如:
 # - "0001-bootstrap-ohos-toolchain.patch"
 
@@ -75,19 +79,13 @@ patches_applied: []
 
 # 编译中学到的知识
 knowledge_gained:
-  - "HMDFS umask 077 问题：HMDFS 创建文件 owner 为 file_manager 服务账户，autoconf config.status 使用 umask 077 剥离 group 权限，需 sed 替换为 umask 007"
-  - "/bin/sh 为 musl sh，部分 autoconf 功能不兼容，建议使用 /data/service/hnp/bin/bash"
-  - "GitHub archive 包不含 configure，需 autoreconf -i 生成"
-  - "pkg.m4 需手动安装到 aclocal 目录"
-  - "/tmp 只读 (E002)，使用 $HOME/tmp 替代"
+  - "OHOS 目标需显式使用 aarch64-unknown-linux-ohos build/host triplets，避免 Autotools 误判目标平台"
+  - "HMDFS 下 config.guess 的临时目录需保留构建用户可访问权限"
 
-patch_generation:
-  method: per-file-difflib
-  source_orig_dir: /storage/Users/currentUser/tmp/builds/ctags-6.2.1.orig
-  source_work_dir: /storage/Users/currentUser/tmp/builds/ctags-6.2.1.work
-  source_orig_hash: 96a75adf91154929
-  source_work_hash: 822d5fd443e24374
-  generated_at: '2026-07-06T12:34:15'
-  patches_count: 0
-
-patch_classification: []
+patch_classification:
+  - file: 0001-config.guess.patch
+    type: portability
+    platform_only: true
+  - file: 0002-configure-tmpdir-perm.patch
+    type: portability
+    platform_only: true

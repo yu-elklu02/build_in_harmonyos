@@ -29,5 +29,10 @@ ohos_compatibility:
 # Conan test_package 测试（L1 最小冒烟测试，CI 通过 conan create 自动执行）
 conan_test:
   type: executable
-  description: "运行 ctags --version 验证二进制可执行"
-  test_method: "ctags --version"
+  description: "运行 ctags 生成 C 标签，检查 main 标签和 C 语言解析器"
+  test_method: "ctags -o tags ctags-test-input.c"
+
+assertions:
+  - "ctags --version contains Universal Ctags"
+  - "ctags --list-languages contains C"
+  - "generated tags contain main"

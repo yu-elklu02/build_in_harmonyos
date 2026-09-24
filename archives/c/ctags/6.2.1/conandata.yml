@@ -8,5 +8,5 @@ sources:
 patches:
   - patch_file: "patches/0001-config.guess.patch"
     patch_description: "Replace config.guess with OHOS-aware version (HarmonyOS detection + umask 000 fix)"
-  - patch_file: "patches/0002-config.sub.patch"
-    patch_description: "Replace config.sub with OHOS-aware version (linux-ohos OS support)"
+  - patch_file: "patches/0002-configure-tmpdir-perm.patch"
+    patch_description: "Use umask 000 for configure-generated config.status temporary directories on HMDFS"
