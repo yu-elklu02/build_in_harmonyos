@@ -91,9 +91,16 @@ class BoostUnitTestFrameworkConan(ConanFile):
                 self.source_folder, "libs", "test", "test",
                 "prg_exec_monitor-ts", "system-exception-test.cpp",
             )
+            # The source defines cpp_main() and b2 normally supplies the
+            # corresponding entry point from boost_prg_exec_monitor.
+            exception_shim = os.path.join(
+                self.source_folder, "libs", "test", "src", "cpp_main.cpp",
+            )
+            shim_obj = os.path.join(self.build_folder, "cpp_main-gate.o")
             exception_bin = os.path.join(self.build_folder, "system-exception-test")
+            self.run(f'"{cxx}" {flags} -c "{exception_shim}" -o "{shim_obj}"')
             self.run(
-                f'"{cxx}" {flags} "{exception_test}" -L"{lib_dir}" '
+                f'"{cxx}" {flags} "{exception_test}" "{shim_obj}" -L"{lib_dir}" '
                 f'-lboost_unit_test_framework -o "{exception_bin}"'
             )
             self.run(f'"{exception_bin}" --', cwd=os.path.dirname(exception_test), ignore_errors=True)

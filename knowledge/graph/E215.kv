@@ -7,12 +7,12 @@ severity:               2
 category:               ohos, boost.test, signals, exceptions
 match_keywords:         Boost.Test, run-fail, system-exception-test, signal, exception, OHOS
 title:                  Boost.Test run-fail tests may return success on OHOS
-root_cause:             A Boost.Test target classified as run-fail expects a non-zero process exit after an exception or signal. On OHOS, the corresponding exception/signal path can complete with exit 0, so b2 reports the run-fail wrapper as failed even when the test binary prints no errors.
+root_cause:             A Boost.Test target classified as run-fail expects a non-zero process exit after an exception or signal. On AArch64, integer division by zero is not a portable SIGFPE trigger; at -O0 it can return 0, while at -O2 the undefined behavior may be folded to an arbitrary value. b2 can therefore report the run-fail wrapper as failed even when the test binary prints no errors.
 affected_scope:         Boost.Test run-fail targets on OHOS, including system-exception-test; verify each target independently.
 verification_cmd:       b2 -j1 system-exception-test
 rec_priority:           1
 rec_approach:           platform-test-gating
-rec_description:        Reproduce on an OHOS device, retain stdout and exit status, and gate only the affected run-fail target under __OHOS__. Do not classify unrelated compiler interruptions as this issue.
+rec_description:        Reproduce at the actual optimization level on an OHOS AArch64 device, retain stdout and exit status, and gate only the affected run-fail target by architecture. Do not treat a coincidental non-zero exit at -O2 as SIGFPE success or classify unrelated compiler interruptions as this issue.
 rec_command:            b2 -j1 system-exception-test
 rec_auto_fix:           false
 rec_impl:               manual-patch
