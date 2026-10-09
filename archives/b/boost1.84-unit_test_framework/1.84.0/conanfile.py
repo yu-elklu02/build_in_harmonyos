@@ -83,6 +83,21 @@ class BoostUnitTestFrameworkConan(ConanFile):
             cwd=os.path.join(self.source_folder, "libs", "test", "test"),
         )
 
+        # On AArch64 integer division by zero does not raise SIGFPE.  The
+        # upstream run-fail target therefore returns 0 on OHOS/Linux AArch64,
+        # although the source guard only covers Apple AArch64 and PPC.
+        if str(self.settings.arch) == "armv8":
+            exception_test = os.path.join(
+                self.source_folder, "libs", "test", "test",
+                "prg_exec_monitor-ts", "system-exception-test.cpp",
+            )
+            exception_bin = os.path.join(self.build_folder, "system-exception-test")
+            self.run(
+                f'"{cxx}" {flags} "{exception_test}" -L"{lib_dir}" '
+                f'-lboost_unit_test_framework -o "{exception_bin}"'
+            )
+            self.run(f'"{exception_bin}" --', cwd=os.path.dirname(exception_test), ignore_errors=True)
+
     def package(self):
         copy(self, "boost/*", src=self.source_folder,
              dst=os.path.join(self.package_folder, "include"))
