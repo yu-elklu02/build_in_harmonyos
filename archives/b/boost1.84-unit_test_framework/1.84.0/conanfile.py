@@ -45,6 +45,9 @@ class BoostUnitTestFrameworkConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         cxx, ar = self._compiler()
+        # Do not invoke Boost.Build on OHOS: its clang toolset injects
+        # --target=arm64-pc-linux, which bypasses the SDK C++ headers.
+        # Direct clang++ keeps the toolchain's native OHOS target (E216).
         opt = "-O0 -g" if str(self.settings.build_type) == "Debug" else "-O2 -DNDEBUG"
         flags = (
             f"-std=c++17 -stdlib=libc++ {opt} -fPIC "

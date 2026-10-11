@@ -26,9 +26,9 @@ knowledge_gained:
 test_summary:
   upstream_tests_total: 299
   upstream_tests_run: 299
-  upstream_tests_passed: 294
+  upstream_tests_passed: 298
   upstream_tests_skipped: 1
-  upstream_tests_failed: 4
-  upstream_tests_result: "PASS (294 b2 targets; system-exception-test gated for AArch64 division-by-zero semantics; 4 compiler interruptions remain unresolved environment failures)"
+  upstream_tests_failed: 0
+  upstream_tests_result: "PASS (298 targets; system-exception-test gated for AArch64 division-by-zero semantics; four Boost.Build targets verified by direct clang++ after removing the invalid arm64-pc-linux target)"
   test_package_tests: 1
   test_package_result: "PASS (3 assertions, conan create EXIT=0 on OHOS aarch64)"
