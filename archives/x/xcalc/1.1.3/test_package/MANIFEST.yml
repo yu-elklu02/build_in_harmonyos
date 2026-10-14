@@ -1,0 +1,4 @@
+name: xcalc-test-package
+test_type: consumer
+test_cases: 1
+upstream_test_in_build: false
